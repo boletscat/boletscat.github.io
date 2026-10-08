@@ -1013,6 +1013,25 @@ h3{font:700 13px var(--body);text-transform:uppercase;letter-spacing:.08em;color
 .wtips{margin:0;padding-left:18px;line-height:1.45}.wtips li{margin:4px 0}
 #cards img.photo,#cards .look img{cursor:zoom-in}
 .lbcap{color:#fff;text-align:center;font-size:14px}.lbcap b{display:block;font-size:16px}.lbcap span{display:block;opacity:.8;font-size:12px}.lbcap a{color:#fff}
+.hdbtns{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.cmpbar{position:fixed;left:50%;transform:translateX(-50%);bottom:max(12px,env(safe-area-inset-bottom));z-index:4000;display:flex;gap:10px;align-items:center;background:var(--surface);color:var(--fg);border:1px solid var(--line);border-radius:14px;padding:8px 10px 8px 14px;box-shadow:0 8px 28px rgba(0,0,0,.25);max-width:calc(100vw - 24px);font-size:14px}
+.cmpbar .cmpn{color:var(--muted)}.cmpbar .note{margin:0}
+.cmpbox{max-width:980px!important}
+.cmphead{display:flex;justify-content:space-between;align-items:center;gap:8px}.cmphead h2{margin:0}
+.cmpdays{display:flex;gap:6px;overflow-x:auto;padding:10px 0 4px;scrollbar-width:none}.cmpdays .chip{flex:0 0 auto}
+.cmpsay{background:var(--surface-2);border-radius:10px;padding:9px 12px;margin:8px 0 12px!important}
+.cmpgrid{display:grid;gap:10px}
+.cmpcol{display:flex;flex-direction:column;gap:6px;min-width:0}
+.cmpname b{display:block;font-size:15px;line-height:1.25}.cmpname span{font-size:12px;color:var(--muted)}
+.cmprow{border:1px solid var(--line);border-radius:10px;padding:7px 9px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.cmprow .k{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);font-weight:700}
+.cmprow .s{font-size:12px;color:var(--muted)}
+.cmprow.cmpwin{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 10%,transparent)}
+.cmpscore{display:inline-block;align-self:flex-start;min-width:38px;text-align:center;font:800 18px var(--body);border-radius:8px;padding:2px 8px}
+.cmpsp{list-style:none;margin:2px 0 0;padding:0;display:grid;gap:2px}.cmpsp li{display:flex;justify-content:space-between;gap:6px;font-size:13px}.cmpsp li i{font-style:normal;color:var(--muted);font-size:12px;white-space:nowrap}
+.cmpsp li.only span::before,.onlydot{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--moss);margin-right:5px;vertical-align:middle}
+.cmpstrip{display:flex;align-items:flex-end;gap:2px;height:34px}.cmpstrip i{flex:1;border-radius:2px 2px 0 0;opacity:.75}.cmpstrip i.on{opacity:1;outline:2px solid var(--fg)}
+@media (max-width:600px){.cmpgrid{gap:6px}.cmprow{padding:6px}.cmpsp li{flex-direction:column;gap:0}.cmpname b{font-size:13.5px}}
 /* Compacto */
 .panel{padding:14px}
 h3{margin:12px 0 6px}
@@ -3256,7 +3275,7 @@ function renderDetail(){
   if(r.rain>8) reasons.push(`se esperan ${r.rain.toFixed(0)} mm ese día: lleva chubasquero`);
   const maxS=Math.max(...all.map(a=>a.score),1);
   el.innerHTML=`
-    <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start"><h2>${esc(s.n)}</h2><button class="star" id="favBtn" aria-pressed="${FAVS.has(s.id)}">${FAVS.has(s.id)?"★ Favorita":"☆ Favorita"}</button></div>
+    <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start"><h2>${esc(s.n)}</h2><div class="hdbtns"><button class="star" id="cmpBtn" aria-pressed="${CMP.includes(s.id)}" title="Comparar con otras zonas">⇄ Comparar</button><button class="star" id="favBtn" aria-pressed="${FAVS.has(s.id)}">${FAVS.has(s.id)?"★ Favorita":"☆ Favorita"}</button></div></div>
     <div class="meta">${esc(s.c)} · ${s.alt} m · ${esc(s.h)}</div>
     ${(()=>{const dv=drive(s);return dv?`<div class="drive meta"><b style="color:var(--fg)">≈ ${dv.txt} en coche</b> · ${dv.km} km desde ${esc(origin.name)}</div>`:`<div class="meta"><a href="#" id="askOrigin">Indica desde dónde sales</a> para ver el tiempo en coche.</div>`})()}
     ${safetyBlock(s,r)}${huntDay(r.d)?`<div class="hunt"><b>${fmtDay(r.d,dayIdx)} es ${huntWhy(r.d)}: día habitual de batidas de jabalí.</b> Viste ropa de color vivo (naranja o amarillo), no entres en zonas con carteles de "batuda" o "cacera", habla en voz alta y no te alejes de las pistas.</div>`:""}
@@ -3308,6 +3327,7 @@ function renderDetail(){
     <p class="note">Lluvia y temperatura combinando las estaciones Meteocat ${(all.src||[s.st]).join(", ")}, corregidas a ${s.alt} m.</p>`;
   el.querySelectorAll(".sp").forEach(b=>b.onclick=()=>{guideFocus=b.dataset.sp;guideFilter="todas";setView("guide");});
   el.querySelector("#favBtn").onclick=()=>toggleFav(s.id);
+  el.querySelector("#cmpBtn").onclick=()=>{ cmpToggle(s.id); const b=el.querySelector("#cmpBtn"); b.setAttribute("aria-pressed",CMP.includes(s.id)); if(CMP.length>=2&&CMP.includes(s.id)) showCompare(); };
   wireReports(el,s); wireBefore(el,s,r); wireField(el,s); wireSpotFb(el,s,r);
   const zs=el.querySelector('#zoomSpots'); if(zs) zs.onclick=zoomToSpots;
   const zr=el.querySelector('#zoomRoute'); if(zr) zr.onclick=zoomToRoute;
@@ -3497,11 +3517,86 @@ try{ initMap(); }catch(e){}
   db.doc("forecast/latest").onSnapshot(snap=>{
     if(!snap.exists){ document.getElementById("detail").innerHTML='<div class="empty">Todavía no hay previsión. La primera actualización llega cada mañana.</div>'; return; }
     DATA=snap.data(); clearTimeout(window._loadWD);
-    try{ build(); }catch(err){ console.error(err); loadFail("No se ha podido mostrar la previsión ("+(err.message||err)+")."); }
+    try{ build(); renderCmpBar(); }catch(err){ console.error(err); loadFail("No se ha podido mostrar la previsión ("+(err.message||err)+")."); }
   }, e=>{ document.getElementById("fresh").textContent="Error al leer los datos: "+(e.message||e.code); loadFail("No se han podido leer los datos de previsión."); });
   window._loadWD=setTimeout(()=>{ if(!DATA) loadFail("La previsión está tardando más de lo normal."); },15000);
 })();
 document.querySelectorAll(".langsel button").forEach(b=>{ b.setAttribute("aria-pressed",b.dataset.lang===I18N.lang); b.onclick=()=>{ if(b.dataset.lang!==I18N.lang) setLang(b.dataset.lang); }; });
+/* ---------- Comparar zonas ----------
+   Hasta 3 zonas lado a lado para el día elegido: nota, variedad de especies, kilos esperados, coche, desnivel y tiempo. */
+let CMP=[]; try{ CMP=JSON.parse(localStorage.getItem("boletaire.cmp")||"[]").filter(id=>SITES.some(s=>s.id===id)).slice(0,3); }catch(e){}
+function cmpSave(){ try{ localStorage.setItem("boletaire.cmp",JSON.stringify(CMP)); }catch(e){} renderCmpBar(); }
+function cmpToggle(id){ const i=CMP.indexOf(id); if(i>=0) CMP.splice(i,1); else { if(CMP.length>=3) CMP.shift(); CMP.push(id); } cmpSave(); }
+function renderCmpBar(){
+  let bar=document.getElementById("cmpBar");
+  if(!CMP.length){ bar?.remove(); return; }
+  if(!bar){ bar=document.createElement("div"); bar.id="cmpBar"; bar.className="cmpbar"; document.body.appendChild(bar); }
+  const names=CMP.map(id=>SITES.find(s=>s.id===id)?.n.split(" – ")[0]).join(" · ");
+  bar.innerHTML=`<span><b>Comparar</b> <span class="cmpn">${esc(names)}</span></span>
+    ${CMP.length>=2?`<button class="btn small" id="cmpOpen">Ver comparación</button>`:`<span class="note">Añade otra zona con «⇄ Comparar»</span>`}
+    <button class="btn small ghost" id="cmpClear" aria-label="Quitar todas">✕</button>`;
+  bar.querySelector("#cmpOpen")?.addEventListener("click",()=>showCompare());
+  bar.querySelector("#cmpClear").onclick=()=>{ CMP=[]; cmpSave(); document.getElementById("cmpModal")?.remove(); const b=document.getElementById("cmpBtn"); if(b) b.setAttribute("aria-pressed","false"); };
+}
+function cmpZone(id,di){
+  const s=SITES.find(x=>x.id===id), r=RES[id]?.[di]; if(!s||!r) return null;
+  const sp=r.sp.filter(x=>x.p>=20);
+  const edible=sp.filter(x=>["excelente","comestible"].includes(SP[x.id].ed));
+  let kg=0; edible.forEach((x,k)=>{ const y=yieldFor(id,x.id,x.p,k); if(y) kg+=y.week; });
+  return {s,r,sp,edible,kg,good:edible.filter(x=>SP[x.id].ed==="excelente"&&x.p>=35).length,dv:drive(s),slope:SLOPE[id][0],hunt:huntDay(r.d),all:RES[id]};
+}
+function showCompare(di=dayIdx){
+  document.getElementById("cmpModal")?.remove();
+  const Z=CMP.map(id=>cmpZone(id,di)).filter(Boolean); if(Z.length<2) return;
+  const best=(f,hi=true)=>{ const v=Z.map(f); const m=hi?Math.max(...v):Math.min(...v); return v.map(x=>x===m&&v.filter(y=>y===m).length<Z.length); };
+  const bScore=best(z=>z.r.score), bVar=best(z=>z.sp.length), bKg=best(z=>Math.round(z.kg*10)), bDrive=Z.every(z=>z.dv)?best(z=>z.dv.min,false):Z.map(()=>false), bSlope=best(z=>z.slope,false);
+  const allSp=Z.map(z=>new Set(z.sp.map(x=>x.id)));
+  const only=(k,id)=>allSp.every((S,j)=>j===k||!S.has(id));
+  const win=(arr,i)=>arr[i]?" cmpwin":"";
+  const nm=z=>esc(z.s.n.split(" – ")[0]);
+  // resumen en una frase
+  const say=[]; const i1=bScore.indexOf(true), i2=bVar.indexOf(true), i3=bKg.indexOf(true), i4=bDrive.indexOf(true);
+  if(i1>=0) say.push(`mejor nota en <b>${nm(Z[i1])}</b>`);
+  if(i2>=0) say.push(`más variedad en <b>${nm(Z[i2])}</b> (${Z[i2].sp.length} especies)`);
+  if(i3>=0&&i3!==i2) say.push(`más kilos esperados en <b>${nm(Z[i3])}</b>`);
+  if(i4>=0) say.push(`más cerca <b>${nm(Z[i4])}</b>`);
+  const o=document.createElement("div"); o.id="cmpModal"; o.className="welcome cmpmodal"; o.setAttribute("role","dialog"); o.setAttribute("aria-modal","true");
+  o.innerHTML=`<div class="wcard cmpbox">
+    <div class="cmphead"><h2>Comparar zonas</h2><button class="btn small ghost" id="cmpClose">Cerrar</button></div>
+    <div class="cmpdays">${DAYS.map((d,i)=>`<button class="chip small" data-di="${i}" aria-pressed="${i===di}">${fmtDay(d.d||d,i)} ${fmtDate(d.d||d)}</button>`).join("")}</div>
+    ${say.length?`<p class="cmpsay">${say.join(" · ").replace(/^./,c=>c.toUpperCase())}.</p>`:`<p class="cmpsay">Las zonas están muy igualadas este día.</p>`}
+    ${di>=7?`<p class="note" style="margin-top:-6px">Faltan más de 7 días: la previsión de ese día aún puede cambiar bastante.</p>`:""}
+    <div class="cmpgrid" style="grid-template-columns:repeat(${Z.length},minmax(0,1fr))">
+      ${Z.map((z,i)=>`<div class="cmpcol">
+        <div class="cmpname"><b>${esc(z.s.n)}</b><span>${esc(z.s.c)} · ${z.s.alt} m</span></div>
+        <div class="cmprow${win(bScore,i)}"><span class="k">Nota</span><span class="cmpscore" style="background:${col(z.r.score)};color:${light(z.r.score)?"#1a1a1a":"#fff"}">${z.r.score}</span> <span class="s">${LABEL[band(z.r.score)]}</span></div>
+        <div class="cmprow${win(bVar,i)}"><span class="k">Variedad</span><b>${z.sp.length} especies</b><span class="s">${z.good} excelentes con buena probabilidad</span></div>
+        <div class="cmprow${win(bKg,i)}"><span class="k">Cantidad esperada</span><b>${z.kg<0.05?"casi nada":"≈ "+nf(z.kg,1)+" kg/ha"}</b><span class="s">en una semana como esa, setas comestibles</span></div>
+        <div class="cmprow"><span class="k">Qué puede salir</span>
+          <ul class="cmpsp">${z.sp.slice(0,8).map(x=>`<li${only(i,x.id)?' class="only"':""}><span>${esc(SP[x.id].ca)}</span><i>${probLabel(x.p)}</i></li>`).join("")||'<li><span>Nada en temporada</span></li>'}</ul>
+          ${z.sp.some(x=>only(i,x.id))?`<span class="s"><span class="onlydot"></span> solo en esta zona</span>`:""}</div>
+        <div class="cmprow${win(bDrive,i)}"><span class="k">En coche</span><b>${z.dv?z.dv.txt:"–"}</b><span class="s">${z.dv?z.dv.km+" km":"Indica desde dónde sales"}</span></div>
+        <div class="cmprow${win(bSlope,i)}"><span class="k">Desnivel</span><b style="color:${SLOPEC[z.slope]}">${SLOPEN[z.slope]}</b></div>
+        <div class="cmprow"><span class="k">Tiempo ese día</span><b>${z.r.lo.toFixed(0)}° / ${z.r.hi.toFixed(0)}°</b><span class="s">${z.r.rain>=1?nf(z.r.rain,0)+" mm de lluvia":"sin lluvia"} · ${z.r.W} mm en 3 semanas</span></div>
+        <div class="cmprow"><span class="k">Mejor cota</span><b>${z.r.optAlt} m</b></div>
+        <div class="cmprow"><span class="k">Batidas</span><b>${z.hunt?"Día habitual de batidas":"No es día de batida"}</b></div>
+        <div class="cmprow"><span class="k">Próximos días</span><div class="cmpstrip">${z.all.map((a,k)=>`<i title="${fmtDay(a.d,k)}: ${a.score}" class="${k===di?"on":""}" style="height:${Math.max(6,a.score)}%;background:${col(a.score)}"></i>`).join("")}</div></div>
+        <button class="btn small" data-go="${z.s.id}">Ver ${nm(z)}</button>
+      </div>`).join("")}
+    </div>
+    <p class="note">La variedad cuenta las especies con al menos algo de probabilidad ese día. Los kilos son orientativos (media de producción de cada especie en Catalunya).</p>
+  </div>`;
+  document.body.appendChild(o);
+  const close=()=>o.remove();
+  o.querySelector("#cmpClose").onclick=close;
+  o.addEventListener("click",e=>{ if(e.target===o) close(); });
+  o.addEventListener("keydown",e=>{ if(e.key==="Escape") close(); });
+  o.querySelectorAll("[data-di]").forEach(b=>b.onclick=()=>showCompare(+b.dataset.di));
+  o.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>{ sel=b.dataset.go; selTown=null; dayIdx=di; close(); renderAll(); document.getElementById("detail")?.scrollIntoView({behavior:"smooth",block:"start"}); });
+  o.querySelector("#cmpClose").focus();
+  o.querySelector('.cmpdays [aria-pressed="true"]')?.scrollIntoView({inline:"center",block:"nearest"});
+}
+
 function loadFail(msg){
   const el=document.getElementById("detail"); if(!el) return;
   el.innerHTML=`<div class="empty"><p>${esc(msg)}</p><p class="note">Suele pasar con mala conexión o justo al publicar una versión nueva.</p><button class="btn small" onclick="location.reload()">Volver a cargar</button></div>`;
