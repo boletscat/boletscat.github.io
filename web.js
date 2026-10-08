@@ -58,7 +58,7 @@
     btn.disabled=true; if(msg) msg.textContent="Guardando…";
     try{ const c=await caches.open(OFFC); let b=0, ok=0; const L=offUrls(s);
       for(const u of L){ try{ const r=await fetch(u,{cache:"reload"}); if(r.ok){ const bl=await r.clone().blob(); b+=bl.size; await c.put(u,r); ok++; } }catch(e){} if(msg) msg.textContent=`Guardando… ${ok}/${L.length}`; }
-      const o=offList(); o[id]={d:new Date().toISOString(),b}; offSave(o);
+      const o=offList(); o[id]={d:new Date().toISOString(),b}; offSave(o); window.BOLETAIRE_EVENT&&window.BOLETAIRE_EVENT("sin-cobertura/"+id,"Zona guardada sin cobertura");
       renderDetail();
     }catch(e){ btn.disabled=false; if(msg) msg.textContent="No se ha podido guardar. Prueba con buena conexión."; }
   }
@@ -71,6 +71,20 @@
   document.addEventListener("click",e=>{ const a=e.target.closest("[data-offsave]"), d=e.target.closest("[data-offdel]");
     if(a){ e.preventDefault(); offStore(a.dataset.offsave,a); } else if(d){ e.preventDefault(); offDelete(d.dataset.offdel); } });
   const _fb=fieldBlock; fieldBlock=function(s){ return _fb(s).replace(/<p class="note">El GPS del móvil funciona sin cobertura[^<]*<\/p>/,'<p class="note">El GPS del móvil funciona sin cobertura.</p>')+offHtml(s); };
+  // Contador de visitas sin cookies: páginas vistas y qué zonas se abren (sin datos personales)
+  (function(){
+    if(CFG.goatcounter){
+      window.goatcounter={no_onload:false};
+      const s=document.createElement("script"); s.async=true; s.src="https://gc.zgo.at/count.js";
+      s.dataset.goatcounter=`https://${CFG.goatcounter}.goatcounter.com/count`; document.head.appendChild(s);
+      let last=null; const ev=(path,title)=>{ try{ window.goatcounter&&window.goatcounter.count&&window.goatcounter.count({path,title,event:true}); }catch(e){} };
+      document.addEventListener("click",()=>setTimeout(()=>{ try{ if(sel&&sel!==last){ last=sel; const z=SITES.find(x=>x.id===sel); ev("zona/"+sel, z?z.n:sel); } }catch(e){} },300),true);
+      window.BOLETAIRE_EVENT=ev;
+    } else if(CFG.cloudflareToken){
+      const s=document.createElement("script"); s.defer=true; s.src="https://static.cloudflareinsights.com/beacon.min.js";
+      s.dataset.cfBeacon=JSON.stringify({token:CFG.cloudflareToken}); document.head.appendChild(s);
+    }
+  })();
   // Pie: donaciones, aviso legal y créditos
   function footer(){
     if(document.getElementById("webfoot")) return;

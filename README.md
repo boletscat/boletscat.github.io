@@ -35,5 +35,13 @@ Para que la gente pueda avisar de «he encontrado setas aquí» en la web hace f
 4. Pégalas en `config.js` en `supabaseUrl` y `supabaseKey` y vuelve a subir la web.
 Sin estos datos, la web funciona igual pero sin avisos entre usuarios. Solo se publica la zona, nunca el punto exacto.
 
+## Contador de visitas (opcional, sin cookies)
+Para saber cuánta gente entra y qué zonas miran, sin pedir permiso de cookies:
+- **GoatCounter** (gratis para proyectos pequeños): crea una cuenta en https://www.goatcounter.com con el código que quieras (p. ej. `boletaire`) y ponlo en `config.js` → `goatcounter: "boletaire"`. Verás las visitas en `https://boletaire.goatcounter.com`, incluidas las zonas que se abren (`zona/montseny`…).
+- **o Cloudflare Web Analytics** (gratis): crea un sitio en Cloudflare → Web Analytics y copia el token en `cloudflareToken`.
+
+## Vista previa al compartir
+La web ya trae imagen y título para cuando se comparte el enlace (`og.jpg`). Algunas apps (WhatsApp, Facebook) necesitan la dirección completa: cuando tengas la definitiva, en `index.html` cambia `content="og.jpg"` por `content="https://TU-DIRECCION/og.jpg"` y añade `<meta property="og:url" content="https://TU-DIRECCION/">`.
+
 ## Versiones
 Cada cambio queda guardado en el historial de Git: para volver atrás, `git revert` o «Revert» en GitHub.
