@@ -21,8 +21,11 @@ Rellena tus datos en `legal.html` (donde pone [TU NOMBRE…]).
    - Cuatro registros **A** para `@`: 185.199.108.153, 185.199.109.153, 185.199.110.153, 185.199.111.153
    - Un registro **CNAME** para `www` → `TU-USUARIO.github.io`
 
-## Datos diarios
-`data/forecast.json` y `data/history.json` los actualiza la tarea de las 7:00. Si no se actualizan, la app sigue funcionando con los últimos datos.
+## Datos diarios (automático)
+La carpeta `.github/workflows/` trae una acción que cada mañana (6:40 en verano, 5:40 en invierno) descarga los datos de Meteocat y MET Norway, calcula la previsión con `model.js` (script `scripts/update-forecast.mjs`) y guarda `data/forecast.json` y `data/history.json`.
+1. Al subir el repositorio a GitHub, entra en la pestaña **Actions** y pulsa «I understand… enable workflows» si te lo pide.
+2. Para probarla al momento: Actions → «Previsión diaria» → **Run workflow**.
+3. Si un día falla (por ejemplo, Meteocat caído), la web sigue con los datos del día anterior y GitHub te avisa por correo.
 
 ## Versiones
 Cada cambio queda guardado en el historial de Git: para volver atrás, `git revert` o «Revert» en GitHub.
