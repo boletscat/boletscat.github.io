@@ -1020,6 +1020,9 @@ h3{font:700 13px var(--body);text-transform:uppercase;letter-spacing:.08em;color
 .cmphead{display:flex;justify-content:space-between;align-items:center;gap:8px}.cmphead h2{margin:0}
 .cmpdays{display:flex;gap:6px;overflow-x:auto;padding:10px 0 4px;scrollbar-width:none}.cmpdays .chip{flex:0 0 auto}
 .cmpsay{background:var(--surface-2);border-radius:10px;padding:9px 12px;margin:8px 0 12px!important}
+.cmpadvice{margin:10px 0 8px;padding:11px 13px;border-radius:12px;background:color-mix(in srgb,var(--moss) 14%,var(--surface));border:1px solid color-mix(in srgb,var(--moss) 35%,transparent)}
+.cmpadvice p{margin:3px 0 0!important;line-height:1.5}.cmpme{font:700 11px var(--body);text-transform:uppercase;letter-spacing:.05em;color:var(--moss)}
+.cmpsay{font-size:13px}
 .cmpgrid{display:grid;gap:10px}
 .cmpcol{display:flex;flex-direction:column;gap:6px;min-width:0}
 .cmpname b{display:block;font-size:15px;line-height:1.25}.cmpname span{font-size:12px;color:var(--muted)}
@@ -3545,6 +3548,48 @@ function cmpZone(id,di){
   let kg=0; edible.forEach((x,k)=>{ const y=yieldFor(id,x.id,x.p,k); if(y) kg+=y.week; });
   return {s,r,sp,edible,kg,good:edible.filter(x=>SP[x.id].ed==="excelente"&&x.p>=35).length,dv:drive(s),slope:SLOPE[id][0],hunt:huntDay(r.d),all:RES[id]};
 }
+/* Qué haría yo: recomendación en una frase a partir de la comparación */
+function cmpAdvice(Z,di){
+  const ca=I18N.lang==="ca", nm=z=>"<b>"+esc(z.s.n.split(" – ")[0])+"</b>";
+  const maxSp=Math.max(1,...Z.map(z=>z.sp.length)), maxKg=Math.max(0.01,...Z.map(z=>z.kg));
+  const mins=Z.map(z=>z.dv?z.dv.min:null), minMin=Math.min(...mins.filter(m=>m!=null));
+  const val=z=>0.45*z.r.score/100+0.2*z.sp.length/maxSp+0.2*z.kg/maxKg+(z.dv?0.1*Math.max(0,1-(z.dv.min-minMin)/60):0.05)+0.05*({1:1,2:.6,3:.2}[z.slope])-(z.hunt?0.05:0)-(z.r.rain>8?0.05:0);
+  const R=Z.map(z=>({z,v:val(z)})).sort((a,b)=>b.v-a.v); const B=R[0].z, O=R.slice(1).map(x=>x.z);
+  // día flojo en todas
+  if(Math.max(...Z.map(z=>z.r.score))<30){
+    let bd=null; Z.forEach(z=>z.all.forEach((a,k)=>{ if(k!==di&&(!bd||a.score>bd.sc)) bd={sc:a.score,k,z}; }));
+    const when=bd&&bd.sc>=50?(ca?` Si pots canviar de dia, jo hi aniria ${fmtDay(bd.z.all[bd.k].d,bd.k)} ${fmtDate(bd.z.all[bd.k].d)} a ${nm(bd.z)} (nota ${bd.sc}).`:` Si puedes cambiar de día, yo iría el ${fmtDay(bd.z.all[bd.k].d,bd.k)} ${fmtDate(bd.z.all[bd.k].d)} a ${nm(bd.z)} (nota ${bd.sc}).`):"";
+    return ca?`Aquest dia jo no hi aniria: cap de les zones passa de ${Math.max(...Z.map(z=>z.r.score))}.${when}`:`Ese día yo no iría: ninguna de las zonas pasa de ${Math.max(...Z.map(z=>z.r.score))}.${when}`;
+  }
+  const spN=id=>{ const n=SP[id].ca; return esc(n.charAt(0).toLowerCase()+n.slice(1)); };
+  const why=[], lst=a=>[...new Set(a)].sort((x,y)=>x-y).join("–");
+  const lowS=O.filter(o=>B.r.score>=o.r.score+8), lowV=O.filter(o=>B.sp.length>o.sp.length), lowK=O.filter(o=>B.kg>=o.kg*1.15&&B.kg>=0.3);
+  const far=O.filter(o=>B.dv&&o.dv&&o.dv.min-B.dv.min>=10), steep=O.filter(o=>B.slope<o.slope), hunt=O.filter(o=>o.hunt&&!B.hunt);
+  if(lowS.length===O.length) why.push(ca?`té més nota (${B.r.score} contra ${lst(lowS.map(o=>o.r.score))})`:`tiene más nota (${B.r.score} frente a ${lst(lowS.map(o=>o.r.score))})`);
+  if(lowV.length) why.push(ca?`hi pot sortir més varietat (${B.sp.length} espècies contra ${lst(lowV.map(o=>o.sp.length))})`:`puede salir más variedad (${B.sp.length} especies frente a ${lst(lowV.map(o=>o.sp.length))})`);
+  if(lowK.length===O.length) why.push(ca?`s'hi esperen més quilos per hectàrea`:`se esperan más kilos por hectárea`);
+  if(far.length===O.length) why.push(ca?`et queda ${Math.min(...far.map(o=>o.dv.min))-B.dv.min} minuts més a prop`:`te queda ${Math.min(...far.map(o=>o.dv.min))-B.dv.min} minutos más cerca`);
+  if(steep.length===O.length) why.push(ca?`té menys desnivell`:`tiene menos desnivel`);
+  if(hunt.length) why.push(ca?`a ${hunt.map(nm).join(" i ")} és dia de batuda`:`en ${hunt.map(nm).join(" y ")} es día de batida`);
+  const ex=B.sp.filter(x=>SP[x.id].ed==="excelente"&&x.p>=35&&O.every(o=>!o.sp.some(y=>y.id===x.id))).map(x=>spN(x.id));
+  if(ex.length) why.push(ca?`només allà hi pot sortir ${ex.join(" i ")}`:`solo allí puede salir ${ex.join(" y ")}`);
+  const uniq=[...new Set(why)].slice(0,3);
+  const close=R.length>1&&R[0].v-R[1].v<0.03;
+  let t;
+  if(close) t=ca?`Estan molt igualades. Jo em decantaria per ${nm(B)}${uniq.length?", perquè "+uniq.join(", "):", però qualsevol de les dues és bona opció"}.`
+               :`Están muy igualadas. Yo me decantaría por ${nm(B)}${uniq.length?", porque "+uniq.join(", "):", pero cualquiera de las dos es buena opción"}.`;
+  else t=ca?`Veient la nota, la varietat d'espècies i els quilos esperats, jo aniria a ${nm(B)}${uniq.length?": "+uniq.join(", "):""}.`
+           :`Viendo la nota, la variedad de especies y los kilos esperados, yo iría a ${nm(B)}${uniq.length?": "+uniq.join(", "):""}.`;
+  // lo que tiene a favor la otra
+  const o=O[0], alt=[];
+  const exO=o.sp.filter(x=>SP[x.id].ed==="excelente"&&x.p>=35&&!B.sp.some(y=>y.id===x.id)).map(x=>spN(x.id));
+  if(exO.length) alt.push(ca?`busques ${exO.join(" o ")}`:`buscas ${exO.join(" o ")}`);
+  if(o.dv&&B.dv&&B.dv.min-o.dv.min>=10) alt.push(ca?`vols fer menys cotxe`:`quieres hacer menos coche`);
+  if(o.slope<B.slope) alt.push(ca?`vols caminar amb menys pujada`:`quieres caminar con menos cuesta`);
+  if(alt.length) t+=ca?` Si ${alt.join(" o ")}, millor ${nm(o)}.`:` Si ${alt.join(" o ")}, mejor ${nm(o)}.`;
+  if(B.r.rain>8) t+=ca?` Porta impermeable: s'hi esperen ${Math.round(B.r.rain)} mm.`:` Lleva chubasquero: se esperan ${Math.round(B.r.rain)} mm.`;
+  return t;
+}
 function showCompare(di=dayIdx){
   document.getElementById("cmpModal")?.remove();
   const Z=CMP.map(id=>cmpZone(id,di)).filter(Boolean); if(Z.length<2) return;
@@ -3564,7 +3609,8 @@ function showCompare(di=dayIdx){
   o.innerHTML=`<div class="wcard cmpbox">
     <div class="cmphead"><h2>Comparar zonas</h2><button class="btn small ghost" id="cmpClose">Cerrar</button></div>
     <div class="cmpdays">${DAYS.map((d,i)=>`<button class="chip small" data-di="${i}" aria-pressed="${i===di}">${fmtDay(d.d||d,i)} ${fmtDate(d.d||d)}</button>`).join("")}</div>
-    ${say.length?`<p class="cmpsay">${say.join(" · ").replace(/^./,c=>c.toUpperCase())}.</p>`:`<p class="cmpsay">Las zonas están muy igualadas este día.</p>`}
+    <div class="cmpadvice"><span class="cmpme">${I18N.lang==="ca"?"Què faria jo":"Qué haría yo"}</span><p>${cmpAdvice(Z,di)}</p></div>
+    ${say.length?`<p class="cmpsay">${say.join(" · ").replace(/^./,c=>c.toUpperCase())}.</p>`:""}
     ${di>=7?`<p class="note" style="margin-top:-6px">Faltan más de 7 días: la previsión de ese día aún puede cambiar bastante.</p>`:""}
     <div class="cmpgrid" style="grid-template-columns:repeat(${Z.length},minmax(0,1fr))">
       ${Z.map((z,i)=>`<div class="cmpcol">
