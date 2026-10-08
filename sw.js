@@ -1,9 +1,9 @@
 /* Boletaire – funciona sin conexión: guarda la app, la última previsión y las zonas que hayas visto */
-const V="boletaire-v3";
-const CORE=["./","index.html","config.js","manifest.webmanifest","icon-192.png","icon-512.png","shim.js","web.js","relief.jpg","data/forecast.json","data/history.json",
-  "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js","https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css"];
+const V="boletaire-v4", KEEP="boletaire-zonas";
+const CORE=["./","index.html","config.js","manifest.webmanifest","icon-192.png","icon-512.png","shim.js","web.js","relief.jpg","i18n_ca.js","cat.png","bosque.png","data/forecast.json","data/history.json",
+  "lib/leaflet.js"];
 self.addEventListener("install",e=>{ e.waitUntil(caches.open(V).then(c=>Promise.all(CORE.map(u=>c.add(u).catch(()=>{}))))); self.skipWaiting(); });
-self.addEventListener("activate",e=>{ e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==V).map(k=>caches.delete(k))))); self.clients.claim(); });
+self.addEventListener("activate",e=>{ e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==V&&k!==KEEP).map(k=>caches.delete(k))))); self.clients.claim(); });
 self.addEventListener("fetch",e=>{
   const u=new URL(e.request.url); if(e.request.method!=="GET") return;
   const net1st = /\/data\/|index\.html$|\/$|\.js$/.test(u.pathname);

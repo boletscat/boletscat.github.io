@@ -27,5 +27,13 @@ La carpeta `.github/workflows/` trae una acción que cada mañana (6:40 en veran
 2. Para probarla al momento: Actions → «Previsión diaria» → **Run workflow**.
 3. Si un día falla (por ejemplo, Meteocat caído), la web sigue con los datos del día anterior y GitHub te avisa por correo.
 
+## Avisos entre usuarios (opcional, gratis)
+Para que la gente pueda avisar de «he encontrado setas aquí» en la web hace falta una pequeña base de datos. Supabase la da gratis:
+1. Entra en https://supabase.com, crea una cuenta y un proyecto nuevo (región: Europa).
+2. En el proyecto: **SQL Editor** → pega todo el contenido de `supabase.sql` → **Run**.
+3. En **Project Settings → API** copia la **Project URL** y la clave pública **anon** (o «publishable»).
+4. Pégalas en `config.js` en `supabaseUrl` y `supabaseKey` y vuelve a subir la web.
+Sin estos datos, la web funciona igual pero sin avisos entre usuarios. Solo se publica la zona, nunca el punto exacto.
+
 ## Versiones
 Cada cambio queda guardado en el historial de Git: para volver atrás, `git revert` o «Revert» en GitHub.

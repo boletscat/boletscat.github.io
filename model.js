@@ -326,12 +326,17 @@ function computeSite(site, w, start){
     const humA=n?hs/n:70, windA=n?ws/n:5;
     const dry = clamp(1 - Math.max(0,62-humA)/90 - Math.max(0,windA-14)/70, 0.7, 1);
     const tz = TERR[site.id]; const optAlt = tz ? Math.round(clamp(site.alt + (((fc[i].lo+fc[i].hi)/2) - 12)/0.0065, tz[2], tz[3])/50)*50 : site.alt;
-    const score = Math.round(100*Math.min(1,moist*1.08)*tScore*frost*dry*altF);
+    const score0 = Math.round(100*Math.min(1,moist*1.08)*tScore*frost*dry*altF);
     const mo=dd.getMonth()+1, prevM=mo===1?12:mo-1, nextM=mo===12?1:mo+1;
     const soilK=(typeof TERR!=="undefined"&&TERR[site.id])?TERR[site.id][0]:(site.soil||"mixto");
     const cand=[...new Set([...site.sp,...(EXTRA[soilK]||[])])];
     const inS=id=>{const m=MONTHS[id]; if(!m) return 1; return m.includes(mo)?1:(m.includes(prevM)||m.includes(nextM))?0.35:0;};
-    const sp = cand.map(id=>{const t=SP[id].t;const fit=trap(tref,t[0]-4,t[0],t[1],t[1]+4);const se=inS(id);return {id,se,p:Math.round(score*se*(site.sp.includes(id)?1:0.8)*(0.35+0.65*fit))}}).filter(x=>x.se>0&&(site.sp.includes(x.id)||x.se===1)).sort((a,b)=>b.p-a.p).slice(0,6);
+    const sp0 = cand.map(id=>{const t=SP[id].t;const fit=trap(tref,t[0]-4,t[0],t[1],t[1]+4);const se=inS(id);return {id,se,p:Math.round(score0*se*(site.sp.includes(id)?1:0.8)*(0.35+0.65*fit))}}).filter(x=>x.se>0&&(site.sp.includes(x.id)||x.se===1)).sort((a,b)=>b.p-a.p).slice(0,6);
+    /* Época del año: en otoño salen muchas especies; en primavera pocas (moixernó, múrgola) y en invierno casi nada */
+    const bestSe=sp0.length?Math.max(...sp0.map(x=>x.se)):0;
+    const seasonF=MPROD[mo]*(bestSe>=1?1:bestSe>0?0.6:0.2);
+    const score=Math.round(score0*seasonF);
+    const sp=sp0.map(x=>({...x,p:Math.round(x.p*seasonF)}));
     out.push({d:fc[i].d,score,altF,center:Math.round(center/50)*50,W:Math.round(W),soil,trigger,recent:Math.round(w.r7*lagF+trig),tref,tScore,minLo,frost,rain:fc[i].r,lo:fc[i].lo,hi:fc[i].hi,hum:fc[i].hum,wind:fc[i].wind,gust:fc[i].gust,dry,optAlt,sp});
   }
   return out;

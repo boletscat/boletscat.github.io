@@ -15,6 +15,17 @@ window.BOLETAIRE_WEB = true;
   // fotos del diario: en IndexedDB (no caben en localStorage)
   const idb=()=>new Promise((res,rej)=>{ const r=indexedDB.open("boletaire",1); r.onupgradeneeded=()=>r.result.createObjectStore("photos"); r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); });
   const idbOp=(mode,fn)=>idb().then(d=>new Promise((res,rej)=>{ const tx=d.transaction("photos",mode); const q=fn(tx.objectStore("photos")); tx.oncomplete=()=>res(q&&q.result); tx.onerror=()=>rej(tx.error); }));
+  // Avisos entre usuarios: Supabase (si está configurado en config.js)
+  const SB = CFG.supabaseUrl && CFG.supabaseKey ? { u: CFG.supabaseUrl.replace(/\/$/,""), k: CFG.supabaseKey } : null;
+  let tok = LS.getItem("boletaire.token"); if(!tok){ tok = Array.from(crypto.getRandomValues(new Uint8Array(18)),b=>b.toString(16).padStart(2,"0")).join(""); LS.setItem("boletaire.token",tok); }
+  const sbH = ()=>({ apikey: SB.k, Authorization: "Bearer "+SB.k, "Content-Type": "application/json" });
+  const repSubs=[]; let repDocs=[];
+  const repLoad=()=>fetch(SB.u+"/rest/v1/reports?select=uid,items,updated_at&order=updated_at.desc&limit=500",{headers:sbH()})
+    .then(r=>{ if(!r.ok) throw new Error(r.status); return r.json(); })
+    .then(a=>{ repDocs=a.map(v=>({id:v.uid,data:()=>({items:v.items,updatedAt:v.updated_at})})); repSubs.forEach(f=>f({docs:repDocs})); })
+    .catch(()=>{ repSubs.forEach(f=>f({docs:repDocs})); });
+  if(SB) setInterval(()=>{ if(repSubs.length&&document.visibilityState==="visible") repLoad(); }, 5*60e3);
+  window.BOLETAIRE_REPORTS = !!SB;
   const db={
     doc(path){
       const seg=path.split("/");
@@ -25,6 +36,8 @@ window.BOLETAIRE_WEB = true;
                  update:async v=>{ const o=store(); o[id]={...(o[id]||{}),...v}; save(o); setTimeout(fire,0); },
                  delete:async()=>{ try{ await idbOp("readwrite",st=>st.delete(id)); }catch(e){} const o=store(); delete o[id]; save(o); setTimeout(fire,0); },
                  onSnapshot(fn){ const o=store(); fn(snap(id in o,o[id])); return ()=>{}; } }; }
+      if(seg[0]==="reports"&&seg.length===2&&SB){ return { get:async()=>snap(false,null), onSnapshot(fn){ fn(snap(false,null)); return ()=>{}; }, update:refused, delete:refused,
+        set:async v=>{ if(seg[1]!==uid) return refused(); const r=await fetch(SB.u+"/rest/v1/rpc/post_report",{method:"POST",headers:sbH(),body:JSON.stringify({p_uid:uid,p_token:tok,p_items:v.items||[]})}); if(!r.ok) throw new Error("supabase "+r.status); await repLoad(); } }; }
       return { get:async()=>snap(false,null), set:refused, update:refused, delete:refused, onSnapshot(fn){ fn(snap(false,null)); return ()=>{}; } };
     },
     collection(path){
@@ -32,6 +45,7 @@ window.BOLETAIRE_WEB = true;
         onSnapshot(fn,err){
           if(path==="history"){ json("data/history.json").then(a=>fn({docs:a.map(v=>({id:v.d,data:()=>v}))})).catch(()=>fn({docs:[]})); }
           else if(path.startsWith("data/users/")){ userSubs.push(fn); setTimeout(fire,0); }
+          else if(path==="reports"&&SB){ repSubs.push(fn); repLoad(); }
           else setTimeout(()=>fn({docs:[]}),0);
           return ()=>{}; },
         get:async()=>({docs:[]}), doc:(id)=>db.doc(path+"/"+id) };
