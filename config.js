@@ -1,6 +1,6 @@
 /* ===== Configuración de Boletaire web: rellena estos datos ===== */
 window.WEBCFG = {
-  contact: "",     // correo para recibir avisos de errores (déjalo vacío para ocultar el botón)
+  contact: "guillemestellers@gmail.com",     // correo para recibir avisos de errores (déjalo vacío para ocultar el botón)
   kofi: "",        // enlace de donaciones, p. ej. "https://ko-fi.com/boletaire" (vacío = sin botón)
   amazonTag: "",   // tu ID de Afiliados de Amazon, p. ej. "boletaire-21" (vacío = enlaces sin comisión)
   // Avisos entre usuarios (opcional): proyecto gratuito de Supabase. Instrucciones en README.md

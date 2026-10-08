@@ -3496,10 +3496,16 @@ try{ initMap(); }catch(e){}
   if(!db){ document.getElementById("detail").innerHTML='<div class="empty">No se pueden cargar las previsiones en esta vista. Abre la app con tu cuenta de Claude.</div>'; document.getElementById("fresh").textContent="Sin conexión a los datos"; return; }
   db.doc("forecast/latest").onSnapshot(snap=>{
     if(!snap.exists){ document.getElementById("detail").innerHTML='<div class="empty">Todavía no hay previsión. La primera actualización llega cada mañana.</div>'; return; }
-    DATA=snap.data(); build();
-  }, e=>{ document.getElementById("fresh").textContent="Error al leer los datos: "+(e.message||e.code); });
+    DATA=snap.data(); clearTimeout(window._loadWD);
+    try{ build(); }catch(err){ console.error(err); loadFail("No se ha podido mostrar la previsión ("+(err.message||err)+")."); }
+  }, e=>{ document.getElementById("fresh").textContent="Error al leer los datos: "+(e.message||e.code); loadFail("No se han podido leer los datos de previsión."); });
+  window._loadWD=setTimeout(()=>{ if(!DATA) loadFail("La previsión está tardando más de lo normal."); },15000);
 })();
 document.querySelectorAll(".langsel button").forEach(b=>{ b.setAttribute("aria-pressed",b.dataset.lang===I18N.lang); b.onclick=()=>{ if(b.dataset.lang!==I18N.lang) setLang(b.dataset.lang); }; });
+function loadFail(msg){
+  const el=document.getElementById("detail"); if(!el) return;
+  el.innerHTML=`<div class="empty"><p>${esc(msg)}</p><p class="note">Suele pasar con mala conexión o justo al publicar una versión nueva.</p><button class="btn small" onclick="location.reload()">Volver a cargar</button></div>`;
+}
 /* ---------- Bienvenida (solo la primera vez) ---------- */
 function welcomeSeen(){ try{ return localStorage.getItem("boletaire.welcome")==="1"; }catch(e){ return true; } }
 function welcomeDone(){ try{ localStorage.setItem("boletaire.welcome","1"); localStorage.removeItem("boletaire.welcomeStep"); }catch(e){} document.getElementById("welcome")?.remove(); }
