@@ -3297,6 +3297,7 @@ function renderDetail(){
         <div class="altbar" aria-hidden="true"><b style="left:0;right:0"></b><u style="left:calc(${((r.optAlt-TERR[s.id][2])/(TERR[s.id][3]-TERR[s.id][2])*100).toFixed(0)}% - 1px)"></u></div></div>
       <div class="fact" style="grid-column:1/-1"><div class="k">Dónde buscar dentro de la zona</div><div class="s" style="font-size:13.5px;color:var(--fg)">${searchAdvice(r,s)}</div></div>
       <div class="fact" style="grid-column:1/-1"><div class="k">Desnivel</div><div class="v soil"><i style="background:${SLOPEC[SLOPE[s.id][0]]}"></i>${SLOPEN[SLOPE[s.id][0]]}</div><div class="s">${esc(SLOPE[s.id][1])}</div></div>
+      ${(()=>{const pp=pickPressure(s,r.d,r.score);return `<div class="fact" style="grid-column:1/-1"><div class="k">Gente en el bosque</div><div class="v soil"><i style="background:${SLOPEC[pp.lvl]}"></i>${PRESSN[pp.lvl]}</div><div class="s">${pressureTip(pp)}</div></div>`;})()}
       <div class="fact"><div class="k">Humedad del aire</div><div class="v">${r.hum??'–'} %</div><div class="s">${r.hum==null?'Sin dato':r.hum>=85?'Ambiente muy húmedo':r.hum>=65?'Húmedo, bien para las setas':r.hum>=50?'Algo seco':'Seco: el suelo pierde agua'}</div></div>
       <div class="fact"><div class="k">Viento</div><div class="v">${r.wind??'–'} km/h</div><div class="s">${r.gust!=null?`Máx. ${r.gust} km/h. `:''}${r.wind==null?'':r.wind>=20?'Seca mucho el suelo':r.wind>=12?'Moderado':'Flojo'}</div></div>
     </div>
@@ -3525,6 +3526,28 @@ try{ initMap(); }catch(e){}
   window._loadWD=setTimeout(()=>{ if(!DATA) loadFail("La previsión está tardando más de lo normal."); },15000);
 })();
 document.querySelectorAll(".langsel button").forEach(b=>{ b.setAttribute("aria-pressed",b.dataset.lang===I18N.lang); b.onclick=()=>{ if(b.dataset.lang!==I18N.lang) setLang(b.dataset.lang); }; });
+/* ---------- Gente en el bosque ----------
+   Los sábados, domingos y festivos va mucha más gente; los días siguientes queda menos por coger.
+   Más presión cerca de Barcelona y cuando las condiciones son buenas (todo el mundo sale a la vez). */
+const crowdDay=iso=>{ const d=new Date(iso+"T12:00:00"), w=d.getDay(); if(HOLI.has(iso)||w===6) return 1; if(w===0) return .9; if(w===5) return .45; return .15; };
+const isoAdd=(iso,n)=>{ const d=new Date(iso+"T12:00:00"); d.setDate(d.getDate()+n); return d.toISOString().slice(0,10); };
+function pickPressure(s,iso,score){
+  const P=(0.5*crowdDay(iso)+crowdDay(isoAdd(iso,-1))+0.55*crowdDay(isoAdd(iso,-2))+0.3*crowdDay(isoAdd(iso,-3)))/1.75;
+  const dB=hav(41.39,2.17,s.lat,s.lon);
+  const pop=Math.max(0.25,Math.min(1,1.15-dB/140))*(["montseny","collserola","stllorenc","berti","montnegre","viladrau","sanhilari","serramarina"].includes(s.id)?1.1:1);
+  const v=Math.max(0,Math.min(1,P*pop*(0.4+0.6*(score||0)/100)));
+  const prev=[1,2,3].map(k=>isoAdd(iso,-k)).find(x=>crowdDay(x)>=.9);
+  const ca=I18N.lang==="ca", pw=prev&&(HOLI.has(prev)?(ca?"un festiu":"un festivo"):new Date(prev+"T12:00:00").getDay()===0?(ca?"un diumenge":"un domingo"):(ca?"un dissabte":"un sábado"));
+  const why=crowdDay(iso)>=.9&&crowdDay(isoAdd(iso,-1))>=.9?(ca?"porta dies amb molta gent":"lleva días de mucha gente"):crowdDay(iso)>=.9?(ca?"és dia de molta gent":"es día de mucha gente"):prev?(ca?`ve després d'${pw.replace(/^un /,"un ")}`.replace("d'un","d'un"):`viene después de ${pw}`):(ca?"és entre setmana":"es entre semana");
+  return {v, lvl:v<0.25?1:v<0.5?2:3, kgF:1-0.4*v, why};
+}
+const PRESSN={1:"Poca gente",2:"Algo de gente",3:"Mucha gente"};
+function pressureTip(pp){
+  const ca=I18N.lang==="ca";
+  if(pp.lvl===1) return ca?"Dia tranquil: pel bosc hi haurà passat poca gent.":"Día tranquilo: el bosque habrá tenido poca gente.";
+  if(pp.lvl===2) return ca?`Hi haurà passat una mica de gent perquè ${pp.why}. Allunya't una mica de les pistes i dels aparcaments.`:`Habrá pasado algo de gente porque ${pp.why}. Aléjate un poco de las pistas y aparcamientos.`;
+  return ca?`Segurament ja hi hauran passat molts boletaires perquè ${pp.why}. Ves-hi d'hora, surt de les pistes i busca a les zones menys accessibles; o, si pots, ves-hi entre setmana.`:`Probablemente ya habrán pasado muchos boletaires porque ${pp.why}. Ve temprano, sal de las pistas y busca en las zonas menos accesibles; o, si puedes, ve entre semana.`;
+}
 /* ---------- Comparar zonas ----------
    Hasta 3 zonas lado a lado para el día elegido: nota, variedad de especies, kilos esperados, coche, desnivel y tiempo. */
 let CMP=[]; try{ CMP=JSON.parse(localStorage.getItem("boletaire.cmp")||"[]").filter(id=>SITES.some(s=>s.id===id)).slice(0,3); }catch(e){}
@@ -3546,14 +3569,15 @@ function cmpZone(id,di){
   const sp=r.sp.filter(x=>x.p>=20);
   const edible=sp.filter(x=>["excelente","comestible"].includes(SP[x.id].ed));
   let kg=0; edible.forEach((x,k)=>{ const y=yieldFor(id,x.id,x.p,k); if(y) kg+=y.week; });
-  return {s,r,sp,edible,kg,good:edible.filter(x=>SP[x.id].ed==="excelente"&&x.p>=35).length,dv:drive(s),slope:SLOPE[id][0],hunt:huntDay(r.d),all:RES[id]};
+  const pp=pickPressure(s,r.d,r.score); kg*=pp.kgF;
+  return {s,r,sp,edible,kg,pp,good:edible.filter(x=>SP[x.id].ed==="excelente"&&x.p>=35).length,dv:drive(s),slope:SLOPE[id][0],hunt:huntDay(r.d),all:RES[id]};
 }
 /* Qué haría yo: recomendación en una frase a partir de la comparación */
 function cmpAdvice(Z,di){
   const ca=I18N.lang==="ca", nm=z=>"<b>"+esc(z.s.n.split(" – ")[0])+"</b>";
   const maxSp=Math.max(1,...Z.map(z=>z.sp.length)), maxKg=Math.max(0.01,...Z.map(z=>z.kg));
   const mins=Z.map(z=>z.dv?z.dv.min:null), minMin=Math.min(...mins.filter(m=>m!=null));
-  const val=z=>0.45*z.r.score/100+0.2*z.sp.length/maxSp+0.2*z.kg/maxKg+(z.dv?0.1*Math.max(0,1-(z.dv.min-minMin)/60):0.05)+0.05*({1:1,2:.6,3:.2}[z.slope])-(z.hunt?0.05:0)-(z.r.rain>8?0.05:0);
+  const val=z=>0.45*z.r.score/100+0.2*z.sp.length/maxSp+0.2*z.kg/maxKg+(z.dv?0.1*Math.max(0,1-(z.dv.min-minMin)/60):0.05)+0.05*({1:1,2:.6,3:.2}[z.slope])-(z.hunt?0.05:0)-(z.r.rain>8?0.05:0)-0.06*z.pp.v;
   const R=Z.map(z=>({z,v:val(z)})).sort((a,b)=>b.v-a.v); const B=R[0].z, O=R.slice(1).map(x=>x.z);
   // día flojo en todas
   if(Math.max(...Z.map(z=>z.r.score))<30){
@@ -3570,6 +3594,8 @@ function cmpAdvice(Z,di){
   if(lowK.length===O.length) why.push(ca?`s'hi esperen més quilos per hectàrea`:`se esperan más kilos por hectárea`);
   if(far.length===O.length) why.push(ca?`et queda ${Math.min(...far.map(o=>o.dv.min))-B.dv.min} minuts més a prop`:`te queda ${Math.min(...far.map(o=>o.dv.min))-B.dv.min} minutos más cerca`);
   if(steep.length===O.length) why.push(ca?`té menys desnivell`:`tiene menos desnivel`);
+  const crowded=O.filter(o=>o.pp.lvl>B.pp.lvl);
+  if(crowded.length===O.length) why.push(ca?`hi haurà passat menys gent`:`habrá pasado menos gente`);
   if(hunt.length) why.push(ca?`a ${hunt.map(nm).join(" i ")} és dia de batuda`:`en ${hunt.map(nm).join(" y ")} es día de batida`);
   const ex=B.sp.filter(x=>SP[x.id].ed==="excelente"&&x.p>=35&&O.every(o=>!o.sp.some(y=>y.id===x.id))).map(x=>spN(x.id));
   if(ex.length) why.push(ca?`només allà hi pot sortir ${ex.join(" i ")}`:`solo allí puede salir ${ex.join(" y ")}`);
@@ -3587,6 +3613,7 @@ function cmpAdvice(Z,di){
   if(o.dv&&B.dv&&B.dv.min-o.dv.min>=10) alt.push(ca?`vols fer menys cotxe`:`quieres hacer menos coche`);
   if(o.slope<B.slope) alt.push(ca?`vols caminar amb menys pujada`:`quieres caminar con menos cuesta`);
   if(alt.length) t+=ca?` Si ${alt.join(" o ")}, millor ${nm(o)}.`:` Si ${alt.join(" o ")}, mejor ${nm(o)}.`;
+  if(B.pp.lvl===3) t+=ca?` Compte: aquell dia hi haurà passat molta gent; ves-hi d'hora i allunya't de les pistes.`:` Ojo: ese día habrá pasado mucha gente; ve temprano y aléjate de las pistas.`;
   if(B.r.rain>8) t+=ca?` Porta impermeable: s'hi esperen ${Math.round(B.r.rain)} mm.`:` Lleva chubasquero: se esperan ${Math.round(B.r.rain)} mm.`;
   return t;
 }
@@ -3594,7 +3621,7 @@ function showCompare(di=dayIdx){
   document.getElementById("cmpModal")?.remove();
   const Z=CMP.map(id=>cmpZone(id,di)).filter(Boolean); if(Z.length<2) return;
   const best=(f,hi=true)=>{ const v=Z.map(f); const m=hi?Math.max(...v):Math.min(...v); return v.map(x=>x===m&&v.filter(y=>y===m).length<Z.length); };
-  const bScore=best(z=>z.r.score), bVar=best(z=>z.sp.length), bKg=best(z=>Math.round(z.kg*10)), bDrive=Z.every(z=>z.dv)?best(z=>z.dv.min,false):Z.map(()=>false), bSlope=best(z=>z.slope,false);
+  const bScore=best(z=>z.r.score), bVar=best(z=>z.sp.length), bKg=best(z=>Math.round(z.kg*10)), bDrive=Z.every(z=>z.dv)?best(z=>z.dv.min,false):Z.map(()=>false), bSlope=best(z=>z.slope,false), bPress=best(z=>z.pp.lvl,false);
   const allSp=Z.map(z=>new Set(z.sp.map(x=>x.id)));
   const only=(k,id)=>allSp.every((S,j)=>j===k||!S.has(id));
   const win=(arr,i)=>arr[i]?" cmpwin":"";
@@ -3617,12 +3644,13 @@ function showCompare(di=dayIdx){
         <div class="cmpname"><b>${esc(z.s.n)}</b><span>${esc(z.s.c)} · ${z.s.alt} m</span></div>
         <div class="cmprow${win(bScore,i)}"><span class="k">Nota</span><span class="cmpscore" style="background:${col(z.r.score)};color:${light(z.r.score)?"#1a1a1a":"#fff"}">${z.r.score}</span> <span class="s">${LABEL[band(z.r.score)]}</span></div>
         <div class="cmprow${win(bVar,i)}"><span class="k">Variedad</span><b>${z.sp.length} especies</b><span class="s">${z.good} excelentes con buena probabilidad</span></div>
-        <div class="cmprow${win(bKg,i)}"><span class="k">Cantidad esperada</span><b>${z.kg<0.05?"casi nada":"≈ "+nf(z.kg,1)+" kg/ha"}</b><span class="s">en una semana como esa, setas comestibles</span></div>
+        <div class="cmprow${win(bKg,i)}"><span class="k">Cantidad esperada</span><b>${z.kg<0.05?"casi nada":"≈ "+nf(z.kg,1)+" kg/ha"}</b><span class="s">setas comestibles, descontando lo que ya habrán cogido</span></div>
         <div class="cmprow"><span class="k">Qué puede salir</span>
           <ul class="cmpsp">${z.sp.slice(0,8).map(x=>`<li${only(i,x.id)?' class="only"':""}><span>${esc(SP[x.id].ca)}</span><i>${probLabel(x.p)}</i></li>`).join("")||'<li><span>Nada en temporada</span></li>'}</ul>
           ${z.sp.some(x=>only(i,x.id))?`<span class="s"><span class="onlydot"></span> solo en esta zona</span>`:""}</div>
         <div class="cmprow${win(bDrive,i)}"><span class="k">En coche</span><b>${z.dv?z.dv.txt:"–"}</b><span class="s">${z.dv?z.dv.km+" km":"Indica desde dónde sales"}</span></div>
         <div class="cmprow${win(bSlope,i)}"><span class="k">Desnivel</span><b style="color:${SLOPEC[z.slope]}">${SLOPEN[z.slope]}</b></div>
+        <div class="cmprow${win(bPress,i)}"><span class="k">Gente en el bosque</span><b style="color:${SLOPEC[z.pp.lvl]}">${PRESSN[z.pp.lvl]}</b><span class="s">${z.pp.lvl===1?(I18N.lang==="ca"?"Dia tranquil":"Día tranquilo"):(I18N.lang==="ca"?"Aquell dia ":"Ese día ")+z.pp.why}</span></div>
         <div class="cmprow"><span class="k">Tiempo ese día</span><b>${z.r.lo.toFixed(0)}° / ${z.r.hi.toFixed(0)}°</b><span class="s">${z.r.rain>=1?nf(z.r.rain,0)+" mm de lluvia":"sin lluvia"} · ${z.r.W} mm en 3 semanas</span></div>
         <div class="cmprow"><span class="k">Mejor cota</span><b>${z.r.optAlt} m</b></div>
         <div class="cmprow"><span class="k">Batidas</span><b>${z.hunt?"Día habitual de batidas":"No es día de batida"}</b></div>
