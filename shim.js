@@ -26,6 +26,13 @@ window.BOLETAIRE_WEB = true;
     .catch(()=>{ repSubs.forEach(f=>f({docs:repDocs})); });
   if(SB) setInterval(()=>{ if(repSubs.length&&document.visibilityState==="visible") repLoad(); }, 5*60e3);
   window.BOLETAIRE_REPORTS = !!SB;
+  // Comunidad (foro y «Estoy aquí»): tabla genérica docs(coll, uid, data)
+  const SHARED={forum:true,checkins:true}; const colSubs={forum:[],checkins:[]}; const colDocs={forum:[],checkins:[]};
+  const colLoad=c=>fetch(SB.u+`/rest/v1/docs?select=uid,data,updated_at&coll=eq.${c}&order=updated_at.desc&limit=400`,{headers:sbH()})
+    .then(r=>{ if(!r.ok) throw new Error(r.status); return r.json(); })
+    .then(a=>{ colDocs[c]=a.map(v=>({id:v.uid,data:()=>v.data})); colSubs[c].forEach(f=>f({docs:colDocs[c]})); })
+    .catch(()=>{ colSubs[c].forEach(f=>f({docs:colDocs[c]})); });
+  if(SB) setInterval(()=>{ if(document.visibilityState!=="visible") return; for(const c in colSubs) if(colSubs[c].length) colLoad(c); }, 90e3);
   const db={
     doc(path){
       const seg=path.split("/");
@@ -36,6 +43,8 @@ window.BOLETAIRE_WEB = true;
                  update:async v=>{ const o=store(); o[id]={...(o[id]||{}),...v}; save(o); setTimeout(fire,0); },
                  delete:async()=>{ try{ await idbOp("readwrite",st=>st.delete(id)); }catch(e){} const o=store(); delete o[id]; save(o); setTimeout(fire,0); },
                  onSnapshot(fn){ const o=store(); fn(snap(id in o,o[id])); return ()=>{}; } }; }
+      if(SHARED[seg[0]]&&seg.length===2&&SB){ const c=seg[0]; return { get:async()=>{ const d=colDocs[c].find(x=>x.id===seg[1]); return snap(!!d,d?d.data():null); }, onSnapshot(fn){ fn(snap(false,null)); return ()=>{}; }, update:refused, delete:refused,
+        set:async v=>{ if(seg[1]!==uid) return refused(); const r=await fetch(SB.u+"/rest/v1/rpc/put_doc",{method:"POST",headers:sbH(),body:JSON.stringify({p_coll:c,p_uid:uid,p_token:tok,p_data:v})}); if(!r.ok) throw new Error("supabase "+r.status); await colLoad(c); } }; }
       if(seg[0]==="reports"&&seg.length===2&&SB){ return { get:async()=>snap(false,null), onSnapshot(fn){ fn(snap(false,null)); return ()=>{}; }, update:refused, delete:refused,
         set:async v=>{ if(seg[1]!==uid) return refused(); const r=await fetch(SB.u+"/rest/v1/rpc/post_report",{method:"POST",headers:sbH(),body:JSON.stringify({p_uid:uid,p_token:tok,p_items:v.items||[]})}); if(!r.ok) throw new Error("supabase "+r.status); await repLoad(); } }; }
       return { get:async()=>snap(false,null), set:refused, update:refused, delete:refused, onSnapshot(fn){ fn(snap(false,null)); return ()=>{}; } };
@@ -46,6 +55,7 @@ window.BOLETAIRE_WEB = true;
           if(path==="history"){ json("data/history.json").then(a=>fn({docs:a.map(v=>({id:v.d,data:()=>v}))})).catch(()=>fn({docs:[]})); }
           else if(path.startsWith("data/users/")){ userSubs.push(fn); setTimeout(fire,0); }
           else if(path==="reports"&&SB){ repSubs.push(fn); repLoad(); }
+          else if(SHARED[path]&&SB){ colSubs[path].push(fn); colLoad(path); }
           else setTimeout(()=>fn({docs:[]}),0);
           return ()=>{}; },
         get:async()=>({docs:[]}), doc:(id)=>db.doc(path+"/"+id) };

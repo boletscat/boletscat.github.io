@@ -1035,6 +1035,25 @@ h3{font:700 13px var(--body);text-transform:uppercase;letter-spacing:.08em;color
 .cmpsp li.only span::before,.onlydot{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--moss);margin-right:5px;vertical-align:middle}
 .cmpstrip{display:flex;align-items:flex-end;gap:2px;height:34px}.cmpstrip i{flex:1;border-radius:2px 2px 0 0;opacity:.75}.cmpstrip i.on{opacity:1;outline:2px solid var(--fg)}
 @media (max-width:600px){.cmpgrid{gap:6px}.cmprow{padding:6px}.cmpsp li{flex-direction:column;gap:0}.cmpname b{font-size:13.5px}}
+.checkin{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin:12px 0;padding:10px 12px;border-radius:12px;background:var(--surface-2)}
+.checkin>div{flex:1 1 220px}.checkin b{display:block;font-size:14px}.checkin .note{margin:2px 0 0}
+.fgrid{grid-template-columns:minmax(0,1fr) minmax(0,1.4fr)}@media (max-width:860px){.fgrid{grid-template-columns:1fr}}
+.fwarn{background:color-mix(in srgb,var(--bad) 10%,var(--surface));border-left:3px solid var(--bad);border-radius:8px;padding:9px 12px;font-size:13px;line-height:1.45}
+.fnow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:13px;margin:8px 0}.fnow span{background:var(--surface-2);border-radius:20px;padding:3px 9px}
+.fform{display:grid;gap:8px;margin-top:10px}.fform input,.fform textarea,.fform select,.freply textarea{width:100%;box-sizing:border-box;font:15px var(--body);padding:9px 11px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);color:var(--fg)}
+.frow{display:flex;gap:8px}.frow select{flex:1}.fphotobtn{cursor:pointer;white-space:nowrap}
+.ffil{margin-bottom:8px}
+.fthread{border:1px solid var(--line);border-radius:12px;margin:8px 0;overflow:hidden}
+.fhead{display:block;width:100%;text-align:left;background:none;border:0;padding:10px 12px;cursor:pointer;color:var(--fg);font:inherit}.fhead b{display:block;font-size:15px}.fhead span{font-size:12.5px;color:var(--muted)}
+.fthread.open .fhead{background:var(--surface-2)}
+.fbody{padding:4px 12px 12px}
+.fpost{padding:9px 0;border-top:1px solid var(--line)}.fpost:first-child{border-top:0}
+.fpost.fai{background:color-mix(in srgb,var(--moss) 9%,transparent);margin:0 -12px;padding:9px 12px}
+.fmeta{display:flex;justify-content:space-between;gap:8px;font-size:12px;color:var(--muted)}.fau{font-weight:700;color:var(--fg)}.fau.ai{color:var(--moss)}.fau.own{color:var(--warn)}
+.ftitle{display:block;margin:4px 0 2px}.ftext{font-size:14px;line-height:1.5;margin-top:3px}
+.fphoto{display:block;max-width:100%;max-height:320px;border-radius:10px;margin-top:8px;cursor:zoom-in}
+.flink{background:none;border:0;color:var(--muted);font-size:12px;text-decoration:underline;cursor:pointer;padding:4px 0}
+.freply{margin-top:8px;display:grid;gap:6px}
 /* Compacto */
 .panel{padding:14px}
 h3{margin:12px 0 6px}
@@ -1187,6 +1206,7 @@ details.sec[open]{padding-bottom:10px}
     <button id="v-map" aria-pressed="true">Mapa</button>
     <button id="v-guide" aria-pressed="false">Guía de setas</button>
     <button id="v-trips" aria-pressed="false">Mis salidas</button>
+    <button id="v-forum" aria-pressed="false">Comunidad</button>
     <button id="v-how" aria-pressed="false">Cómo se calcula</button>
   </nav>
 
@@ -1236,6 +1256,8 @@ details.sec[open]{padding-bottom:10px}
       <div class="panel"><h2>Tus salidas</h2><p class="note">Solo tú ves tus salidas.</p><div id="tripStats"></div><h3>Historial</h3><ol id="tripList"></ol></div>
     </div>
   </section>
+
+  <section id="view-forum" hidden><div class="grid fgrid" id="forumBox" style="margin-top:14px"></div></section>
 
   <section id="view-how" hidden>
     <div class="panel how" id="accBox" style="margin-bottom:14px"></div>
@@ -3301,6 +3323,7 @@ function renderDetail(){
       <div class="fact"><div class="k">Humedad del aire</div><div class="v">${r.hum??'–'} %</div><div class="s">${r.hum==null?'Sin dato':r.hum>=85?'Ambiente muy húmedo':r.hum>=65?'Húmedo, bien para las setas':r.hum>=50?'Algo seco':'Seco: el suelo pierde agua'}</div></div>
       <div class="fact"><div class="k">Viento</div><div class="v">${r.wind??'–'} km/h</div><div class="s">${r.gust!=null?`Máx. ${r.gust} km/h. `:''}${r.wind==null?'':r.wind>=20?'Seca mucho el suelo':r.wind>=12?'Moderado':'Flojo'}</div></div>
     </div>
+    ${dayIdx===0||all[dayIdx].d===todayISO()?checkinBlock(s):""}
     <div class="strip">${all.map((a,i)=>`<div class="${i===dayIdx?'on':''}${i>=7?' far':''}"><div class="col"><i style="height:${Math.max(4,a.score/100*100)}%;background:${col(a.score)}"></i></div>${fmtDay(a.d,i)}<br><span class="rain">${a.score}</span><br><span class="wx">${a.rain.toFixed(0)}mm · ${a.hum??'–'}%</span></div>`).join("")}</div>
     ${spotsBlock(s,r)}
     ${parkBlock(s,r)}
@@ -3331,6 +3354,7 @@ function renderDetail(){
     <p class="note">Lluvia y temperatura combinando las estaciones Meteocat ${(all.src||[s.st]).join(", ")}, corregidas a ${s.alt} m.</p>`;
   el.querySelectorAll(".sp").forEach(b=>b.onclick=()=>{guideFocus=b.dataset.sp;guideFilter="todas";setView("guide");});
   el.querySelector("#favBtn").onclick=()=>toggleFav(s.id);
+  el.querySelector("#ciBtn")?.addEventListener("click",()=>checkIn(s.id));
   el.querySelector("#cmpBtn").onclick=()=>{ cmpToggle(s.id); const b=el.querySelector("#cmpBtn"); b.setAttribute("aria-pressed",CMP.includes(s.id)); if(CMP.length>=2&&CMP.includes(s.id)) showCompare(); };
   wireReports(el,s); wireBefore(el,s,r); wireField(el,s); wireSpotFb(el,s,r);
   const zs=el.querySelector('#zoomSpots'); if(zs) zs.onclick=zoomToSpots;
@@ -3374,12 +3398,13 @@ function renderGuide(){
 }
 function renderAll(){ if(!DATA) return; applyAdj(); renderDays(); renderPlan(); renderSeason(); renderFerias(); renderMap(); renderTownsLayer(); if(selTown!=null) renderTownDetail(); else renderDetail(); renderRank(); renderBugs(); renderAcc(); }
 function setView(v){
-  ["map","guide","trips","how"].forEach(k=>{document.getElementById("view-"+k).hidden=k!==v;document.getElementById("v-"+k).setAttribute("aria-pressed",k===v);});
+  ["map","guide","trips","forum","how"].forEach(k=>{document.getElementById("view-"+k).hidden=k!==v;document.getElementById("v-"+k).setAttribute("aria-pressed",k===v);});
+  if(v==="forum") renderForum();
   if(v==="guide") renderGuide();
   if(v==="trips"){ renderTripForm(); renderTrips(); }
   if(v==="how"){ document.getElementById("calib").innerHTML=calibrationBlock(); }
 }
-["map","guide","trips","how"].forEach(k=>document.getElementById("v-"+k).onclick=()=>{guideFocus=null;setView(k)});
+["map","guide","trips","forum","how"].forEach(k=>document.getElementById("v-"+k).onclick=()=>{guideFocus=null;setView(k)});
 document.querySelectorAll('#mapmode .chip[data-m]').forEach(b=>b.onclick=()=>{mapMode=b.dataset.m;renderMap();});
 document.getElementById('forestBtn').onclick=()=>{showForest=!showForest;try{localStorage.setItem('boletaire.forest',showForest?'1':'0')}catch(e){};renderForestLayer();};
 document.getElementById('catBtn').onclick=()=>{showCat=!showCat;try{localStorage.setItem('boletaire.cat',showCat?'1':'0')}catch(e){};renderCatLayer();const n=document.getElementById('catNote');if(n)n.hidden=!showCat;};
@@ -3497,6 +3522,7 @@ try{ initMap(); }catch(e){}
         BUGS=[]; q.docs.forEach(d=>{ (d.data().items||[]).forEach(it=>BUGS.push({uid:d.id,...it})); });
         BUGS.sort((a,b)=>b.at.localeCompare(a.at)); renderBugs();
       }, ()=>{});
+      try{ forumStart(db); }catch(e){}
       db.collection("reports").onSnapshot(q=>{
         REPORTS=[]; q.docs.forEach(d=>{const v=d.data(); (v.items||[]).forEach(it=>REPORTS.push({uid:d.id,...it}));});
         if(DATA) renderAll();
@@ -3526,6 +3552,161 @@ try{ initMap(); }catch(e){}
   window._loadWD=setTimeout(()=>{ if(!DATA) loadFail("La previsión está tardando más de lo normal."); },15000);
 })();
 document.querySelectorAll(".langsel button").forEach(b=>{ b.setAttribute("aria-pressed",b.dataset.lang===I18N.lang); b.onclick=()=>{ if(b.dataset.lang!==I18N.lang) setLang(b.dataset.lang); }; });
+/* ---------- Comunidad: foro de dudas y «Estoy aquí buscando» ----------
+   Cada persona escribe solo su propio documento (forum/<id>, checkins/<id>); los hilos se montan juntando todos.
+   Claude puede responder: al momento (botón, con la cuenta de quien lo pide) o cada mañana con la tarea diaria (forum/claude). */
+let FORUM=[], FORUMDOCS={}, CHECKINS=[], OWNER_UID=null, forumFilter="todo", forumOpen=null, forumBusy=false, FPHOTO=null;
+const fid=(uid,id)=>uid+":"+id;
+const myNick=()=>{ try{ return localStorage.getItem("boletaire.nick")||""; }catch(e){ return ""; } };
+function forumThreads(){
+  const qs=FORUM.filter(p=>p.kind==="q");
+  const rep={}; FORUM.filter(p=>p.kind==="r").forEach(r=>{ (rep[r.parent]=rep[r.parent]||[]).push(r); });
+  return qs.map(q=>{ const R=(rep[q.gid]||[]).sort((a,b)=>a.at.localeCompare(b.at)); return {q,R,last:R.length?R[R.length-1].at:q.at}; })
+    .sort((a,b)=>b.last.localeCompare(a.last));
+}
+function forumIngest(docs){
+  FORUMDOCS={}; FORUM=[];
+  docs.forEach(d=>{ const v=d.data()||{}; FORUMDOCS[d.id]=v; (v.items||[]).forEach(it=>{ if(!it||!it.id||!it.at) return; FORUM.push({...it,uid:d.id,gid:fid(d.id,it.id),nick:it.ai?"Claude":(v.nick||"")}); }); });
+  if(!document.getElementById("view-forum")?.hidden) renderForum();
+}
+function checkinsIngest(docs){
+  CHECKINS=[]; const lim=Date.now()-12*3600e3;
+  docs.forEach(d=>(d.data()?.items||[]).forEach(it=>{ if(it&&it.site&&Date.parse(it.at)>lim) CHECKINS.push({uid:d.id,...it}); }));
+  if(DATA) renderDetail();
+}
+function checkinsToday(site){ const t=todayISO(); return new Set(CHECKINS.filter(c=>c.site===site&&c.at.slice(0,10)===t).map(c=>c.uid)).size; }
+async function checkIn(site){
+  if(!DB||!UID) return;
+  const mine=(CHECKINS.filter(c=>c.uid===UID).map(({uid,...c})=>c));
+  const items=[{site,at:new Date().toISOString()},...mine].slice(0,6);
+  try{ await DB.doc(`checkins/${UID}`).set({items}); CHECKINS=[...CHECKINS.filter(c=>c.uid!==UID),...items.map(i=>({uid:UID,...i}))]; renderDetail(); }catch(e){ const m=document.getElementById("ciMsg"); if(m) m.textContent="No se ha podido guardar."; }
+}
+function checkinBlock(s){
+  if(!DB||!UID||(window.BOLETAIRE_WEB&&!window.BOLETAIRE_REPORTS)) return "";
+  const n=checkinsToday(s.id), me=CHECKINS.some(c=>c.uid===UID&&c.site===s.id&&c.at.slice(0,10)===todayISO());
+  return `<div class="checkin"><div><b>${n?`Hoy ${n===1?"1 boletaire ha":n+" boletaires han"} marcado que estaba${n===1?"":"n"} aquí`:"Nadie ha marcado hoy que esté aquí"}</b>
+    <span class="note">Si estás en esta zona, márcalo: así los demás saben cuánta gente hay. Es anónimo y solo se guarda la zona.</span></div>
+    <button class="btn small${me?" ghost":""}" id="ciBtn" ${me?"disabled":""}>${me?"✓ Marcado":"Estoy aquí buscando"}</button><span class="note" id="ciMsg" role="status"></span></div>`;
+}
+/* ----- publicar ----- */
+async function forumSave(newItems){
+  const mine=(FORUMDOCS[UID]?.items||[]);
+  const items=[...newItems,...mine].slice(0,25);
+  const nick=myNick()||FORUMDOCS[UID]?.nick||"";
+  await DB.doc(`forum/${UID}`).set({nick,items,updatedAt:new Date().toISOString()});
+}
+const newId=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+async function photoToData(file){
+  let b=await shrinkImage(file,720); let url=await blobURL(b);
+  if(url.length>110000){ b=await shrinkImage(file,520); url=await blobURL(b); }
+  return url.length>140000?null:url;
+}
+const blobURL=b=>new Promise(r=>{ const fr=new FileReader(); fr.onload=()=>r(fr.result); fr.onerror=()=>r(""); fr.readAsDataURL(b); });
+async function askClaudeForum(gid){
+  const th=forumThreads().find(t=>t.q.gid===gid); if(!th||!SAMPLE||forumBusy) return;
+  forumBusy=true; renderForum();
+  const q=th.q; const zone=q.site?SITES.find(s=>s.id===q.site):null;
+  const ca=I18N.lang==="ca";
+  const ctx=th.R.filter(r=>!r.ai).map(r=>`- ${r.nick||"Usuario"}: ${r.text}`).join("\n");
+  const prompt=`Eres el experto en setas de la app Boletaire (Catalunya). Responde en ${ca?"catalán":"español"}, en un tono cercano, con 3–6 frases como máximo.
+Pregunta de un usuario en el foro${zone?` (zona: ${zone.n}, ${zone.h})`:""}:
+"""${q.title?q.title+"\n":""}${q.text}"""
+${ctx?`Respuestas de otros usuarios:\n${ctx}\n`:""}${q.photo?"Adjunta una foto de la seta.\n":""}
+Normas obligatorias: nunca afirmes que una seta concreta es comestible ni digas que se puede comer basándote en una foto o una descripción. Si es una duda de identificación, di qué especies podría ser, con qué tóxicas se puede confundir y qué rasgos tiene que mirar (láminas, anillo, volva, color de la carne al cortar, olor, hábitat), y recomienda siempre que la revise una asociación micológica o un experto antes de comerla. Si la pregunta no va de setas o del monte, contesta amablemente que el foro es para eso.`;
+  try{
+    const opts={modelTier:"default",cache:false};
+    if(q.photo&&photoCaps?.images){ const bl=await (await fetch(q.photo)).blob(); opts.images=[bl]; }
+    const res=await SAMPLE(prompt,opts);
+    const text=(res.text||"").trim(); if(!text) throw new Error("vacío");
+    await forumSave([{id:newId(),kind:"r",parent:gid,text,ai:true,at:new Date().toISOString()}]);
+  }catch(e){ const m=document.getElementById("fMsg"); if(m) m.textContent=e.code==="not_granted"?"Necesitas permitir que la app pregunte a Claude.":"Claude no ha podido responder ahora. Prueba más tarde."; }
+  forumBusy=false; renderForum();
+}
+async function forumDelete(p){
+  const doc=FORUMDOCS[p.uid]; if(!doc) return;
+  const items=(doc.items||[]).filter(it=>it.id!==p.id&&(p.kind!=="q"||it.parent!==p.gid));
+  try{ await DB.doc(`forum/${p.uid}`).set({...doc,items,updatedAt:new Date().toISOString()}); }catch(e){}
+  // respuestas de otros a una pregunta borrada: se ocultan solas al no tener hilo
+}
+/* ----- pintar ----- */
+function fAgo(iso){ const m=Math.round((Date.now()-Date.parse(iso))/60000); if(m<60) return m<=1?"ahora":`hace ${m} min`; const h=Math.round(m/60); if(h<24) return `hace ${h} h`; const d=Math.round(h/24); return d===1?"ayer":`hace ${d} días`; }
+function fAuthor(p){
+  if(p.ai) return `<span class="fau ai">Claude · IA</span>`;
+  const own=OWNER_UID&&p.uid===OWNER_UID;
+  return `<span class="fau${own?" own":""}"><span>${esc(p.nick||("Boletaire "+p.uid.slice(-4)))}</span>${own?` · <span>creador de Boletaire</span>`:""}${p.uid===UID?` <span>(tú)</span>`:""}</span>`;
+}
+function fPost(p,isQ){
+  const z=p.site?SITES.find(s=>s.id===p.site):null;
+  const canDel=p.uid===UID||IS_OWNER;
+  return `<div class="fpost${p.ai?" fai":""}">
+    <div class="fmeta">${fAuthor(p)}<span>${fAgo(p.at)}${z?` · ${esc(z.n)}`:""}</span></div>
+    ${isQ&&p.title?`<b class="ftitle">${esc(p.title)}</b>`:""}
+    <div class="ftext">${esc(p.text).replace(/\n/g,"<br>")}</div>
+    ${p.photo?`<img class="fphoto" src="${p.photo}" alt="Foto de la seta" loading="lazy">`:""}
+    ${canDel?`<button class="flink" data-fdel="${p.gid}">Borrar</button>`:""}
+  </div>`;
+}
+function renderForum(){
+  const el=document.getElementById("forumBox"); if(!el) return;
+  if(!DB||!UID||(window.BOLETAIRE_WEB&&!window.BOLETAIRE_REPORTS)){ el.innerHTML=`<div class="panel"><h2>Comunidad</h2><p class="note">${window.BOLETAIRE_WEB?"La comunidad estará disponible muy pronto en la versión web.":"Abre la app con tu cuenta para participar en la comunidad."}</p></div>`; return; }
+  const TH=forumThreads();
+  const list=TH.filter(t=>forumFilter==="todo"||(forumFilter==="sin"&&!t.R.length)||(forumFilter==="mias"&&(t.q.uid===UID||t.R.some(r=>r.uid===UID))));
+  // gente en el bosque ahora mismo
+  const now={}; CHECKINS.filter(c=>c.at.slice(0,10)===todayISO()).forEach(c=>{ (now[c.site]=now[c.site]||new Set()).add(c.uid); });
+  const nowL=Object.entries(now).sort((a,b)=>b[1].size-a[1].size).slice(0,6);
+  el.innerHTML=`
+   <div class="panel">
+     <h2 style="margin-top:0">Comunidad</h2>
+     <p class="fwarn"><b>Nunca comas una seta solo porque alguien te diga aquí que es comestible</b>, tampoco Claude: con una foto no se puede asegurar. Ante la duda, llévala a una asociación micológica.</p>
+     ${nowL.length?`<div class="fnow"><b>Hoy en el bosque:</b> ${nowL.map(([id,S])=>`<span>${esc(SITES.find(s=>s.id===id)?.n.split(" – ")[0]||id)} · ${S.size}</span>`).join("")}</div>`:""}
+     <form id="fForm" class="fform">
+       <input id="fNick" maxlength="24" placeholder="Tu nombre o apodo (opcional)" value="${esc(myNick()||FORUMDOCS[UID]?.nick||"")}">
+       <input id="fTitle" maxlength="80" placeholder="Título: p. ej. ¿Qué seta es esta?" required>
+       <textarea id="fText" rows="3" maxlength="1200" placeholder="Cuenta tu duda: dónde la encontraste, bajo qué árboles, color, olor, si cambia de color al cortarla…" required></textarea>
+       <div class="frow"><select id="fSite"><option value="">Zona (opcional)</option>${[...SITES].sort((a,b)=>a.n.localeCompare(b.n)).map(s=>`<option value="${s.id}" ${s.id===sel?"":""}>${esc(s.n)}</option>`).join("")}</select>
+         <label class="btn small ghost fphotobtn">${FPHOTO?"✓ Foto añadida":"+ Foto"}<input type="file" accept="image/*" id="fPhoto" hidden></label></div>
+       <div class="actions"><button class="btn small" type="submit">Publicar pregunta</button><span class="note" id="fMsg" role="status"></span></div>
+     </form>
+   </div>
+   <div class="panel">
+     <div class="chips ffil">${[["todo","Todas"],["sin","Sin respuesta"],["mias","Las mías"]].map(([k,l])=>`<button class="chip small" data-ff="${k}" aria-pressed="${forumFilter===k}">${l}</button>`).join("")}</div>
+     ${list.length?list.map(t=>{ const open=forumOpen===t.q.gid; const hasAI=t.R.some(r=>r.ai);
+       return `<article class="fthread${open?" open":""}">
+         <button class="fhead" data-fopen="${t.q.gid}"><b>${esc(t.q.title||t.q.text.slice(0,60))}</b><span>${t.R.length?`${t.R.length} respuesta${t.R.length>1?"s":""}`:"Sin respuesta"} · ${fAgo(t.last)}${t.q.photo?" · 📷":""}</span></button>
+         ${open?`<div class="fbody">${fPost(t.q,true)}${t.R.map(r=>fPost(r,false)).join("")}
+           <form class="freply" data-fparent="${t.q.gid}"><textarea rows="2" maxlength="1000" placeholder="Escribe tu respuesta" required></textarea>
+             <div class="actions"><button class="btn small" type="submit">Responder</button>
+             ${SAMPLE&&!hasAI?`<button class="btn small ghost" type="button" data-fai="${t.q.gid}" ${forumBusy?"disabled":""}>${forumBusy?"Claude está respondiendo…":"Pedir respuesta a Claude"}</button>`:""}</div></form></div>`:""}
+       </article>`; }).join(""):`<p class="note">${forumFilter==="todo"?"Todavía no hay preguntas. ¡Sé el primero!":"No hay nada aquí."}</p>`}
+     ${!SAMPLE&&!window.BOLETAIRE_WEB?`<p class="note">Claude revisa cada mañana las preguntas sin respuesta y contesta las que puede.</p>`:""}
+   </div>`;
+  wireForum(el);
+}
+function wireForum(el){
+  el.querySelectorAll("[data-ff]").forEach(b=>b.onclick=()=>{ forumFilter=b.dataset.ff; renderForum(); });
+  el.querySelectorAll("[data-fopen]").forEach(b=>b.onclick=()=>{ forumOpen=forumOpen===b.dataset.fopen?null:b.dataset.fopen; renderForum(); });
+  el.querySelectorAll("[data-fai]").forEach(b=>b.onclick=()=>askClaudeForum(b.dataset.fai));
+  el.querySelectorAll("[data-fdel]").forEach(b=>b.onclick=()=>{ const p=FORUM.find(x=>x.gid===b.dataset.fdel); if(p) forumDelete(p); });
+  el.querySelectorAll("img.fphoto").forEach(i=>i.onclick=()=>window.open(i.src,"_blank"));
+  const ph=el.querySelector("#fPhoto"); if(ph) ph.onchange=async()=>{ const f=ph.files[0]; if(!f) return; FPHOTO=await photoToData(f); const m=el.querySelector("#fMsg"); if(!FPHOTO&&m) m.textContent="La foto es demasiado grande."; const lb=el.querySelector(".fphotobtn"); if(lb&&FPHOTO) lb.firstChild.textContent="✓ Foto añadida"; };
+  const f=el.querySelector("#fForm"); if(f) f.onsubmit=async e=>{ e.preventDefault();
+    const nick=f.querySelector("#fNick").value.trim(), title=f.querySelector("#fTitle").value.trim(), text=f.querySelector("#fText").value.trim(), site=f.querySelector("#fSite").value;
+    const msg=f.querySelector("#fMsg"); if(title.length<4||text.length<8){ msg.textContent="Escribe un título y explica un poco tu duda."; return; }
+    try{ localStorage.setItem("boletaire.nick",nick); }catch(e){}
+    msg.textContent="Publicando…";
+    try{ const it={id:newId(),kind:"q",title,text,at:new Date().toISOString()}; if(site) it.site=site; if(FPHOTO) it.photo=FPHOTO;
+      await forumSave([it]); FPHOTO=null; forumOpen=fid(UID,it.id); renderForum(); }
+    catch(err){ msg.textContent="No se ha podido publicar. Prueba con una foto más pequeña o sin foto."; } };
+  el.querySelectorAll(".freply").forEach(fr=>fr.onsubmit=async e=>{ e.preventDefault(); const t=fr.querySelector("textarea").value.trim(); if(t.length<2) return;
+    try{ await forumSave([{id:newId(),kind:"r",parent:fr.dataset.fparent,text:t,at:new Date().toISOString()}]); }catch(err){} });
+}
+function forumStart(db){
+  db.collection("forum").onSnapshot(q=>forumIngest(q.docs),()=>{});
+  db.collection("checkins").onSnapshot(q=>checkinsIngest(q.docs),()=>{});
+  db.doc("config/meta").onSnapshot(s=>{ OWNER_UID=s.exists?s.data()?.ownerUid||null:null;
+    if(IS_OWNER&&UID&&OWNER_UID!==UID&&!window.BOLETAIRE_WEB) db.doc("config/meta").set({...(s.exists?s.data():{}),ownerUid:UID}).catch(()=>{}); },()=>{});
+}
+
 /* ---------- Gente en el bosque ----------
    Los sábados, domingos y festivos va mucha más gente; los días siguientes queda menos por coger.
    Más presión cerca de Barcelona y cuando las condiciones son buenas (todo el mundo sale a la vez). */
@@ -3535,7 +3716,8 @@ function pickPressure(s,iso,score){
   const P=(0.5*crowdDay(iso)+crowdDay(isoAdd(iso,-1))+0.55*crowdDay(isoAdd(iso,-2))+0.3*crowdDay(isoAdd(iso,-3)))/1.75;
   const dB=hav(41.39,2.17,s.lat,s.lon);
   const pop=Math.max(0.25,Math.min(1,1.15-dB/140))*(["montseny","collserola","stllorenc","berti","montnegre","viladrau","sanhilari","serramarina"].includes(s.id)?1.1:1);
-  const v=Math.max(0,Math.min(1,P*pop*(0.4+0.6*(score||0)/100)));
+  let v=Math.max(0,Math.min(1,P*pop*(0.4+0.6*(score||0)/100)));
+  if(iso===todayISO()&&typeof checkinsToday==="function"){ const n=checkinsToday(s.id); if(n>=5) v=Math.max(v,0.6); else if(n>=2) v=Math.max(v,0.3); }
   const prev=[1,2,3].map(k=>isoAdd(iso,-k)).find(x=>crowdDay(x)>=.9);
   const ca=I18N.lang==="ca", pw=prev&&(HOLI.has(prev)?(ca?"un festiu":"un festivo"):new Date(prev+"T12:00:00").getDay()===0?(ca?"un diumenge":"un domingo"):(ca?"un dissabte":"un sábado"));
   const why=crowdDay(iso)>=.9&&crowdDay(isoAdd(iso,-1))>=.9?(ca?"porta dies amb molta gent":"lleva días de mucha gente"):crowdDay(iso)>=.9?(ca?"és dia de molta gent":"es día de mucha gente"):prev?(ca?`ve després d'${pw.replace(/^un /,"un ")}`.replace("d'un","d'un"):`viene después de ${pw}`):(ca?"és entre setmana":"es entre semana");
