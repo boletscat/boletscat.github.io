@@ -1502,14 +1502,14 @@ const YLD = {
  murgola:[0.5,4,25,"calc"], moixerno:[2,12,40,"calc"], carreretes:[1,6,3,""], cepestiu:[2,15,150,"acid"]
 };
 const NFC={}; const nf=(v,d=0)=>(NFC[d]||(NFC[d]=new Intl.NumberFormat(LOCALE,{maximumFractionDigits:d,minimumFractionDigits:0}))).format(v);
-function yieldFor(siteId, spId, p, rank){
+function yieldFor(siteId, spId, p, rank, kf=1){
   const y=YLD[spId]; if(!y) return null;
   const soil=TERR[siteId]?.[0];
   let f = rank<2?1:rank<4?0.7:0.5;                       // especie principal o secundaria en la zona
   if(y[3]==="acid") f*= soil==="acido"?1.2:soil==="calcareo"?0.55:0.9;
   if(y[3]==="calc") f*= soil==="calcareo"?1.2:soil==="acido"?0.75:1;
   const season=y[0]*f, good=y[1]*f;
-  const week = season*0.18*Math.min(1.6,p/60);            // ~1/6 de la temporada en una buena semana
+  const week = season*0.18*Math.min(1.6,p/60)*kf;         // ~1/6 de la temporada en una buena semana, menos lo que ya habrán recogido otros
   const kgDisp = v=> v<1? nf(v,1) : nf(v,0);
   return {season, good, week, n:Math.round(week*1000/y[2]), txt:`${kgDisp(season)}–${kgDisp(good)} kg/ha`, wtxt: week<0.05?'casi nada esta semana':`${nf(week,1)} kg/ha · ~${Math.round(week*1000/y[2])} setas`};
 }
@@ -1947,7 +1947,7 @@ function ranked(){
   return L.sort((a,b)=>(b._k-a._k) || (a._d-b._d) || (b.r.score-a.r.score));
 }
 /* Kilos por hectárea esperables esa semana sumando las especies comestibles de la zona */
-function zoneKg(id,r){ if(!r) return 0; let t=0; r.sp.forEach((x,i)=>{ if(!["excelente","comestible","precaucion"].includes(SP[x.id]?.ed)) return; const Y=yieldFor(id,x.id,x.p,i); if(Y) t+=Y.week; }); return Math.round(t*10)/10; }
+function zoneKg(id,r){ if(!r) return 0; const z=SITES.find(q=>q.id===id); const kf=z&&r.d?pickPressure(z,r.d,r.score).kgF:1; let t=0; r.sp.forEach((x,i)=>{ if(!["excelente","comestible","precaucion"].includes(SP[x.id]?.ed)) return; const Y=yieldFor(id,x.id,x.p,i,kf); if(Y) t+=Y.week; }); return Math.round(t*10)/10; }
 function bestRanked(){ const keep=sortMode; sortMode="cantidad"; const r=ranked(); sortMode=keep; return r; }
 
 function renderDays(){
@@ -3337,8 +3337,9 @@ function renderDetail(){
     ${sparkline(s.id)}
     <h3>Qué puedes encontrar</h3>
     ${r.sp.length?"":`<p class="note" style="margin-top:0">En esta época del año no es temporada de ninguna de las setas de esta zona.</p>`}
-    <div class="splist">${r.sp.map(x=>`<button class="sp" data-sp="${x.id}">${thumb(x.id)}<span class="n"><b>${SP[x.id].ca}</b><span>${SP[x.id].es}</span><span style="display:block;margin-top:4px">${badge(SP[x.id].ed)}</span></span><span class="prob">${probLabel(x.p)}${(()=>{const Y=yieldFor(s.id,x.id,x.p,r.sp.indexOf(x));return Y?`<span class="yld">≈ ${Y.wtxt}<br><em>temporada ${Y.txt}</em></span>`:''})()}</span></button>`).join("")}</div>
-    <p class="yieldnote">Kilos de peso fresco por hectárea (100 × 100 m) en un bosque adecuado. Arriba lo que podría salir esa semana; abajo una temporada normal y una buena. Es una estimación: donde pasa mucha gente se encuentra bastante menos.</p>
+    ${(()=>{ const pp=pickPressure(s,r.d,r.score); window.__kf=pp.kgF; return ""; })()}
+    <div class="splist">${r.sp.map(x=>`<button class="sp" data-sp="${x.id}">${thumb(x.id)}<span class="n"><b>${SP[x.id].ca}</b><span>${SP[x.id].es}</span><span style="display:block;margin-top:4px">${badge(SP[x.id].ed)}</span></span><span class="prob">${probLabel(x.p)}${(()=>{const Y=yieldFor(s.id,x.id,x.p,r.sp.indexOf(x),window.__kf||1);return Y?`<span class="yld">≈ ${Y.wtxt}<br><em>temporada ${Y.txt}</em></span>`:''})()}</span></button>`).join("")}</div>
+    <p class="yieldnote">Kilos de peso fresco por hectárea (100 × 100 m) en un bosque adecuado. Arriba lo que podría salir esa semana; abajo una temporada normal y una buena. Es una estimación${(window.__kf||1)<0.97?`: ya descuenta lo que habrán recogido otros boletaires ese día (−${Math.round((1-window.__kf)*100)} %, por los fines de semana y festivos anteriores)`:" y ese día apenas habrá pasado gente"}.</p>
     <h3>Cuidado, también salen aquí</h3>
     <div class="splist">${s.tx.map(id=>`<button class="sp" data-sp="${id}">${thumb(id)}<span class="n"><b>${SP[id].ca}</b><span>${SP[id].es}</span></span>${badge(SP[id].ed)}</button>`).join("")}</div>
     ${s.note?`<div class="warnbox">${esc(s.note)}</div>`:''}
