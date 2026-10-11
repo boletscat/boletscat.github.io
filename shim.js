@@ -9,7 +9,13 @@ window.BOLETAIRE_WEB = true;
   const jwt=t=>{ try{ return JSON.parse(decodeURIComponent(escape(atob(t.split(".")[1].replace(/-/g,"+").replace(/_/g,"/"))))); }catch(e){ return {}; } };
   const mkSes=(at,rt,exp)=>{ const p=jwt(at); return {access_token:at,refresh_token:rt,expires_at:exp||p.exp||Math.floor(Date.now()/1000)+3600,id:p.sub,email:p.email||""}; };
   let SES=null; try{ SES=JSON.parse(LS.getItem(AUTHK)||"null"); }catch(e){}
-  (function(){ const h=location.hash||""; if(!/access_token=|error_description=/.test(h)) return;
+  let GTOK=null;
+  (function(){ const h=location.hash||""; if(!/id_token=/.test(h)) return;
+    const p=new URLSearchParams(h.slice(1)); let st=null; try{ st=JSON.parse(LS.getItem("boletaire.gstate")||"null"); }catch(e){}
+    if(st&&p.get("state")===st.state) GTOK={id:p.get("id_token"),nonce:st.nonce}; else window.BOLETAIRE_AUTH_ERR="state";
+    LS.removeItem("boletaire.gstate"); try{ history.replaceState(null,"",location.pathname+location.search); }catch(e){} })();
+  (function(){ const h=location.hash||""; if(/[#&]error=/.test(h)&&/state=/.test(h)){ try{ history.replaceState(null,"",location.pathname+location.search); }catch(e){} return; }
+    if(!/access_token=|error_description=/.test(h)) return;
     const p=new URLSearchParams(h.slice(1));
     if(p.get("access_token")){ SES=mkSes(p.get("access_token"),p.get("refresh_token"),+p.get("expires_at")||0); if(SES.id){ LS.setItem(AUTHK,JSON.stringify(SES)); window.BOLETAIRE_JUST_LOGGED=true; } else SES=null; }
     else window.BOLETAIRE_AUTH_ERR=p.get("error_description")||"error";
@@ -115,6 +121,12 @@ window.BOLETAIRE_WEB = true;
       if(r.ok) return true; let j={}; try{ j=await r.json(); }catch(e){}
       throw Object.assign(new Error(j.msg||j.message||j.error_description||"error"),{status:r.status}); },
     google:CFG.googleClientId||"",
+    async startGoogle(){ const rnd=n=>Array.from(crypto.getRandomValues(new Uint8Array(n)),b=>b.toString(16).padStart(2,"0")).join("");
+      const nonce=rnd(16), state=rnd(12);
+      const hashed=Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256",new TextEncoder().encode(nonce))),b=>b.toString(16).padStart(2,"0")).join("");
+      LS.setItem("boletaire.gstate",JSON.stringify({nonce,state}));
+      const q=new URLSearchParams({client_id:CFG.googleClientId,redirect_uri:location.origin+location.pathname,response_type:"id_token",scope:"openid email profile",nonce:hashed,state,prompt:"select_account"});
+      location.href="https://accounts.google.com/o/oauth2/v2/auth?"+q; },
     async signInGoogle(idToken,nonce){
       const r=await fetch(SB.u+"/auth/v1/token?grant_type=id_token",{method:"POST",headers:{apikey:SB.k,"Content-Type":"application/json"},body:JSON.stringify({provider:"google",id_token:idToken,nonce})});
       const j=await r.json().catch(()=>({})); if(!r.ok||!j.access_token) throw Object.assign(new Error(j.msg||j.error_description||j.message||"error"),{status:r.status});
@@ -127,6 +139,7 @@ window.BOLETAIRE_WEB = true;
     pull:pullData,
     async ban(id){ await rpc("mod_ban",{p_uid:id,p_ban:true,p_reason:"comunidad"}); for(const c in colSubs) await colLoad(c); await repLoad(); }
   };
+  if(GTOK&&SB){ window.BAUTH.signInGoogle(GTOK.id,GTOK.nonce).catch(()=>{ window.BAUTH.error="google"; window.dispatchEvent(new Event("boletaire-autherr")); }); }
   if(SES&&SB){ pullData(); setInterval(()=>{ if(document.visibilityState==="visible") token(); }, 10*60e3); }
   const user={ id:async()=>uid, me:async()=>({id:uid}), canEdit:async()=>false, isOwner:isAdmin, can:async()=>false, profiles:async()=>({}) };
   window.BCL={ use: async n=> n==="db"?db : n==="user"?user : null };

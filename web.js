@@ -106,7 +106,9 @@
       .acctbox .row{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
       .acctbox .ok{background:var(--surface-2);border-radius:10px;padding:10px 12px;margin:8px 0;font-size:14px;line-height:1.45}
       .acctbox .danger{color:#b3261e;border-color:#b3261e55}
-      .gbtn{min-height:44px;display:flex;justify-content:center;margin:6px 0 2px}
+      .gbtn{display:flex;justify-content:center;margin:6px 0 2px}
+      .gbtn2{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;max-width:340px;background:#fff;color:#1f1f1f;border:1px solid #747775;border-radius:999px;padding:10px 16px;font:600 15px var(--body);cursor:pointer}
+      .gbtn2:disabled{opacity:.6}
       .orsep{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:12.5px;margin:10px 0}.orsep:before,.orsep:after{content:"";flex:1;border-top:1px solid var(--line)}
       .loginask{background:var(--surface-2);border:1px dashed var(--line);border-radius:12px;padding:12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:space-between}
       .loginask span{font-size:14px;flex:1 1 200px}
@@ -144,20 +146,12 @@
         }catch(err){ b.disabled=false;
           m.textContent=err.status===429?"Se han enviado demasiados correos. Prueba de nuevo dentro de un rato.":"No se ha podido enviar el correo. Revisa la dirección y la conexión."; } };
     };
-    // Botón oficial de Google (Google Identity Services): Google nos da un token y Supabase lo comprueba
-    let gsiP=null;
-    const loadGsi=()=>gsiP||(gsiP=new Promise((res,rej)=>{ if(window.google&&google.accounts&&google.accounts.id) return res();
-      const sc=document.createElement("script"); sc.src="https://accounts.google.com/gsi/client"; sc.async=true; sc.onload=()=>res(); sc.onerror=()=>{ gsiP=null; rej(new Error("gsi")); }; document.head.appendChild(sc); }));
-    async function googleButton(box,msg){
+    const GLOGO=`<svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.6 5.4 2.7 13.3l7.9 6.1C12.5 13.6 17.8 9.5 24 9.5z"/><path fill="#4285F4" d="M46.1 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.4c-.5 2.9-2.2 5.3-4.6 6.9l7.4 5.7c4.3-4 6.9-9.9 6.9-17.1z"/><path fill="#FBBC05" d="M10.6 28.6c-.5-1.4-.8-2.9-.8-4.6s.3-3.2.8-4.6l-7.9-6.1C1 16.6 0 20.2 0 24s1 7.4 2.7 10.7l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.4-5.7c-2.1 1.4-4.8 2.2-8.5 2.2-6.2 0-11.5-4.2-13.4-9.9l-7.9 6.1C6.6 42.6 14.6 48 24 48z"/></svg>`;
+    function googleButton(box,msg){
       if(!box) return;
-      box.innerHTML=`<span class="note">Cargando Google…</span>`;
-      try{ await loadGsi();
-        const raw=Array.from(crypto.getRandomValues(new Uint8Array(16)),b=>b.toString(16).padStart(2,"0")).join("");
-        const hashed=Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256",new TextEncoder().encode(raw))),b=>b.toString(16).padStart(2,"0")).join("");
-        google.accounts.id.initialize({client_id:A.google,nonce:hashed,ux_mode:"popup",auto_select:false,itp_support:true,use_fedcm_for_button:true,
-          callback:async resp=>{ if(msg) msg.textContent="Entrando…"; try{ await A.signInGoogle(resp.credential,raw); }catch(e){ if(msg) msg.textContent="No se ha podido entrar con Google. Prueba con tu correo."; } } });
-        box.innerHTML=""; google.accounts.id.renderButton(box,{type:"standard",theme:"outline",size:"large",text:"continue_with",shape:"pill",logo_alignment:"left",width:Math.min(320,box.clientWidth||300),locale:(window.I18N&&I18N.lang==="ca")?"ca":"es"});
-      }catch(e){ box.innerHTML=""; if(msg) msg.textContent="No se ha podido cargar el botón de Google. Entra con tu correo."; }
+      box.innerHTML=`<button type="button" class="gbtn2">${GLOGO}<span>Continuar con Google</span></button>`;
+      box.querySelector("button").onclick=async e=>{ e.currentTarget.disabled=true; if(msg) msg.textContent="Abriendo Google…";
+        try{ await A.startGoogle(); }catch(err){ e.currentTarget.disabled=false; if(msg) msg.textContent="No se ha podido abrir Google. Entra con tu correo."; } };
     }
     function openAccount(){
       const u=A.user(); if(!u) return openLogin();
@@ -187,7 +181,9 @@
     if(document.readyState!=="loading") acctBtn(); else document.addEventListener("DOMContentLoaded",acctBtn);
     window.addEventListener("boletaire-sync",()=>{ const el=document.getElementById("acSync"); const sy=A.sync(); if(el&&!sy.busy&&!sy.err) el.textContent="Tus salidas, rutas y notas se guardan en tu cuenta: las verás en cualquier móvil u ordenador donde entres. Las fotos se quedan en este dispositivo."; });
     if(A.justLogged) setTimeout(()=>toast("Has entrado como "+A.user().email+". Ya puedes publicar en la comunidad."),1200);
-    if(A.error) setTimeout(()=>toast("El enlace ha caducado o ya se usó. Pide uno nuevo desde «Entrar».",6000),1200);
+    const authErr=()=>toast(A.error==="google"||A.error==="state"?"No se ha podido entrar con Google. Prueba otra vez o entra con tu correo.":"El enlace ha caducado o ya se usó. Pide uno nuevo desde «Entrar».",6000);
+    if(A.error) setTimeout(authErr,1200);
+    window.addEventListener("boletaire-autherr",authErr);
     // Comunidad: sin cuenta se puede leer, pero para escribir hay que entrar
     const _rf=renderForum; renderForum=function(){ _rf(); const el=document.getElementById("forumBox"); if(!el) return;
       if(!A.user()){
