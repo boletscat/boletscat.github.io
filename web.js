@@ -94,6 +94,99 @@
     document.body.appendChild(d);
   }
   if(document.readyState!=="loading") footer(); else document.addEventListener("DOMContentLoaded",footer);
+
+  // ---------- Cuentas: entrar con el correo para publicar y guardar tus salidas en la nube ----------
+  if(window.BAUTH&&BAUTH.enabled){
+    const A=BAUTH;
+    const st=document.createElement("style");
+    st.textContent=`.acct{border:1px solid var(--line);background:var(--surface);color:var(--fg);font:700 12.5px var(--body);padding:6px 12px;border-radius:999px;cursor:pointer;align-self:center;white-space:nowrap}
+      .acct.in{background:var(--moss);color:var(--moss-ink);border-color:transparent;width:32px;height:32px;padding:0;display:grid;place-items:center;font-size:14px}
+      @media (max-width:599px){header.top{position:relative}.acct{position:absolute;top:10px;right:0}}
+      .acctbox .lead{color:var(--muted);font-size:14px}
+      .acctbox .row{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+      .acctbox .ok{background:var(--surface-2);border-radius:10px;padding:10px 12px;margin:8px 0;font-size:14px;line-height:1.45}
+      .acctbox .danger{color:#b3261e;border-color:#b3261e55}
+      .loginask{background:var(--surface-2);border:1px dashed var(--line);border-radius:12px;padding:12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:space-between}
+      .loginask span{font-size:14px;flex:1 1 200px}
+      .webtoast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:10px 14px;border-radius:12px;font:600 14px var(--body);z-index:6000;max-width:calc(100% - 32px);box-shadow:0 6px 20px rgba(0,0,0,.25)}`;
+    document.head.appendChild(st);
+    const toast=(t,ms=4500)=>{ const d=document.createElement("div"); d.className="webtoast"; d.setAttribute("role","status"); d.textContent=t; document.body.appendChild(d); setTimeout(()=>d.remove(),ms); };
+    const nickGet=()=>{ try{ return localStorage.getItem("boletaire.nick")||""; }catch(e){ return ""; } };
+    function modal(html){
+      document.getElementById("acctModal")?.remove();
+      const o=document.createElement("div"); o.id="acctModal"; o.className="welcome"; o.setAttribute("role","dialog"); o.setAttribute("aria-modal","true");
+      o.innerHTML=`<div class="wcard acctbox">${html}</div>`; document.body.appendChild(o);
+      const esc_=e=>{ if(e.key==="Escape") close(); };
+      const close=()=>{ o.remove(); document.removeEventListener("keydown",esc_); };
+      o.addEventListener("click",e=>{ if(e.target===o||e.target.closest("[data-close]")) close(); });
+      document.addEventListener("keydown",esc_);
+      return o;
+    }
+    window.openLogin=function(reason){
+      const o=modal(`<h2>Entrar en Boletaire</h2>
+        ${reason?`<p><b>${reason}</b></p>`:""}
+        <p class="lead">Sin contraseñas: te enviamos un enlace a tu correo y entras tocándolo.</p>
+        <form id="loginForm"><input type="email" id="loginEmail" autocomplete="email" placeholder="tu@correo.com" required>
+          <div class="row"><button class="btn" type="submit">Enviarme el enlace</button><button class="btn ghost" type="button" data-close>Ahora no</button></div>
+          <p class="note" id="loginMsg" role="status"></p></form>
+        <p class="note">Con la cuenta puedes preguntar y responder en la comunidad, avisar de setas, marcar «Estoy aquí» y tener tus salidas en todos tus dispositivos. Ver el mapa y la previsión no necesita cuenta.</p>`);
+      const f=o.querySelector("#loginForm"), m=o.querySelector("#loginMsg"), inp=o.querySelector("#loginEmail");
+      setTimeout(()=>inp.focus(),50);
+      f.onsubmit=async e=>{ e.preventDefault(); const email=inp.value.trim().toLowerCase(); if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ m.textContent="Escribe un correo válido."; return; }
+        const b=f.querySelector("button[type=submit]"); b.disabled=true; m.textContent="Enviando…";
+        try{ await A.signIn(email);
+          o.querySelector(".acctbox").innerHTML=`<h2>Revisa tu correo</h2><p>Te hemos enviado un enlace a tu correo:</p><p><b>${esc(email)}</b></p><p>Ábrelo en este mismo móvil y entrarás en Boletaire.</p>
+            <p class="note">Puede tardar un minuto. Si no lo ves, mira en la carpeta de spam o promociones. El correo llega en inglés («Confirm your email address» o «Your sign-in link»).</p>
+            <div class="row"><button class="btn" data-close>Entendido</button></div>`;
+        }catch(err){ b.disabled=false;
+          m.textContent=err.status===429?"Se han enviado demasiados correos. Prueba de nuevo dentro de un rato.":"No se ha podido enviar el correo. Revisa la dirección y la conexión."; } };
+    };
+    function openAccount(){
+      const u=A.user(); if(!u) return openLogin();
+      const sy=A.sync();
+      const o=modal(`<h2>Tu cuenta</h2>
+        <p class="lead">${esc(u.email)}</p>
+        <label class="bl">Nombre que verán los demás en la comunidad<input id="acNick" maxlength="24" value="${esc(nickGet())}" placeholder="Tu nombre o apodo"></label>
+        <div class="ok" id="acSync">${sy.busy?"Guardando tus salidas…":sy.err?"No se han podido guardar tus salidas en la cuenta. Se reintentará al volver a tener conexión.":"Tus salidas, rutas y notas se guardan en tu cuenta: las verás en cualquier móvil u ordenador donde entres. Las fotos se quedan en este dispositivo."}</div>
+        <div class="row"><button class="btn" id="acSave">Guardar</button><button class="btn ghost" id="acOut">Cerrar sesión</button></div>
+        <details><summary class="note">Borrar mi cuenta</summary>
+          <p class="note">Se borran tu cuenta, tus mensajes y avisos de la comunidad y las salidas guardadas en la nube. Las de este móvil se quedan aquí.</p>
+          <button class="btn small ghost danger" id="acDel">Borrar mi cuenta para siempre</button> <span class="note" id="acMsg" role="status"></span></details>
+        <p class="note"><a href="legal.html#privacidad">Qué datos guardamos</a></p>`);
+      o.querySelector("#acSave").onclick=()=>{ try{ localStorage.setItem("boletaire.nick",o.querySelector("#acNick").value.trim()); }catch(e){} o.remove(); toast("Guardado"); try{ renderForum(); }catch(e){} };
+      o.querySelector("#acOut").onclick=async e=>{ e.target.disabled=true; e.target.textContent="Cerrando…"; await A.signOut(); };
+      let armed=false; o.querySelector("#acDel").onclick=async e=>{ const m=o.querySelector("#acMsg");
+        if(!armed){ armed=true; e.target.textContent="Pulsa otra vez para confirmar"; return; }
+        e.target.disabled=true; m.textContent="Borrando…"; try{ await A.deleteAccount(); }catch(err){ e.target.disabled=false; m.textContent="No se ha podido borrar. Prueba más tarde."; } };
+    }
+    function acctBtn(){
+      const h=document.querySelector("header.top"); if(!h) return;
+      let b=document.getElementById("acctBtn"); if(!b){ b=document.createElement("button"); b.id="acctBtn"; h.appendChild(b); b.onclick=()=>A.user()?openAccount():openLogin(); }
+      const u=A.user(); b.className="acct"+(u?" in":"");
+      if(u){ const n=nickGet()||u.email; b.textContent=n.trim().charAt(0).toUpperCase(); b.title="Tu cuenta"; b.setAttribute("aria-label","Tu cuenta"); }
+      else { b.textContent="Entrar"; b.title=""; b.setAttribute("aria-label","Entrar"); }
+    }
+    if(document.readyState!=="loading") acctBtn(); else document.addEventListener("DOMContentLoaded",acctBtn);
+    window.addEventListener("boletaire-sync",()=>{ const el=document.getElementById("acSync"); const sy=A.sync(); if(el&&!sy.busy&&!sy.err) el.textContent="Tus salidas, rutas y notas se guardan en tu cuenta: las verás en cualquier móvil u ordenador donde entres. Las fotos se quedan en este dispositivo."; });
+    if(A.justLogged) setTimeout(()=>toast("Has entrado como "+A.user().email+". Ya puedes publicar en la comunidad."),1200);
+    if(A.error) setTimeout(()=>toast("El enlace ha caducado o ya se usó. Pide uno nuevo desde «Entrar».",6000),1200);
+    // Comunidad: sin cuenta se puede leer, pero para escribir hay que entrar
+    const _rf=renderForum; renderForum=function(){ _rf(); const el=document.getElementById("forumBox"); if(!el) return;
+      if(!A.user()){
+        const f=el.querySelector("#fForm"); if(f) f.outerHTML=`<div class="loginask"><span>Para preguntar o responder en la comunidad, entra con tu correo. Leer es libre.</span><button class="btn small" data-login>Entrar</button></div>`;
+        el.querySelectorAll(".freply").forEach(fr=>{ fr.outerHTML=`<div class="loginask"><span>Entra para responder.</span><button class="btn small" data-login>Entrar</button></div>`; });
+      } else { const n=el.querySelector("#fNick"); if(n&&!n.value){ n.value=nickGet(); } }
+      el.querySelectorAll("[data-login]").forEach(b=>b.onclick=()=>openLogin("Para participar en la comunidad necesitas entrar."));
+      // moderación: el administrador puede bloquear a quien moleste
+      if(IS_OWNER) el.querySelectorAll("[data-fdel]").forEach(b=>{ const p=FORUM.find(x=>x.gid===b.dataset.fdel); if(!p||p.uid===UID||p.ai||p.uid==="claude") return;
+        const k=document.createElement("button"); k.className="flink"; k.textContent="Bloquear usuario"; k.style.marginLeft="10px";
+        k.onclick=async()=>{ if(k.dataset.arm!=="1"){ k.dataset.arm="1"; k.textContent="Pulsa otra vez: se borra todo lo suyo"; return; }
+          try{ await A.ban(p.uid); toast("Usuario bloqueado y sus mensajes borrados"); }catch(e){ toast("No se ha podido bloquear"); } };
+        b.after(k); });
+    };
+    const _ci=checkIn; checkIn=function(site){ if(!A.user()) return openLogin("Para marcar que estás buscando aquí, entra con tu correo."); return _ci(site); };
+    const _wr=wireReports; wireReports=function(el,s){ _wr(el,s); const o=el.querySelector("#repOpen"); if(o&&!A.user()) o.onclick=()=>openLogin("Para avisar a los demás de lo que has encontrado, entra con tu correo."); };
+  }
   // App instalable y sin conexión
   if("serviceWorker" in navigator) addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
   try{ renderGuide(); }catch(e){}

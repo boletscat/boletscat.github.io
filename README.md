@@ -35,6 +35,13 @@ Para que la gente pueda avisar de «he encontrado setas aquí», usar la **Comun
 4. Pégalas en `config.js` en `supabaseUrl` y `supabaseKey` y vuelve a subir la web.
 Sin estos datos, la web funciona igual pero sin avisos, foro ni «Estoy aquí». Solo se publica la zona, nunca el punto exacto.
 
+### Cuentas de usuario
+Para publicar en la comunidad hay que entrar con el correo (sin contraseña: llega un enlace). Ver el mapa sigue siendo libre.
+1. **SQL Editor** → pega `supabase_cuentas.sql` → **Run** (después de `supabase.sql`). El correo del creador queda como administrador: puede borrar mensajes y bloquear cuentas desde el foro.
+2. **Authentication → URL Configuration**: *Site URL* = la dirección de la web (https://boletscat.github.io) y añade `https://boletscat.github.io/**` en *Redirect URLs*.
+3. Con el correo gratuito de Supabase solo salen **2 correos por hora** y en inglés. Para más (y en castellano), configura un SMTP propio en **Authentication → Emails → SMTP Settings** (p. ej. Brevo, 300 correos al día gratis) y edita las plantillas «Magic link» y «Confirm signup».
+4. Las salidas de cada usuario se guardan en la tabla `user_data`; solo las puede leer su dueño.
+
 ## Contador de visitas (opcional, sin cookies)
 Para saber cuánta gente entra y qué zonas miran, sin pedir permiso de cookies:
 - **GoatCounter** (gratis para proyectos pequeños): crea una cuenta en https://www.goatcounter.com con el código que quieras (p. ej. `boletaire`) y ponlo en `config.js` → `goatcounter: "boletaire"`. Verás las visitas en `https://boletaire.goatcounter.com`, incluidas las zonas que se abren (`zona/montseny`…).
