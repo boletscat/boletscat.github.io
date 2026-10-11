@@ -2101,11 +2101,20 @@ function spotsBlock(s,r){
 }
 function wireSpotFb(el,s,r){ const S=rankSpots(s,r); el.querySelectorAll('[data-fb]').forEach(b=>b.onclick=()=>{const c=S[+b.dataset.fb]; if(c) saveFb(s,c,b.dataset.ok==='1');}); }
 function mainPark(s,r){ const S=rankSpots(s,r); return S[0]?.pk||SPOTS[s.id]?.p||null; }
+/* Accesos regulados en temporada de setas (fuente: Parc Natural del Montseny, Diputació de Barcelona, 2026) */
+const ACCESS={
+  montseny:{from:"2026-10-10",to:"2026-12-08",src:"https://parcs.diba.cat/web/montseny",
+    es:{t:"Aforo limitado en Santa Fe",d:"Del 10 de octubre al 8 de diciembre el parque regula el acceso: el aparcamiento de Santa Fe tiene solo 74 plazas (Collformic, 20) y se llena pronto. Los fines de semana y festivos hay punto de información en la rotonda de Fogars de Montclús (y en El Brull para Collformic) que te desviará si está lleno. No aparques en la carretera ni en las pistas: multan.",tip:"Llega antes de las 9 o sube en Bus Parc desde Sant Celoni (más frecuencias en otoño y línea nueva a Fontmartina)."},
+    ca:{t:"Aforament limitat a Santa Fe",d:"Del 10 d'octubre al 8 de desembre el parc regula l'accés: l'aparcament de Santa Fe té només 74 places (Collformic, 20) i s'omple aviat. Els caps de setmana i festius hi ha punt d'informació a la rotonda de Fogars de Montclús (i al Brull per a Collformic) que et desviarà si és ple. No aparquis a la carretera ni a les pistes: multen.",tip:"Arriba abans de les 9 o puja amb el Bus Parc des de Sant Celoni (més freqüències a la tardor i línia nova a Fontmartina)."}}
+};
+function accessInfo(s,iso){ const a=ACCESS[s.id]; if(!a||!iso||iso<a.from||iso>a.to) return null; const w=new Date(iso+"T12:00:00").getDay(); return {...a[I18N.lang==="ca"?"ca":"es"],busy:w===0||w===6||HOLI.has(iso),src:a.src}; }
+function accessBlock(s,r){ const A=accessInfo(s,r&&r.d); if(!A) return "";
+  return `<div class="hunt accessbox"><b>⚠ ${esc(A.t)}${A.busy?(I18N.lang==="ca"?" · avui és dia de molta gent":" · ese día es de mucha gente"):""}</b> ${esc(A.d)} <b>${esc(A.tip)}</b> <a href="${A.src}" target="_blank" rel="noopener">Parc Natural del Montseny</a></div>`; }
 function parkBlock(s,r){
   const S=rankSpots(s,r); const P=SPOTS[s.id]?.p;
   const pks=S[0]?.pks?.length?S[0].pks:(P?[P]:[]); if(!pks.length) return "";
   const n=pks.length;
-  return `<h3>Dónde dejar el coche</h3>`+pks.map((p,i)=>{
+  return `<h3>Dónde dejar el coche</h3>`+accessBlock(s,r)+pks.map((p,i)=>{
     const nav=`https://www.google.com/maps/dir/?api=1${origin?`&origin=${origin.lat},${origin.lon}`:""}&destination=${p[0]},${p[1]}`;
     const who=S.map((c,j)=>c.pki===i?j+1:0).filter(Boolean);
     return `<div class="park"><em class="pk">${pkLab(i,n)}</em><div><b>${p[3]?pkName(p):"Aparca en "+esc(START[s.id])}</b>
@@ -3767,7 +3776,7 @@ function cmpAdvice(Z,di){
   const ca=I18N.lang==="ca", nm=z=>"<b>"+esc(z.s.n.split(" – ")[0])+"</b>";
   const maxSp=Math.max(1,...Z.map(z=>z.sp.length)), maxKg=Math.max(0.01,...Z.map(z=>z.kg));
   const mins=Z.map(z=>z.dv?z.dv.min:null), minMin=Math.min(...mins.filter(m=>m!=null));
-  const val=z=>0.45*z.r.score/100+0.2*z.sp.length/maxSp+0.2*z.kg/maxKg+(z.dv?0.1*Math.max(0,1-(z.dv.min-minMin)/60):0.05)+0.05*({1:1,2:.6,3:.2}[z.slope])-(z.hunt?0.05:0)-(z.r.rain>8?0.05:0)-0.06*z.pp.v;
+  const val=z=>0.45*z.r.score/100+0.2*z.sp.length/maxSp+0.2*z.kg/maxKg+(z.dv?0.1*Math.max(0,1-(z.dv.min-minMin)/60):0.05)+0.05*({1:1,2:.6,3:.2}[z.slope])-(z.hunt?0.05:0)-(z.r.rain>8?0.05:0)-0.06*z.pp.v-((A=>A&&A.busy?0.04:0)(accessInfo(z.s,z.r.d)));
   const R=Z.map(z=>({z,v:val(z)})).sort((a,b)=>b.v-a.v); const B=R[0].z, O=R.slice(1).map(x=>x.z);
   // día flojo en todas
   if(Math.max(...Z.map(z=>z.r.score))<30){
@@ -3804,6 +3813,8 @@ function cmpAdvice(Z,di){
   if(o.slope<B.slope) alt.push(ca?`vols caminar amb menys pujada`:`quieres caminar con menos cuesta`);
   if(alt.length) t+=ca?` Si ${alt.join(" o ")}, millor ${nm(o)}.`:` Si ${alt.join(" o ")}, mejor ${nm(o)}.`;
   if(B.pp.lvl===3) t+=ca?` Compte: aquell dia hi haurà passat molta gent; ves-hi d'hora i allunya't de les pistes.`:` Ojo: ese día habrá pasado mucha gente; ve temprano y aléjate de las pistas.`;
+  { const A=accessInfo(B.s,B.r.d); if(A&&A.busy) t+=ca?` A Santa Fe l'aforament és limitat (74 places): arriba abans de les 9 o puja amb el Bus Parc des de Sant Celoni.`:` En Santa Fe el aforo es limitado (74 plazas): llega antes de las 9 o sube en Bus Parc desde Sant Celoni.`;
+    else if(!A){ const Oa=O.find(x=>{ const a=accessInfo(x.s,x.r.d); return a&&a.busy; }); if(Oa) t+=ca?` A més, ${nm(Oa)} té l'aparcament limitat aquest dia.`:` Además, ${nm(Oa)} tiene el aparcamiento limitado ese día.`; } }
   if(B.r.rain>8) t+=ca?` Porta impermeable: s'hi esperen ${Math.round(B.r.rain)} mm.`:` Lleva chubasquero: se esperan ${Math.round(B.r.rain)} mm.`;
   return t;
 }
@@ -3839,6 +3850,7 @@ function showCompare(di=dayIdx){
           <ul class="cmpsp">${z.sp.slice(0,8).map(x=>`<li${only(i,x.id)?' class="only"':""}><span>${esc(SP[x.id].ca)}</span><i>${probLabel(x.p)}</i></li>`).join("")||'<li><span>Nada en temporada</span></li>'}</ul>
           ${z.sp.some(x=>only(i,x.id))?`<span class="s"><span class="onlydot"></span> solo en esta zona</span>`:""}</div>
         <div class="cmprow${win(bDrive,i)}"><span class="k">En coche</span><b>${z.dv?z.dv.txt:"–"}</b><span class="s">${z.dv?z.dv.km+" km":"Indica desde dónde sales"}</span></div>
+        ${Z.some(q=>accessInfo(q.s,q.r.d))?`<div class="cmprow"><span class="k">Acceso</span>${(()=>{ const A=accessInfo(z.s,z.r.d); return A?`<b style="color:#b3261e">${esc(A.t)}</b><span class="s">${esc(A.tip)}</span>`:`<b>Libre</b>`; })()}</div>`:""}
         <div class="cmprow${win(bSlope,i)}"><span class="k">Desnivel</span><b style="color:${SLOPEC[z.slope]}">${SLOPEN[z.slope]}</b></div>
         <div class="cmprow${win(bPress,i)}"><span class="k">Gente en el bosque</span><b style="color:${SLOPEC[z.pp.lvl]}">${PRESSN[z.pp.lvl]}</b><span class="s">${z.pp.lvl===1?(I18N.lang==="ca"?"Dia tranquil":"Día tranquilo"):(I18N.lang==="ca"?"Aquell dia ":"Ese día ")+z.pp.why}</span></div>
         <div class="cmprow"><span class="k">Tiempo ese día</span><b>${z.r.lo.toFixed(0)}° / ${z.r.hi.toFixed(0)}°</b><span class="s">${z.r.rain>=1?nf(z.r.rain,0)+" mm de lluvia":"sin lluvia"} · ${z.r.W} mm en 3 semanas</span></div>
