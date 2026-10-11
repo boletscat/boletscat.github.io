@@ -106,6 +106,8 @@
       .acctbox .row{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
       .acctbox .ok{background:var(--surface-2);border-radius:10px;padding:10px 12px;margin:8px 0;font-size:14px;line-height:1.45}
       .acctbox .danger{color:#b3261e;border-color:#b3261e55}
+      .gbtn{min-height:44px;display:flex;justify-content:center;margin:6px 0 2px}
+      .orsep{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:12.5px;margin:10px 0}.orsep:before,.orsep:after{content:"";flex:1;border-top:1px solid var(--line)}
       .loginask{background:var(--surface-2);border:1px dashed var(--line);border-radius:12px;padding:12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:space-between}
       .loginask span{font-size:14px;flex:1 1 200px}
       .webtoast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:10px 14px;border-radius:12px;font:600 14px var(--body);z-index:6000;max-width:calc(100% - 32px);box-shadow:0 6px 20px rgba(0,0,0,.25)}`;
@@ -125,13 +127,14 @@
     window.openLogin=function(reason){
       const o=modal(`<h2>Entrar en Boletaire</h2>
         ${reason?`<p><b>${reason}</b></p>`:""}
-        <p class="lead">Sin contraseñas: te enviamos un enlace a tu correo y entras tocándolo.</p>
+        ${A.google?`<div id="gBtn" class="gbtn"></div><p class="note" id="gMsg" role="status"></p><div class="orsep"><span>o con tu correo</span></div>`:""}
+        <p class="lead">Sin contraseñas: te enviamos un enlace y entras tocándolo.</p>
         <form id="loginForm"><input type="email" id="loginEmail" autocomplete="email" placeholder="tu@correo.com" required>
           <div class="row"><button class="btn" type="submit">Enviarme el enlace</button><button class="btn ghost" type="button" data-close>Ahora no</button></div>
           <p class="note" id="loginMsg" role="status"></p></form>
         <p class="note">Con la cuenta puedes preguntar y responder en la comunidad, avisar de setas, marcar «Estoy aquí» y tener tus salidas en todos tus dispositivos. Ver el mapa y la previsión no necesita cuenta.</p>`);
       const f=o.querySelector("#loginForm"), m=o.querySelector("#loginMsg"), inp=o.querySelector("#loginEmail");
-      setTimeout(()=>inp.focus(),50);
+      if(A.google) googleButton(o.querySelector("#gBtn"), o.querySelector("#gMsg")); else setTimeout(()=>inp.focus(),50);
       f.onsubmit=async e=>{ e.preventDefault(); const email=inp.value.trim().toLowerCase(); if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ m.textContent="Escribe un correo válido."; return; }
         const b=f.querySelector("button[type=submit]"); b.disabled=true; m.textContent="Enviando…";
         try{ await A.signIn(email);
@@ -141,6 +144,21 @@
         }catch(err){ b.disabled=false;
           m.textContent=err.status===429?"Se han enviado demasiados correos. Prueba de nuevo dentro de un rato.":"No se ha podido enviar el correo. Revisa la dirección y la conexión."; } };
     };
+    // Botón oficial de Google (Google Identity Services): Google nos da un token y Supabase lo comprueba
+    let gsiP=null;
+    const loadGsi=()=>gsiP||(gsiP=new Promise((res,rej)=>{ if(window.google&&google.accounts&&google.accounts.id) return res();
+      const sc=document.createElement("script"); sc.src="https://accounts.google.com/gsi/client"; sc.async=true; sc.onload=()=>res(); sc.onerror=()=>{ gsiP=null; rej(new Error("gsi")); }; document.head.appendChild(sc); }));
+    async function googleButton(box,msg){
+      if(!box) return;
+      box.innerHTML=`<span class="note">Cargando Google…</span>`;
+      try{ await loadGsi();
+        const raw=Array.from(crypto.getRandomValues(new Uint8Array(16)),b=>b.toString(16).padStart(2,"0")).join("");
+        const hashed=Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256",new TextEncoder().encode(raw))),b=>b.toString(16).padStart(2,"0")).join("");
+        google.accounts.id.initialize({client_id:A.google,nonce:hashed,ux_mode:"popup",auto_select:false,itp_support:true,use_fedcm_for_button:true,
+          callback:async resp=>{ if(msg) msg.textContent="Entrando…"; try{ await A.signInGoogle(resp.credential,raw); }catch(e){ if(msg) msg.textContent="No se ha podido entrar con Google. Prueba con tu correo."; } } });
+        box.innerHTML=""; google.accounts.id.renderButton(box,{type:"standard",theme:"outline",size:"large",text:"continue_with",shape:"pill",logo_alignment:"left",width:Math.min(320,box.clientWidth||300),locale:(window.I18N&&I18N.lang==="ca")?"ca":"es"});
+      }catch(e){ box.innerHTML=""; if(msg) msg.textContent="No se ha podido cargar el botón de Google. Entra con tu correo."; }
+    }
     function openAccount(){
       const u=A.user(); if(!u) return openLogin();
       const sy=A.sync();

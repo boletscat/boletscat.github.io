@@ -108,12 +108,18 @@ window.BOLETAIRE_WEB = true;
     catch(e){ syncState.err=true; syncFire(); } }
   window.BAUTH={
     enabled:!!SB, user:()=>SES?{id:SES.id,email:SES.email}:null, isAdmin, sync:()=>syncState,
-    justLogged:!!window.BOLETAIRE_JUST_LOGGED, error:window.BOLETAIRE_AUTH_ERR||null,
+    justLogged:!!window.BOLETAIRE_JUST_LOGGED||(()=>{ try{ const v=sessionStorage.getItem("boletaire.justLogged"); sessionStorage.removeItem("boletaire.justLogged"); return !!v; }catch(e){ return false; } })(), error:window.BOLETAIRE_AUTH_ERR||null,
     _dirty(){ if(!SES) return; clearTimeout(pushT); pushT=setTimeout(pushData,1500); },
     async signIn(email){ const back=location.origin+location.pathname;
       const r=await fetch(SB.u+"/auth/v1/otp?redirect_to="+encodeURIComponent(back),{method:"POST",headers:{apikey:SB.k,"Content-Type":"application/json"},body:JSON.stringify({email,create_user:true})});
       if(r.ok) return true; let j={}; try{ j=await r.json(); }catch(e){}
       throw Object.assign(new Error(j.msg||j.message||j.error_description||"error"),{status:r.status}); },
+    google:CFG.googleClientId||"",
+    async signInGoogle(idToken,nonce){
+      const r=await fetch(SB.u+"/auth/v1/token?grant_type=id_token",{method:"POST",headers:{apikey:SB.k,"Content-Type":"application/json"},body:JSON.stringify({provider:"google",id_token:idToken,nonce})});
+      const j=await r.json().catch(()=>({})); if(!r.ok||!j.access_token) throw Object.assign(new Error(j.msg||j.error_description||j.message||"error"),{status:r.status});
+      SES=mkSes(j.access_token,j.refresh_token,j.expires_at); LS.setItem(AUTHK,JSON.stringify(SES));
+      try{ sessionStorage.setItem("boletaire.justLogged","1"); }catch(e){} location.reload(); },
     async signOut(){ clearTimeout(pushT); await pushData(); if(!syncState.err){ LS.removeItem("boletaire.userdata"); LS.removeItem(DELK); }
       try{ const t=await token(); if(t) await fetch(SB.u+"/auth/v1/logout",{method:"POST",headers:{apikey:SB.k,Authorization:"Bearer "+t}}); }catch(e){}
       SES=null; LS.removeItem(AUTHK); location.reload(); },
