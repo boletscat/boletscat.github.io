@@ -132,3 +132,6 @@ begin
 end $$;
 revoke all on function public.delete_me() from public;
 grant execute on function public.delete_me() to authenticated;
+
+-- Supabase da permiso a «anon» por defecto: lo quitamos (las funciones ya lo comprueban, esto es una segunda barrera)
+revoke execute on function public.put_my_doc(text, jsonb), public.post_my_report(jsonb), public.mod_put_doc(text, text, jsonb), public.mod_ban(text, boolean, text), public.put_my_data(jsonb), public.delete_me() from anon;
