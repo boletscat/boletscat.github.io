@@ -158,8 +158,8 @@
   // Botones en la ficha de la zona (se añaden cada vez que se pinta)
   const det=document.getElementById("detail");
   if(det) new MutationObserver(()=>{
-    const hb=det.querySelector(".hdbtns"); if(!hb||hb.querySelector("#shareBtn")) return;
-    const sb=document.createElement("button"); sb.className="star"; sb.id="shareBtn"; sb.title=T("Compartir el plan con tu grupo"); sb.innerHTML="📤<span class=\"bl2\"> "+T("Compartir")+"</span>"; sb.setAttribute("aria-label",T("Compartir"));
+    const hb=det.querySelector(".hdbtns"); if(!hb||hb.querySelector("#planShareBtn")) return;
+    const sb=document.createElement("button"); sb.className="star"; sb.id="planShareBtn"; sb.title=T("Compartir el plan con tu grupo"); sb.innerHTML="📤<span class=\"bl2\"> "+T("Compartir")+"</span>"; sb.setAttribute("aria-label",T("Compartir"));
     sb.onclick=()=>window.sharePlan(sb); hb.prepend(sb);
     const pb=document.createElement("button"); pb.className="star"; pb.id="pushBtn"; pb.title=T("Avisos al móvil para esta zona"); pb.textContent="🔔"; pb.setAttribute("aria-label",T("Avisos al móvil"));
     pb.setAttribute("aria-pressed",!!state()); pb.onclick=()=>window.openPush(sel); hb.append(pb);
