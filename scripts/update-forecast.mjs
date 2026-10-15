@@ -106,12 +106,27 @@ async function main() {
 
   // historial: nota de hoy de cada zona (últimos 120 días)
   const scores = {};
-  for (const s of SITES) { try { const r = model.computeSite(s, model.zoneWeather(s, data), 0); if (r[0]) scores[s.id] = r[0].score; } catch (e) {} }
+  const outlook = { updatedAt: data.updatedAt, days: [], z: {} };
+  const errs = {};
+  for (const s of SITES) {
+    try {
+      const r = model.computeSite(s, model.zoneWeather(s, data), 0);
+      if (r[0]) scores[s.id] = r[0].score;
+      if (!outlook.days.length) outlook.days = r.map((x) => x.d);
+      outlook.z[s.id] = r.map((x) => x.score);
+    } catch (e) { errs[e.message] = (errs[e.message] || 0) + 1; }
+  }
+  // Si el modelo falla en muchas zonas, mejor que la acción falle y avise por correo que guardar un historial vacío
+  if (Object.keys(scores).length < SITES.length * 0.8) throw new Error("Notas incompletas (" + Object.keys(scores).length + " zonas): " + JSON.stringify(errs));
+  fs.writeFileSync(path.join(dir, "outlook.json"), JSON.stringify(outlook));
+  fs.writeFileSync(path.join(dir, "zones.json"), JSON.stringify(Object.fromEntries(SITES.map((s) => [s.id, s.n]))));
   const hp = path.join(dir, "history.json");
   let hist = []; try { hist = JSON.parse(fs.readFileSync(hp, "utf8")); } catch (e) {}
   hist = hist.filter((h) => h.d !== HOY); hist.push({ d: HOY, scores }); hist.sort((a, b) => a.d.localeCompare(b.d));
   fs.writeFileSync(hp, JSON.stringify(hist.slice(-120)));
   const top = Object.entries(scores).sort((a, b) => b[1] - a[1]).slice(0, 3).map(([k, v]) => k + " " + v).join(", ");
+  // páginas de cada zona para Google (zona/<id>/index.html) y sitemap.xml
+  try { const { buildZonePages } = await import("./zone-pages.mjs"); buildZonePages(ROOT, model, outlook, hist); } catch (e) { console.warn("páginas de zona:", e.message); }
   console.log(`OK ${HOY}: ${n} zonas, ${Object.keys(obs.stations).length} estaciones, observado hasta ${obs.obsUntil}. Mejores: ${top}`);
 }
 main().catch((e) => { console.error(e); process.exit(1); });

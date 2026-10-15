@@ -1355,6 +1355,28 @@ button:focus-visible,a:focus-visible,[tabindex]:focus-visible{outline:2px solid 
   .webtoast{bottom:96px!important}
 }
 #days,#detail,#plan,.mapbox{scroll-margin-top:76px}
+.qcheck{display:grid;gap:8px;margin:4px 0 14px;padding:12px 14px;border-radius:14px;background:linear-gradient(160deg,rgba(52,211,153,.10),rgba(34,211,238,.04));border:1px solid rgba(52,211,153,.28);font-size:13.5px}
+.qcheck.done{display:flex;justify-content:space-between;align-items:center;gap:10px;background:rgba(255,255,255,.03);border-color:var(--glass-line);color:var(--muted)}
+.qcheck.done b{color:var(--fg)}
+.qcrow{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.qcrow select{font:600 13px var(--body);padding:6px 10px;color:var(--fg)}
+.lnk{background:none;border:0;color:var(--moss);font:600 13px var(--body);cursor:pointer;padding:4px;white-space:nowrap}
+.xclose{float:right;margin:-6px -6px 0 0;background:none;border:0;color:var(--muted);font-size:26px;line-height:1;cursor:pointer;padding:4px 8px}
+.wcard .row{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 4px}
+.wcard .lead{color:var(--muted);font-size:14.5px}
+.pushwarn{background:rgba(240,181,74,.08);border-left:3px solid var(--warn);border-radius:10px;padding:10px 12px;font-size:13.5px;margin:8px 0}
+.pushz{border:1px solid var(--glass-line);border-radius:14px;padding:8px 12px;margin:10px 0;display:grid;gap:4px;max-height:220px;overflow:auto}
+.pushz legend{font:600 12px var(--body);letter-spacing:.12em;text-transform:uppercase;color:#8fb0a2;padding:0 6px}
+.pushz label{display:flex;gap:8px;align-items:center;font-size:14px;cursor:pointer}
+.pushz input{width:18px;height:18px;accent-color:var(--moss)}
+.pushmin{display:flex;gap:10px;align-items:center;font-size:14px}.pushmin select{padding:6px 10px;font:600 14px var(--body);color:var(--fg)}
+.btn.danger{color:var(--bad)!important}
+@media (max-width:520px){#shareBtn .bl2{display:none}}
+#pushBtn[aria-pressed="true"]{background:rgba(52,211,153,.18);border-color:rgba(52,211,153,.5)}
+.zlinks{margin-top:22px;background:var(--glass);border:1px solid var(--glass-line);border-radius:18px;padding:4px 18px}
+.zlinks>summary{cursor:pointer;font:700 15px var(--body);padding:12px 0;color:var(--fg)}
+.zlinks ul{list-style:none;margin:0 0 14px;padding:0;columns:3 200px;column-gap:18px;font-size:13.5px}
+.zlinks li{break-inside:avoid;padding:2px 0}.zlinks a{color:var(--muted);text-decoration:none}.zlinks a:hover{color:var(--moss)}
 
 /* ---- Fondo con setas tipo emoji ---- */
 html{background:
@@ -1416,7 +1438,7 @@ body{background:transparent!important}
           <button class="hbtn pri" id="heroGo">Ver el mapa de hoy</button>
           <button class="hbtn sec" id="heroHow">Cómo se calcula <span aria-hidden="true">→</span></button>
         </div>
-        <ul class="hchecks"><li>Datos oficiales del Meteocat</li><li>64 zonas estudiadas</li><li>Funciona sin cobertura</li></ul>
+        <ul class="hchecks"><li>Datos oficiales del Meteocat</li><li>64 zonas estudiadas</li><li>Funciona sin cobertura</li><li id="heroAcc" hidden></li></ul>
         <p class="hfresh" id="heroFresh"></p>
       </div>
       <button class="hcard" id="heroCard" hidden></button>
@@ -1503,6 +1525,7 @@ body{background:transparent!important}
     </div>
   </section>
 
+  <details class="zlinks"><summary>Previsión por zonas</summary><p class="note">Página con la previsión de cada zona: <a href="zona/">ver todas</a>.</p><ul><li><a href="zona/alinya/">Alinyà – Coll de Nargó</a></li><li><a href="zona/masella/">Alp – Masella</a></li><li><a href="zona/oix/">Alta Garrotxa – Oix</a></li><li><a href="zona/bor/">Bosc de Bor – Bellver</a></li><li><a href="zona/gerdar/">Bosc de Gerdar – Sorpe</a></li><li><a href="zona/poblet/">Bosc de Poblet – Les Masies</a></li><li><a href="zona/castellar/">Castellar de n'Hug – La Pobla de Lillet</a></li><li><a href="zona/berti/">Cingles de Bertí</a></li><li><a href="zona/collsacabra/">Collsacabra – Rupit</a></li><li><a href="zona/collserola/">Collserola – Vallvidrera</a></li><li><a href="zona/garrotxa/">Fageda d'en Jordà – Olot</a></li><li><a href="zona/gisclareny/">Gisclareny – Saldes</a></li><li><a href="zona/gombren/">Gombrèn – Montgrony</a></li><li><a href="zona/viladrau/">Guilleries – Viladrau</a></li><li><a href="zona/guils/">Guils de Cerdanya</a></li><li><a href="zona/gavarres/">Les Gavarres</a></li><li><a href="zona/lladurs/">Lladurs – Odèn</a></li><li><a href="zona/lles/">Lles de Cerdanya – Arànser</a></li><li><a href="zona/llucanes/">Lluçanès – Prats</a></li><li><a href="zona/garraf/">Massís del Garraf</a></li><li><a href="zona/moia/">Moianès – Castellterçol</a></li><li><a href="zona/montesquiu/">Montesquiu – Bellmunt</a></li><li><a href="zona/montnegre/">Montnegre i el Corredor</a></li><li><a href="zona/montsec/">Montsec d'Ares</a></li><li><a href="zona/montseny/">Montseny – Santa Fe</a></li><li><a href="zona/montserrat/">Montserrat – Marganell</a></li><li><a href="zona/prades/">Muntanyes de Prades</a></li><li><a href="zona/nautaran/">Naut Aran – Salardú</a></li><li><a href="zona/ogassa/">Ogassa – Coll de Merolla</a></li><li><a href="zona/ports/">Ports de Tortosa-Beseit</a></li><li><a href="zona/queralt/">Queralt – Berga</a></li><li><a href="zona/ensija/">Rasos de Peguera – Serra d'Ensija</a></li><li><a href="zona/riner/">Riner – Pinars del Solsonès</a></li><li><a href="zona/rocacorba/">Rocacorba – Canet d'Adri</a></li><li><a href="zona/sanhilari/">Sant Hilari Sacalm</a></li><li><a href="zona/frontanya/">Sant Jaume de Frontanyà</a></li><li><a href="zona/erm/">Sant Joan de l'Erm</a></li><li><a href="zona/stllorenc/">Sant Llorenç del Munt</a></li><li><a href="zona/ancosa/">Serra d'Ancosa – La Llacuna</a></li><li><a href="zona/boumort/">Serra de Boumort</a></li><li><a href="zona/busa/">Serra de Busa – Navès</a></li><li><a href="zona/cardo/">Serra de Cardó</a></li><li><a href="zona/castelltallat/">Serra de Castelltallat</a></li><li><a href="zona/catllaras/">Serra de Catllaràs</a></li><li><a href="zona/albera/">Serra de l'Albera</a></li><li><a href="zona/ordal/">Serra de l'Ordal</a></li><li><a href="zona/llaberia/">Serra de Llaberia</a></li><li><a href="zona/montsant/">Serra de Montsant – Ulldemolins</a></li><li><a href="zona/pandols/">Serra de Pàndols – Cavalls</a></li><li><a href="zona/rubio/">Serra de Rubió</a></li><li><a href="zona/montmell/">Serra del Montmell – Marmellar</a></li><li><a href="zona/serramarina/">Serralada de Marina – Sant Fost</a></li><li><a href="zona/camprodon/">Setcases – Vall de Camprodon</a></li><li><a href="zona/aran/">Vall d'Aran – Bossòst</a></li><li><a href="zona/llessui/">Vall d'Àssua – Llessui</a></li><li><a href="zona/boi/">Vall de Boí</a></li><li><a href="zona/cabo/">Vall de Cabó</a></li><li><a href="zona/cardos/">Vall de Cardós – Tírvia</a></li><li><a href="zona/tuixent/">Vall de la Vansa – Tuixent</a></li><li><a href="zona/tavascan/">Vall de Lladorre – Tavascan</a></li><li><a href="zona/valllord/">Vall de Lord – Sant Llorenç de Morunys</a></li><li><a href="zona/ribes/">Vall de Ribes – Bruguera</a></li><li><a href="zona/valferrera/">Vall Ferrera – Àreu</a></li><li><a href="zona/vidra/">Vidrà</a></li></ul></details>
   <div class="disclaimer"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" style="flex:none"><path d="M12 2 1 21h22Z" fill="none" stroke="var(--bad)" stroke-width="2"/><path d="M12 9v5m0 3v.5" stroke="var(--bad)" stroke-width="2" stroke-linecap="round"/></svg><div><strong>No comas ninguna seta sin identificación segura.</strong> Esta app orienta sobre dónde y cuándo buscar; no sirve para identificar. Ante la duda, llévalas a una asociación micológica o a un farmacéutico. Urgencias por intoxicación: <b>112</b> · Servicio de Información Toxicológica: <b>91 562 04 20</b>.</div></div>
 </div>
 
@@ -1933,6 +1956,8 @@ function computeTrend(site, w, start){
 
 /* ---------- Estado ---------- */
 let TREND={}; let DATA=null, RES={}, DAYS=[], dayIdx=0, sel=null, guideFilter="todas", guideFocus=null, mapMode="indice", prov="all";
+/* Enlace directo a una zona: ?z=montseny (lo usan las páginas de zona/ y los planes compartidos) */
+let LINKZ=null; try{ const q=new URLSearchParams(location.search); const z=q.get("z"); if(z&&SITES.some(s=>s.id===z)){ LINKZ=z; sel=z; } const d=+q.get("d"); if(d>=0&&d<9&&q.has("d")) dayIdx=d; }catch(e){}
 const PROVN={all:"Toda Catalunya","08":"Barcelona","17":"Girona","25":"Lleida","43":"Tarragona"};
 const PV={camprodon:"17",frontanya:"08",ogassa:"17",montseny:"08",viladrau:"17",collsacabra:"08",llucanes:"08",valllord:"25",lladurs:"25",gisclareny:"08",queralt:"08",bor:"25",guils:"17",alinya:"25",erm:"25",gerdar:"25",cardos:"25",aran:"25",boi:"25",garrotxa:"17",albera:"17",gavarres:"17",montnegre:"08",stllorenc:"08",prades:"43",ports:"43",montsec:"25",montsant:"43",poblet:"43",llaberia:"43",cardo:"43",ribes:"17",gombren:"17",vidra:"17",serramarina:"08",sanhilari:"17",montesquiu:"08",oix:"17",rocacorba:"17",castellar:"08",ensija:"08",busa:"25",tuixent:"25",lles:"25",boumort:"25",valferrera:"25",nautaran:"25",montmell:"43",ordal:"08",collserola:"08",rubio:"08",castelltallat:"08",
  llessui:"25", tavascan:"25", cabo:"25", catllaras:"08", masella:"17", moia:"08", berti:"08", montserrat:"08", ancosa:"08", riner:"25", garraf:"08", pandols:"43"};
@@ -2073,6 +2098,7 @@ function savePrefs(patch){
 function toggleFav(id){
   FAVS.has(id)?FAVS.delete(id):FAVS.add(id);
   try{localStorage.setItem("boletaire.favs",JSON.stringify([...FAVS]))}catch(e){}
+  if(window.boletairePushSync) boletairePushSync(id,FAVS.has(id));
   savePrefs({});
   if(IS_ADMIN&&DB) DB.doc("config/alerts").set({zones:[...FAVS], threshold:75, rain:20, updatedAt:new Date().toISOString()}).catch(()=>{});
   renderAll();
@@ -2084,22 +2110,24 @@ let flatOnly=false; try{ flatOnly=localStorage.getItem("boletaire.flat")==="1"; 
 const inProv=id=>(prov==="all"||PV[id]===prov)&&(!flatOnly||SLOPE[id][0]===1);
 try{ const p=localStorage.getItem("boletaire.prov"); if(p&&PROVN[p]) prov=p; }catch(e){}
 try{ const s=localStorage.getItem("boletaire.day"); if(s) dayIdx=+s||0; }catch(e){}
+if(LINKZ){ prov="all"; sel=LINKZ; try{ const q=new URLSearchParams(location.search); if(q.has("d")){ const d=+q.get("d"); if(d>=0&&d<9) dayIdx=d; } }catch(e){} }
 
 /* ---------- ¿Acierta la previsión? ----------
    Compara la nota que dio la app ese día (historial diario) con lo que se encontró de verdad:
    tus salidas del diario, los avisos de otros boletaires y tus valoraciones de los puntos.
    Con 3 datos o más de una zona, la nota se corrige un poco (hasta ±12) hacia lo que se encuentra allí. */
 const ACC_GOOD=50;
-let ZADJ={}, ACCKEY="";
+let ZADJ={}, ACCKEY="", CHECKS=null;
 function accEvidence(){
   const H={}; HIST.forEach(h=>{ if(h&&h.d&&h.scores) H[h.d]=h.scores; });
   const sc=(d,id,fb)=>H[d]&&H[d][id]!=null?H[d][id]:fb;
   const E=[];
-  for(const t of TRIPS){ if(!t.site||!t.date) continue; const v=sc(t.date,t.site,t.index); if(v==null) continue; const kg=tripKg(t);
+  if(CHECKS){ for(const c of CHECKS){ const v=sc(c.d,c.site,null); if(v==null) continue; E.push({src:"all",site:c.site,d:c.d,score:v,good:!!c.ok,poor:!c.ok}); } }
+  else for(const t of TRIPS){ if(!t.site||!t.date) continue; const v=sc(t.date,t.site,t.index); if(v==null) continue; const kg=tripKg(t);
     E.push({src:"trip",site:t.site,d:t.date,score:v,good:kg>=0.5,poor:kg<0.2}); }
   for(const r of REPORTS){ if(!r.site||!r.date) continue; const v=sc(r.date,r.site,null); if(v==null) continue;
     E.push({src:"rep",site:r.site,d:r.date,score:v,good:r.qty==="bastante"||r.qty==="mucho",poor:r.qty==="poco"}); }
-  for(const f of SPFB){ if(!f.site||!f.date) continue; const v=sc(f.date,f.site,null); if(v==null) continue;
+  if(!CHECKS) for(const f of SPFB){ if(!f.site||!f.date) continue; const v=sc(f.date,f.site,null); if(v==null) continue;
     E.push({src:"spot",site:f.site,d:f.date,score:v,good:!!f.ok,poor:!f.ok}); }
   return E.filter(e=>e.good||e.poor);
 }
@@ -2107,7 +2135,7 @@ function accStats(E){ let hit=0,over=0,under=0; for(const e of E){ const p=e.sco
   return {n:E.length,hit,over,under,pct:E.length?Math.round(100*hit/E.length):null}; }
 function applyAdj(){
   if(!RES) return;
-  const key=HIST.length+"|"+TRIPS.length+"|"+REPORTS.length+"|"+SPFB.length+"|"+(DATA?.updatedAt||"");
+  const key=HIST.length+"|"+TRIPS.length+"|"+REPORTS.length+"|"+SPFB.length+"|"+(CHECKS?CHECKS.length:-1)+"|"+(DATA?.updatedAt||"");
   if(key===ACCKEY) return; ACCKEY=key;
   for(const id in RES) (RES[id]||[]).forEach(r=>{ if(r.raw!=null){ r.score=r.raw; delete r.raw; } });
   ZADJ={}; const by={}; for(const e of accEvidence()) (by[e.site]??=[]).push(e);
@@ -2123,16 +2151,52 @@ function adjNote(s){
 function accBlock(){
   const E=accEvidence(), s=accStats(E);
   const head=`<h3 style="margin-top:0">¿Acierta la previsión?</h3>`;
-  if(s.n<5) return head+`<p class="note" style="margin-top:0">Todavía hay pocos datos (${s.n}). Cada salida que apuntes, cada aviso y cada «Había setas / No había nada» de los puntos sirve para comprobarlo y para afinar la nota de cada zona.</p>`;
+  if(s.n<5) return head+`<p class="note" style="margin-top:0">Todavía hay pocos datos (${s.n}). Cada vez que alguien responde «¿Había setas?» en una zona, apunta una salida o deja un aviso, sirve para comprobarlo y para afinar la nota de cada zona.</p>`;
   const zones=Object.entries(ZADJ).sort((a,b)=>Math.abs(b[1].a)-Math.abs(a[1].a)).slice(0,6);
   const byZ={}; E.forEach(e=>(byZ[e.site]??=[]).push(e));
   return head+`<div class="facts">
-      <div class="fact"><div class="k">Acierto</div><div class="v">${s.pct}%</div><div class="s">${s.n} comprobaciones</div></div>
+      <div class="fact"><div class="k">Acierto</div><div class="v">${s.pct}%</div><div class="s">${s.n} comprobaciones${CHECKS?" de todos los boletaires":""}</div></div>
       <div class="fact"><div class="k">Fallos</div><div class="v">${s.over+s.under}</div><div class="s">${s.over} por exceso · ${s.under} por defecto</div></div>
     </div>
     ${zones.length?`<p class="note"><b>Zonas corregidas:</b> ${zones.map(([id,z])=>`${esc(SITES.find(x=>x.id===id)?.n||id)} (${z.a>0?"+":""}${z.a})`).join(", ")}.</p>`:""}
     <p class="note">Cuenta como acierto si la nota era ${ACC_GOOD} o más y se encontraron setas, o si era menos de ${ACC_GOOD} y no salían.</p>`;
 }
+/* Comprobaciones de todos («¿Había setas?»), guardadas en Supabase */
+async function loadChecks(){
+  if(!window.BCHECK) return;
+  const a=await BCHECK.load(isoAdd(todayISO(),-120)); if(!Array.isArray(a)) return;
+  CHECKS=a; ACCKEY=""; syncOwnChecks(); if(DATA){ renderAll(); renderAcc(); }
+}
+function postCheck(site,d,ok,src){
+  if(!window.BCHECK) return Promise.resolve(false);
+  if(CHECKS){ CHECKS=CHECKS.filter(c=>!(c._mine&&c.site===site&&c.d===d)); CHECKS.unshift({site,d,ok:!!ok,_mine:true}); ACCKEY=""; }
+  try{ const m=JSON.parse(localStorage.getItem("boletaire.qc")||"{}"); m[site+"|"+d]=ok?1:0; localStorage.setItem("boletaire.qc",JSON.stringify(m)); }catch(e){}
+  return BCHECK.post(site,d,ok,src);
+}
+function myCheck(site){ try{ const m=JSON.parse(localStorage.getItem("boletaire.qc")||"{}"); for(let i=0;i<4;i++){ const d=isoAdd(todayISO(),-i); if(m[site+"|"+d]!=null) return {d,ok:!!m[site+"|"+d],i}; } }catch(e){} return null; }
+// Envía una vez al día las salidas y valoraciones recientes guardadas en este móvil (las de antes de existir la tabla)
+function syncOwnChecks(){
+  if(!window.BCHECK) return; let last=""; try{ last=localStorage.getItem("boletaire.qcsync")||""; }catch(e){}
+  if(last===todayISO()) return; try{ localStorage.setItem("boletaire.qcsync",todayISO()); }catch(e){}
+  const lim=isoAdd(todayISO(),-10);
+  for(const t of TRIPS) if(t.site&&t.date>=lim&&t.date<=todayISO()){ const kg=tripKg(t); if(kg>=0.5||kg<0.2) BCHECK.post(t.site,t.date,kg>=0.5,"salida"); }
+  for(const f of SPFB) if(f.site&&f.date>=lim) BCHECK.post(f.site,f.date,!!f.ok,"punto");
+}
+function qcheckBlock(s){
+  if(!window.BCHECK) return "";
+  const m=myCheck(s.id); const short=s.n.split(" – ")[0];
+  const when=i=>i===0?"hoy":i===1?"ayer":"hace "+i+" días";
+  if(m) return `<div class="qcheck done"><span>Gracias: anotado que <b>${m.ok?"había setas":"no había nada"}</b> ${when(m.i)}. Así comprobamos si la nota acierta.</span><button class="lnk" data-qc-undo>Cambiar</button></div>`;
+  return `<div class="qcheck"><span><b>¿Has ido estos días?</b> Dinos si había setas: así medimos si la nota acierta.</span>
+    <div class="qcrow"><select id="qcDay" aria-label="Qué día fuiste"><option value="0">Hoy</option><option value="1">Ayer</option><option value="2">Anteayer</option><option value="3">Hace 3 días</option></select>
+    <button class="btn small" data-qc="1">🍄 Había setas</button><button class="btn small ghost" data-qc="0">No había nada</button></div></div>`;
+}
+document.addEventListener("click",e=>{
+  const b=e.target.closest("[data-qc],[data-qc-undo]"); if(!b||!b.closest("#detail")) return;
+  const s=SITES.find(x=>x.id===sel); if(!s) return;
+  if(b.hasAttribute("data-qc-undo")){ try{ const m=JSON.parse(localStorage.getItem("boletaire.qc")||"{}"); for(const k in m) if(k.startsWith(s.id+"|")) delete m[k]; localStorage.setItem("boletaire.qc",JSON.stringify(m)); }catch(err){} renderDetail(); return; }
+  const i=+(document.getElementById("qcDay")?.value||0); postCheck(s.id,isoAdd(todayISO(),-i),b.dataset.qc==="1","zona"); renderDetail(); if(!document.getElementById("view-how").hidden) renderAcc();
+});
 function renderAcc(){ const el=document.getElementById("accBox"); if(el) el.innerHTML=accBlock(); }
 
 function build(){
@@ -2512,6 +2576,7 @@ async function saveFb(s,c,ok){
   const id=`fb_${s.id}_${c.la.toFixed(4)}_${c.lo.toFixed(4)}_${todayISO()}`.replace(/[.\-]/g,"");
   const doc={type:"spotfb",site:s.id,la:+c.la.toFixed(5),lo:+c.lo.toFixed(5),ok,date:todayISO()};
   SPFB=[...SPFB.filter(f=>f._id!==id),{...doc,_id:id}]; renderDetail(); renderSpotsLayer();
+  postCheck(s.id,doc.date,ok,"punto");
   try{ await DB.doc(`data/users/${UID}/${id}`).set(doc); }catch(e){}
 }
 
@@ -3530,7 +3595,7 @@ function renderDetail(){
     ${(()=>{const dv=drive(s);return dv?`<div class="drive meta"><b style="color:var(--fg)">≈ ${dv.txt} en coche</b> · ${dv.km} km desde ${esc(origin.name)}</div>`:`<div class="meta"><a href="#" id="askOrigin">Indica desde dónde sales</a> para ver el tiempo en coche.</div>`})()}
     ${safetyBlock(s,r)}${huntDay(r.d)?`<div class="hunt"><b>${fmtDay(r.d,dayIdx)} es ${huntWhy(r.d)}: día habitual de batidas de jabalí.</b> Viste ropa de color vivo (naranja o amarillo), no entres en zonas con carteles de "batuda" o "cacera", habla en voz alta y no te alejes de las pistas.</div>`:""}
     <div class="scoreRow"><div class="bigScore${light(r.score)?' light':''}" style="background:${col(r.score)}">${r.score}</div>
-      <div class="scoreTxt"><b>${LABEL[band(r.score)]} · ${fmtDay(r.d,dayIdx)} ${fmtDate(r.d)}</b><span>${reasons.length?reasons.join(", ").replace(/^./,c=>c.toUpperCase())+".":"Condiciones normales."}</span></div></div>${adjNote(s)}
+      <div class="scoreTxt"><b>${LABEL[band(r.score)]} · ${fmtDay(r.d,dayIdx)} ${fmtDate(r.d)}</b><span>${reasons.length?reasons.join(", ").replace(/^./,c=>c.toUpperCase())+".":"Condiciones normales."}</span></div></div>${adjNote(s)}${qcheckBlock(s)}
     <div class="factors">
       <div class="factor"><span>Lluvia ~3 semanas</span><span class="bar"><i style="width:${r.soil*100}%"></i></span><span class="v">${r.W} mm</span></div>
       <div class="factor"><span>Lluvia desencadenante</span><span class="bar"><i style="width:${r.trigger*100}%"></i></span><span class="v">${r.recent} mm</span></div>
@@ -3572,7 +3637,7 @@ function renderDetail(){
     <div class="actions" style="margin-top:8px"><a class="btn" href="https://www.google.com/maps/dir/?api=1${origin?`&origin=${origin.lat},${origin.lon}`:""}&destination=${(()=>{const P=mainPark(s,r);return P?P[0]+','+P[1]:encodeURIComponent(START[s.id]);})()}" target="_blank" rel="noopener">Cómo llegar</a>
     <a class="btn ghost" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(START[s.id])}" target="_blank" rel="noopener">Ver punto de inicio</a>
     <a class="btn ghost" href="${calLink(s,r)}" target="_blank" rel="noopener">Añadir al calendario</a>
-    <button class="btn ghost" id="shareTrip">Compartir salida</button><span class="note" id="shareTripMsg" role="status"></span>
+    <button class="btn ghost" id="shareTrip">📤 Compartir plan</button><span class="note" id="shareTripMsg" role="status"></span>
     <a class="btn ghost" href="https://www.google.com/maps/search/?api=1&query=${s.lat},${s.lon}" target="_blank" rel="noopener">Ver zona</a></div>
     ${personalBlock(s,r)}
     ${reportsBlock(s)}
@@ -3585,7 +3650,7 @@ function renderDetail(){
   wireReports(el,s); wireBefore(el,s,r); wireField(el,s); wireSpotFb(el,s,r);
   const zs=el.querySelector('#zoomSpots'); if(zs) zs.onclick=zoomToSpots;
   const zr=el.querySelector('#zoomRoute'); if(zr) zr.onclick=zoomToRoute;
-  const st=el.querySelector('#shareTrip'); if(st) st.onclick=()=>shareTrip(s,r,st);
+  const st=el.querySelector('#shareTrip'); if(st) st.onclick=()=>window.sharePlan?sharePlan(st):shareTrip(s,r,st);
   const ao=el.querySelector("#askOrigin"); if(ao) ao.onclick=e=>{e.preventDefault();document.getElementById("originIn").focus();};
   const fx=el.querySelector(".factors"); if(fx){ const d=makeSec("Por qué esta nota","det:Por qué esta nota",false,[]); fx.replaceWith(d); d.appendChild(fx); }
   collapseSections(el,"det",["Dónde buscar exactamente","Qué puedes encontrar"]);
@@ -3673,6 +3738,7 @@ document.getElementById("tripForm").addEventListener("submit",async e=>{
     const photos=[];
     for(let k=0;k<TPH.length;k++){ const pid=`p${Date.now()}_${k}`; await DB.doc(`data/users/${UID}/${pid}`).set({type:"photo",trip:id,data:TPH[k],createdAt:new Date().toISOString()}); photos.push(pid); PHOTOCACHE[pid]=TPH[k]; }
     await DB.doc(`data/users/${UID}/${id}`).set({type:"trip", site, date, items, note:document.getElementById("tnote").value.slice(0,500), index:idx, photos, createdAt:new Date().toISOString()});
+    { const kg=items.reduce((a,i)=>a+i.kg,0); if(date<=todayISO()&&date>=isoAdd(todayISO(),-10)&&(kg>=0.5||kg<0.2)) postCheck(site,date,kg>=0.5,"salida"); }
     renderTripForm(); document.getElementById("tmsg").textContent="Salida guardada.";
   }catch(err){ msg.textContent = err.code==="invalid_argument"||err.code==="permission_denied" ? "No tienes permiso para guardar. Pide al propietario que te comparta la app como Colaborador." : "No se ha podido guardar. Inténtalo de nuevo."; }
 });
@@ -3772,7 +3838,7 @@ try{ initMap(); }catch(e){}
   if(!db){ document.getElementById("detail").innerHTML='<div class="empty">No se pueden cargar las previsiones en esta vista. Abre la app con tu cuenta de Claude.</div>'; document.getElementById("fresh").textContent="Sin conexión a los datos"; return; }
   db.doc("forecast/latest").onSnapshot(snap=>{
     if(!snap.exists){ document.getElementById("detail").innerHTML='<div class="empty">Todavía no hay previsión. La primera actualización llega cada mañana.</div>'; return; }
-    DATA=snap.data(); clearTimeout(window._loadWD);
+    DATA=snap.data(); clearTimeout(window._loadWD); if(!window.__ckl){ window.__ckl=1; setTimeout(loadChecks,0); }
     try{ build(); renderCmpBar(); }catch(err){ console.error(err); loadFail("No se ha podido mostrar la previsión ("+(err.message||err)+")."); }
   }, e=>{ document.getElementById("fresh").textContent="Error al leer los datos: "+(e.message||e.code); loadFail("No se han podido leer los datos de previsión."); });
   window._loadWD=setTimeout(()=>{ if(!DATA) loadFail("La previsión está tardando más de lo normal."); },15000);
@@ -4192,6 +4258,8 @@ maybeWelcome();
         `<span class="dl"><span>${fmtDay(DAYS[0],0)}</span><span>${fmtDay(DAYS[n-1],n-1)}</span></span>`;
       card.setAttribute("aria-label",`Mejor zona hoy: ${b.s.n}, ${Math.round(b.v)} sobre 100. Ver en el mapa.`);
       card.hidden=false;
+      try{ const ha=document.getElementById("heroAcc"); const st=CHECKS?accStats(accEvidence()):null; if(ha){ ha.hidden=!(st&&st.n>=10); if(st&&st.n>=10) ha.textContent=`Acierta el ${st.pct}% (${st.n} comprobaciones)`; } }catch(e){}
+      if(typeof LINKZ!=="undefined"&&LINKZ&&!window.__linkzDone){ window.__linkzDone=1; setTimeout(()=>document.getElementById(innerWidth<860?"detail":"days")?.scrollIntoView({block:"start"}),400); }
       card.onclick=()=>{ sel=b.s.id; selTown=null; dayIdx=0; if(typeof inProv==="function"&&!inProv(sel)){ prov="all"; } renderAll(); toMap(); };
     }catch(e){ console.warn("hero",e); }
   };
@@ -4205,4 +4273,5 @@ maybeWelcome();
 
 </script>
 <script src="web.js"></script>
+<script src="extras.js"></script>
 </body></html>
