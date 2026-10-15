@@ -1,0 +1,88 @@
+/* Plantilla «Musgo»: basada en Material Design 3 (Google, licencia Apache 2.0).
+   Superficies tonales sin bordes, esquinas grandes, chips de filtro y
+   navegación lateral (rail) en escritorio / barra inferior en el móvil. */
+@import url("https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,400;8..144,500;8..144,600;8..144,700&display=swap");
+
+:root{
+  --bg:#f9faef; --surface:#eeefe3; --surface-2:#e2e3d8; --fg:#1a1c16; --muted:#44483d; --line:#c5c8ba;
+  --moss:#4c662b; --moss-ink:#ffffff; --pc:#cdeda3; --on-pc:#354e16; --sc:#dce7c8; --on-sc:#2a331e; --hi:#e8e9de;
+  --display:"Roboto Flex",system-ui,sans-serif; --body:"Roboto Flex",system-ui,sans-serif;
+  --r-xl:28px; --r-l:16px; --r-m:12px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#12140e; --surface:#1e201a; --surface-2:#282b24; --fg:#e2e3d8; --muted:#c5c8ba; --line:#44483d;
+  --moss:#b1d18a; --moss-ink:#1f3701; --pc:#354e16; --on-pc:#cdeda3; --sc:#3f4a34; --on-sc:#dce7c8; --hi:#33362e}}
+:root[data-theme="dark"]{
+  --bg:#12140e; --surface:#1e201a; --surface-2:#282b24; --fg:#e2e3d8; --muted:#c5c8ba; --line:#44483d;
+  --moss:#b1d18a; --moss-ink:#1f3701; --pc:#354e16; --on-pc:#cdeda3; --sc:#3f4a34; --on-sc:#dce7c8; --hi:#33362e}
+
+body{font:15px/1.5 var(--body);font-variation-settings:"opsz" 14}
+
+/* Barra superior */
+header.top{align-items:center;padding-block:10px 18px}
+.brand h1{font:600 30px/1.1 var(--display);font-variation-settings:"opsz" 72;letter-spacing:0}
+.brand small{text-transform:none;letter-spacing:.01em;font:500 13px var(--body)}
+.brand svg{background:var(--pc);border-radius:16px;padding:6px;width:52px;height:52px}
+.langsel{background:var(--surface);border-radius:999px;padding:3px;border:0}
+.langsel button{border-radius:999px!important}
+
+/* Navegación: rail lateral en escritorio */
+nav.views button svg{display:block;width:24px;height:24px;margin:0 auto}
+@media (min-width:861px){
+  .wrap{padding-left:112px;max-width:1300px}
+  nav.views{position:fixed;left:0;top:0;bottom:0;width:88px;flex-direction:column;justify-content:flex-start;gap:12px;
+    padding:96px 0 0;background:var(--bg);border-radius:0;border-right:1px solid var(--line);z-index:1200}
+  nav.views button{display:flex;flex-direction:column;align-items:center;gap:4px;padding:0;background:none!important;color:var(--muted);
+    font:600 12px/1.2 var(--body);text-align:center;white-space:normal}
+  nav.views button svg{width:56px;height:32px;padding:4px 16px;border-radius:999px;box-sizing:border-box;transition:background .2s}
+  nav.views button[aria-pressed="true"]{color:var(--fg)}
+  nav.views button[aria-pressed="true"] svg{background:var(--sc);color:var(--on-sc)}
+  nav.views button:hover svg{background:var(--hi)}
+}
+/* Barra de navegación inferior en el móvil */
+@media (max-width:860px){
+  :root{--tplb:96px}
+  .wrap{padding-bottom:110px}
+  nav.views{position:fixed;left:0;right:0;bottom:0;width:auto;max-width:none;border-radius:0;z-index:1200;
+    background:var(--surface);padding:12px 4px calc(14px + env(safe-area-inset-bottom,0px));justify-content:space-around;gap:0}
+  nav.views button{display:flex;flex-direction:column;align-items:center;gap:4px;padding:0 2px;background:none!important;color:var(--muted);
+    font:600 11px/1.15 var(--body);flex:1 1 0;text-align:center;min-width:0;white-space:normal;hyphens:auto}
+  nav.views button svg{width:56px;height:32px;padding:4px 16px;border-radius:999px;box-sizing:border-box}
+  nav.views button[aria-pressed="true"]{color:var(--fg)}
+  nav.views button[aria-pressed="true"] svg{background:var(--sc);color:var(--on-sc)}
+}
+
+/* Contenedores tonales sin borde */
+.panel,.card,.originbar,.disclaimer{border:0;border-radius:var(--r-xl);background:var(--surface)}
+.panel{padding:22px}
+.panel h2,.panel h3{font-family:var(--display);font-weight:600;letter-spacing:0}
+.originbar{padding:10px 12px 10px 20px;margin-top:4px}
+.originbar input,.townbar input,.frow input,.frow select,.frow textarea{border-radius:4px 4px 0 0;border:0;border-bottom:1px solid var(--muted);background:var(--surface-2);padding:10px 14px}
+.originbar input:focus,.townbar input:focus{outline:0;border-bottom:2px solid var(--moss)}
+.plancard{border:0;border-radius:var(--r-l);background:var(--bg)}
+.plancard:first-child{background:var(--pc);color:var(--on-pc);box-shadow:none}
+.plancard:first-child .pk{color:var(--on-pc)}
+.plancard .pk,.plan .eyebrow{text-transform:none;letter-spacing:.01em;font-size:12px}
+.estnote{border:0;border-radius:var(--r-l);background:var(--sc);color:var(--on-sc)}
+.estnote b{color:var(--on-sc)}
+.day{border:0;border-radius:var(--r-l);background:var(--surface)}
+.day[aria-pressed="true"]{background:var(--pc);color:var(--on-pc);box-shadow:none}
+.day[aria-pressed="true"] .dd{color:var(--on-pc)}
+.mapbox{border-radius:var(--r-xl)}
+
+/* Chips de filtro M3 */
+.chip{border-radius:8px;border:1px solid var(--line);font:600 13.5px var(--body);padding:6px 14px;background:transparent}
+.chip[aria-pressed="true"]{background:var(--sc);color:var(--on-sc);border-color:var(--sc)}
+.chip[aria-pressed="true"]::before{content:"";display:inline-block;width:12px;height:7px;border:solid currentColor;border-width:0 0 2px 2px;transform:rotate(-45deg) translate(1px,-2px);margin-right:7px}
+
+/* Botones: pastilla de 40 px */
+.btn{border-radius:999px;padding:10px 22px;font:600 14px var(--body)}
+.btn.ghost{border-color:var(--muted);color:var(--moss)}
+.rank li button{border-radius:var(--r-m)}
+.rank li button:hover,.rank li button[aria-current="true"]{background:var(--sc);color:var(--on-sc)}
+.pill{border-radius:8px;font-family:var(--display);font-weight:700}
+.bigScore{font-family:var(--display);font-weight:700;border-radius:24px}
+details.sec>summary{letter-spacing:.01em}
+.wcard{border-radius:var(--r-xl);background:var(--surface);box-shadow:0 8px 24px rgba(0,0,0,.18)}
+.leaflet-bar a{border-radius:12px!important}
+.leaflet-bar{border:0!important;box-shadow:0 1px 3px rgba(0,0,0,.25)!important;border-radius:12px!important}

@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Boletaire · Elige plantilla</title><meta name="robots" content="noindex">
+<link rel="icon" href="../icon-192.png">
+<style>
+:root{--bg:#f3f4ef;--fg:#1b211c;--muted:#5e675f;--card:#fff;--line:#d9ddd5;--acc:#2c5a43}
+@media (prefers-color-scheme:dark){:root{--bg:#121613;--fg:#e6ebe5;--muted:#9aa69c;--card:#1a201b;--line:#2c352e;--acc:#86c4a1}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:1180px;margin:0 auto;padding:40px 16px 64px}
+h1{font-size:clamp(28px,5vw,42px);line-height:1.1;margin:0 0 10px;letter-spacing:-.02em}
+.lead{color:var(--muted);max-width:62ch;margin:0 0 32px}
+.tpl{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px;margin-bottom:22px;display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:22px}
+.tpl h2{margin:0 0 4px;font-size:24px}
+.tpl .base{color:var(--muted);font-size:14px;margin:0 0 10px}
+.tpl p{margin:0 0 12px;max-width:60ch}
+.shots{display:grid;grid-template-columns:minmax(0,1fr) 120px;gap:12px;align-items:start;grid-column:1/-1}
+.shots img{width:100%;border-radius:10px;border:1px solid var(--line);display:block}
+.go{display:inline-block;background:var(--acc);color:var(--card);text-decoration:none;font-weight:700;padding:10px 18px;border-radius:999px}
+.go:focus-visible{outline:2px solid var(--acc);outline-offset:3px}
+ul{margin:0 0 14px;padding-left:20px}li{margin-bottom:3px}
+@media (max-width:760px){.tpl{grid-template-columns:1fr}.shots{grid-template-columns:minmax(0,1fr) 90px}}
+</style></head><body><main>
+<h1>Elige el diseño de Boletaire</h1>
+<p class="lead">Tres plantillas con la app completa dentro: mismo mapa, misma previsión y mismas secciones. Ábrelas, navega un rato y quédate con la que más te guste. Abajo del todo, en cada una, hay una barra para saltar de una a otra.</p>
+
+<section class="tpl">
+  <div><h2>Musgo</h2><p class="base">Basada en Material Design 3 de Google (licencia Apache 2.0)</p>
+  <p>Se siente como una app de Android: tarjetas verdes sin bordes, esquinas muy redondeadas y menú con iconos.</p>
+  <ul><li>En el móvil, el menú pasa a una barra abajo, al alcance del pulgar.</li><li>En el ordenador, el menú queda fijo a la izquierda.</li><li>Modo claro y oscuro según el teléfono.</li></ul></div>
+  <div><a class="go" href="musgo/index.html">Abrir Musgo</a></div>
+  <div class="shots"><img src="capturas/musgo-escritorio.jpg" alt="Musgo en el ordenador" loading="lazy"><img src="capturas/musgo-movil.jpg" alt="Musgo en el móvil" loading="lazy"></div>
+</section>
+
+<section class="tpl">
+  <div><h2>Pizarra</h2><p class="base">Basada en shadcn/ui (licencia MIT) con la letra Geist</p>
+  <p>Limpia y precisa, como las webs de herramientas modernas: blanco, líneas finas y negro para lo importante.</p>
+  <ul><li>Cabecera fija con las secciones como pestañas, siempre visible al bajar.</li><li>Los nueve días forman una sola tira compacta.</li><li>Modo claro y oscuro según el teléfono.</li></ul></div>
+  <div><a class="go" href="pizarra/index.html">Abrir Pizarra</a></div>
+  <div class="shots"><img src="capturas/pizarra-escritorio.jpg" alt="Pizarra en el ordenador" loading="lazy"><img src="capturas/pizarra-movil.jpg" alt="Pizarra en el móvil" loading="lazy"></div>
+</section>
+
+<section class="tpl">
+  <div><h2>Sotobosque</h2><p class="base">Estilo revista de naturaleza, inspirada en las plantillas editoriales de HTML5 UP (CC BY 3.0)</p>
+  <p>Oscura y con carácter: titulares con serifa, dorado de rebozuelo y una portada con el mapa real de los bosques de Catalunya.</p>
+  <ul><li>Portada grande solo en la sección del mapa.</li><li>Siempre en oscuro, también de día.</li><li>La que más llama la atención al compartirla.</li></ul></div>
+  <div><a class="go" href="sotobosque/index.html">Abrir Sotobosque</a></div>
+  <div class="shots"><img src="capturas/sotobosque-escritorio.jpg" alt="Sotobosque en el ordenador" loading="lazy"><img src="capturas/sotobosque-movil.jpg" alt="Sotobosque en el móvil" loading="lazy"></div>
+</section>
+
+<section class="tpl">
+  <div><h2>Diseño actual</h2><p class="base">Lo que hay ahora en boletscat.github.io</p><p>Para comparar.</p></div>
+  <div><a class="go" href="../index.html">Abrir el diseño actual</a></div>
+  <div class="shots"><img src="capturas/actual-escritorio.jpg" alt="Diseño actual en el ordenador" loading="lazy"><img src="capturas/actual-movil.jpg" alt="Diseño actual en el móvil" loading="lazy"></div>
+</section>
+</main></body></html>

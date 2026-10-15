@@ -1,0 +1,66 @@
+/* Plantilla «Pizarra»: basada en shadcn/ui (licencia MIT) y la tipografía Geist (OFL).
+   Neutra y precisa: bordes finos, radios pequeños, cabecera fija con pestañas subrayadas. */
+@import url("https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@500&display=swap");
+
+:root{
+  --bg:#ffffff; --surface:#ffffff; --surface-2:#f4f4f5; --fg:#09090b; --muted:#71717a; --line:#e4e4e7;
+  --moss:#1f4d3a; --moss-ink:#ffffff; --ring:#a1a1aa;
+  --display:"Geist",ui-sans-serif,system-ui,sans-serif; --body:"Geist",ui-sans-serif,system-ui,sans-serif; --mono:"Geist Mono",ui-monospace,monospace;
+  --shadow:0 1px 2px rgba(0,0,0,.05);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#09090b; --surface:#09090b; --surface-2:#18181b; --fg:#fafafa; --muted:#a1a1aa; --line:#27272a; --moss:#6fcf9f; --moss-ink:#04140c; --ring:#52525b}}
+:root[data-theme="dark"]{
+  --bg:#09090b; --surface:#09090b; --surface-2:#18181b; --fg:#fafafa; --muted:#a1a1aa; --line:#27272a; --moss:#6fcf9f; --moss-ink:#04140c; --ring:#52525b}
+
+body{font:14px/1.55 var(--body);-webkit-font-smoothing:antialiased}
+.wrap{max-width:1280px;padding-top:0}
+
+/* Cabecera fija a todo lo ancho, con las secciones como pestañas */
+header.top{position:sticky;top:0;z-index:1100;margin-inline:calc(50% - 50vw);padding:12px max(16px,calc(50vw - 624px)) 0;
+  background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:saturate(1.6) blur(12px);-webkit-backdrop-filter:saturate(1.6) blur(12px);
+  border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px}
+.brand svg{width:28px;height:28px}
+.brand h1{font:700 18px/1 var(--display);letter-spacing:-.02em}
+.brand small{display:none}
+header.top .fresh{margin-right:auto;text-align:left;font-size:12.5px;padding-left:16px;border-left:1px solid var(--line)}
+header.top nav.views{flex:1 0 100%;order:9;background:none;padding:0;border-radius:0;gap:2px;margin-top:6px;overflow-x:auto;scrollbar-width:none;width:auto;max-width:100%}
+header.top nav.views button{border-radius:0;padding:10px 12px 11px;font:500 14px var(--body);color:var(--muted);background:none;border-bottom:2px solid transparent;white-space:nowrap}
+header.top nav.views button:hover{color:var(--fg)}
+header.top nav.views button[aria-pressed="true"]{background:none;color:var(--fg);border-bottom-color:var(--fg)}
+@media (max-width:640px){header.top .fresh{order:8;flex:1 0 100%;border:0;padding:0}.brand{margin-right:auto}header.top .acct{position:static}header.top .langsel{margin-left:0}}
+
+/* Tarjetas, campos y botones */
+.panel,.card,.originbar,.disclaimer{border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);background:var(--surface)}
+.panel{padding:20px}
+.panel h2,.panel h3{font-family:var(--display);font-weight:600;letter-spacing:-.015em}
+.originbar{margin-top:18px}
+.originbar input,.townbar input,.frow input,.frow select,.frow textarea,.wcard input{border-radius:6px;border:1px solid var(--line);background:var(--bg);box-shadow:var(--shadow);font-family:var(--body)}
+.originbar input:focus,.townbar input:focus,.frow input:focus{outline:2px solid var(--ring);outline-offset:1px}
+.btn{border-radius:6px;font:500 14px var(--body);padding:8px 14px;background:var(--fg);color:var(--bg)}
+.btn.ghost{background:var(--bg);color:var(--fg);border:1px solid var(--line);box-shadow:var(--shadow)}
+.chip{border-radius:6px;font:500 13px var(--body);padding:5px 11px;box-shadow:var(--shadow)}
+.chip[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.langsel{border:1px solid var(--line);border-radius:7px;padding:2px;background:var(--surface-2)}
+.langsel button{border-radius:5px!important;font-family:var(--body)}
+.langsel button[aria-pressed="true"]{background:var(--bg)!important;color:var(--fg)!important;box-shadow:var(--shadow)}
+
+/* Plan, días y ranking */
+.plancard{border-radius:8px;background:var(--surface);border:1px solid var(--line)}
+.plancard:first-child{border-color:var(--moss);box-shadow:0 0 0 1px var(--moss)}
+.plancard b{font:600 15px/1.25 var(--display)}
+.plancard .pk,.plancard .ph,.plan .eyebrow{text-transform:none;letter-spacing:0;font-size:12px;font-weight:500}
+.estnote{border-left:0;border:1px solid var(--line);border-radius:8px;background:var(--surface-2)}
+.days{gap:0;border:1px solid var(--line);border-radius:10px;overflow:hidden;box-shadow:var(--shadow)}
+.day{border:0;border-right:1px solid var(--line);border-radius:0;background:var(--surface)}
+.day:last-child{border-right:0}
+.day[aria-pressed="true"]{background:var(--surface-2);box-shadow:inset 0 -2px 0 var(--fg)}
+.day .dd{font-family:var(--mono)}
+@media (max-width:700px){.days{border-radius:10px}}
+.mapbox{border-radius:10px;border:1px solid var(--line)}
+.rank li button{border-radius:6px}
+.pill{border-radius:5px;font:600 12.5px var(--mono)}
+.bigScore{font:600 28px var(--mono);border-radius:12px}
+.wcard{border-radius:12px;border:1px solid var(--line);box-shadow:0 16px 40px rgba(0,0,0,.18)}
+.leaflet-bar{border:1px solid var(--line)!important;border-radius:8px!important;box-shadow:var(--shadow)!important;overflow:hidden}
+.leaflet-bar a{background:var(--bg)!important;color:var(--fg)!important}
