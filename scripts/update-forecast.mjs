@@ -119,6 +119,7 @@ async function main() {
   // Si el modelo falla en muchas zonas, mejor que la acción falle y avise por correo que guardar un historial vacío
   if (Object.keys(scores).length < SITES.length * 0.8) throw new Error("Notas incompletas (" + Object.keys(scores).length + " zonas): " + JSON.stringify(errs));
   fs.writeFileSync(path.join(dir, "outlook.json"), JSON.stringify(outlook));
+  fs.writeFileSync(path.join(dir, "zones.json"), JSON.stringify(Object.fromEntries(SITES.map((s) => [s.id, s.n]))));
   const hp = path.join(dir, "history.json");
   let hist = []; try { hist = JSON.parse(fs.readFileSync(hp, "utf8")); } catch (e) {}
   hist = hist.filter((h) => h.d !== HOY); hist.push({ d: HOY, scores }); hist.sort((a, b) => a.d.localeCompare(b.d));

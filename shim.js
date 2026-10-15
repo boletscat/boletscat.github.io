@@ -56,6 +56,11 @@ window.BOLETAIRE_WEB = true;
     .catch(()=>{ repSubs.forEach(f=>f({docs:repDocs})); });
   if(SB) setInterval(()=>{ if(repSubs.length&&document.visibilityState==="visible") repLoad(); }, 5*60e3);
   window.BOLETAIRE_REPORTS = !!SB;
+  // «¿Había setas?» de todos: sin cuenta, con el identificador del dispositivo (no se puede leer desde la web)
+  window.BCHECK = SB ? {
+    post:(site,d,ok,src)=>fetch(SB.u+"/rest/v1/rpc/post_check",{method:"POST",headers:sbH(),body:JSON.stringify({p_uid:uid,p_site:site,p_d:d,p_ok:!!ok,p_src:src||"zona"})}).then(r=>r.ok).catch(()=>false),
+    load:(since)=>fetch(SB.u+"/rest/v1/checks?select=site,d,ok&d=gte."+since+"&order=d.desc&limit=10000",{headers:sbH()}).then(r=>r.ok?r.json():null).catch(()=>null)
+  } : null;
   // Comunidad (foro y «Estoy aquí»): tabla genérica docs(coll, uid, data)
   const SHARED={forum:true,checkins:true}; const colSubs={forum:[],checkins:[]}; const colDocs={forum:[],checkins:[]};
   const colLoad=c=>fetch(SB.u+`/rest/v1/docs?select=uid,data,updated_at&coll=eq.${c}&order=updated_at.desc&limit=400`,{headers:sbH()})
