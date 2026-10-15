@@ -11,21 +11,21 @@ Edita `config.js`:
 Rellena tus datos en `legal.html` (donde pone [TU NOMBRE…]).
 
 ## Publicar en GitHub Pages
-1. Crea un repositorio público llamado `boletaire` y sube todo el contenido de esta carpeta.
-2. Settings → Pages → Source: «Deploy from a branch», rama `main`, carpeta `/ (root)`.
-3. En un par de minutos estará en `https://TU-USUARIO.github.io/boletaire/`.
+La web se publica desde este repositorio, `boletscat/boletscat.github.io`, y está en https://boletscat.github.io.
+- Settings → Pages → Source: «Deploy from a branch», rama `main`, carpeta `/ (root)`. El archivo `.nojekyll` hace que GitHub sirva los archivos tal cual, sin procesarlos con Jekyll.
+- No hay paso de compilación: cada cambio que llega a `main` se publica solo en uno o dos minutos.
 
 ## Dominio propio
 1. En GitHub: Settings → Pages → Custom domain → escribe tu dominio (por ejemplo `boletaire.es`) y activa «Enforce HTTPS».
 2. En tu registrador, en la zona DNS del dominio:
    - Cuatro registros **A** para `@`: 185.199.108.153, 185.199.109.153, 185.199.110.153, 185.199.111.153
-   - Un registro **CNAME** para `www` → `TU-USUARIO.github.io`
+   - Un registro **CNAME** para `www` → `boletscat.github.io`
 
 ## Datos diarios (automático)
-La carpeta `.github/workflows/` trae una acción que cada mañana (6:40 en verano, 5:40 en invierno) descarga los datos de Meteocat y MET Norway, calcula la previsión con `model.js` (script `scripts/update-forecast.mjs`) y guarda `data/forecast.json` y `data/history.json`.
-1. Al subir el repositorio a GitHub, entra en la pestaña **Actions** y pulsa «I understand… enable workflows» si te lo pide.
-2. Para probarla al momento: Actions → «Previsión diaria» → **Run workflow**.
-3. Si un día falla (por ejemplo, Meteocat caído), la web sigue con los datos del día anterior y GitHub te avisa por correo.
+La acción `.github/workflows/forecast.yml` («Previsión diaria») se ejecuta cada mañana a las 4:40 UTC (6:40 en verano, 5:40 en invierno, hora de Madrid). Descarga los datos de Meteocat y MET Norway, calcula la previsión con `model.js` (script `scripts/update-forecast.mjs`) y hace un commit en `main` con `data/forecast.json` y `data/history.json` («Previsión AAAA-MM-DD»). Ese commit vuelve a publicar la web.
+1. Para lanzarla a mano: pestaña **Actions** → «Previsión diaria» → **Run workflow**.
+2. Si un día falla (por ejemplo, Meteocat caído), la web sigue con los datos del día anterior y GitHub te avisa por correo.
+3. GitHub desactiva las acciones programadas de un repositorio tras 60 días sin actividad; como la acción hace un commit cada día, no debería pasar, pero si se para, actívala de nuevo en **Actions**.
 
 ## Avisos entre usuarios (opcional, gratis)
 Para que la gente pueda avisar de «he encontrado setas aquí», usar la **Comunidad** (foro de dudas) y marcar «Estoy aquí buscando» en la web hace falta una pequeña base de datos. Supabase la da gratis:
