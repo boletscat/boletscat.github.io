@@ -296,6 +296,7 @@ const fmtDate=iso=>new Date(iso+"T12:00:00").toLocaleDateString(LOCALE,{day:"num
 const todayISO=()=>{const d=new Date();return new Date(d.getTime()-d.getTimezoneOffset()*6e4).toISOString().slice(0,10)};
 
 /* ---------- Modelo ---------- */
+const MPROD = {1:.3,2:.2,3:.35,4:.6,5:.75,6:.55,7:.35,8:.45,9:.95,10:1,11:.95,12:.6};   // cuánto produce el bosque cada mes respecto a octubre
 function computeSite(site, w, start){
   const fc = w.fc.slice(start);           // días a partir de hoy
   const lagObs = 2 + start;                 // días entre la última observación y hoy

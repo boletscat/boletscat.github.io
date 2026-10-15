@@ -1355,6 +1355,10 @@ button:focus-visible,a:focus-visible,[tabindex]:focus-visible{outline:2px solid 
   .webtoast{bottom:96px!important}
 }
 #days,#detail,#plan,.mapbox{scroll-margin-top:76px}
+.zlinks{margin-top:22px;background:var(--glass);border:1px solid var(--glass-line);border-radius:18px;padding:4px 18px}
+.zlinks>summary{cursor:pointer;font:700 15px var(--body);padding:12px 0;color:var(--fg)}
+.zlinks ul{list-style:none;margin:0 0 14px;padding:0;columns:3 200px;column-gap:18px;font-size:13.5px}
+.zlinks li{break-inside:avoid;padding:2px 0}.zlinks a{color:var(--muted);text-decoration:none}.zlinks a:hover{color:var(--moss)}
 
 /* ---- Fondo con setas tipo emoji ---- */
 html{background:
@@ -1503,6 +1507,7 @@ body{background:transparent!important}
     </div>
   </section>
 
+  <details class="zlinks"><summary>Previsión por zonas</summary><p class="note">Página con la previsión de cada zona: <a href="zona/">ver todas</a>.</p><ul><li><a href="zona/alinya/">Alinyà – Coll de Nargó</a></li><li><a href="zona/masella/">Alp – Masella</a></li><li><a href="zona/oix/">Alta Garrotxa – Oix</a></li><li><a href="zona/bor/">Bosc de Bor – Bellver</a></li><li><a href="zona/gerdar/">Bosc de Gerdar – Sorpe</a></li><li><a href="zona/poblet/">Bosc de Poblet – Les Masies</a></li><li><a href="zona/castellar/">Castellar de n'Hug – La Pobla de Lillet</a></li><li><a href="zona/berti/">Cingles de Bertí</a></li><li><a href="zona/collsacabra/">Collsacabra – Rupit</a></li><li><a href="zona/collserola/">Collserola – Vallvidrera</a></li><li><a href="zona/garrotxa/">Fageda d'en Jordà – Olot</a></li><li><a href="zona/gisclareny/">Gisclareny – Saldes</a></li><li><a href="zona/gombren/">Gombrèn – Montgrony</a></li><li><a href="zona/viladrau/">Guilleries – Viladrau</a></li><li><a href="zona/guils/">Guils de Cerdanya</a></li><li><a href="zona/gavarres/">Les Gavarres</a></li><li><a href="zona/lladurs/">Lladurs – Odèn</a></li><li><a href="zona/lles/">Lles de Cerdanya – Arànser</a></li><li><a href="zona/llucanes/">Lluçanès – Prats</a></li><li><a href="zona/garraf/">Massís del Garraf</a></li><li><a href="zona/moia/">Moianès – Castellterçol</a></li><li><a href="zona/montesquiu/">Montesquiu – Bellmunt</a></li><li><a href="zona/montnegre/">Montnegre i el Corredor</a></li><li><a href="zona/montsec/">Montsec d'Ares</a></li><li><a href="zona/montseny/">Montseny – Santa Fe</a></li><li><a href="zona/montserrat/">Montserrat – Marganell</a></li><li><a href="zona/prades/">Muntanyes de Prades</a></li><li><a href="zona/nautaran/">Naut Aran – Salardú</a></li><li><a href="zona/ogassa/">Ogassa – Coll de Merolla</a></li><li><a href="zona/ports/">Ports de Tortosa-Beseit</a></li><li><a href="zona/queralt/">Queralt – Berga</a></li><li><a href="zona/ensija/">Rasos de Peguera – Serra d'Ensija</a></li><li><a href="zona/riner/">Riner – Pinars del Solsonès</a></li><li><a href="zona/rocacorba/">Rocacorba – Canet d'Adri</a></li><li><a href="zona/sanhilari/">Sant Hilari Sacalm</a></li><li><a href="zona/frontanya/">Sant Jaume de Frontanyà</a></li><li><a href="zona/erm/">Sant Joan de l'Erm</a></li><li><a href="zona/stllorenc/">Sant Llorenç del Munt</a></li><li><a href="zona/ancosa/">Serra d'Ancosa – La Llacuna</a></li><li><a href="zona/boumort/">Serra de Boumort</a></li><li><a href="zona/busa/">Serra de Busa – Navès</a></li><li><a href="zona/cardo/">Serra de Cardó</a></li><li><a href="zona/castelltallat/">Serra de Castelltallat</a></li><li><a href="zona/catllaras/">Serra de Catllaràs</a></li><li><a href="zona/albera/">Serra de l'Albera</a></li><li><a href="zona/ordal/">Serra de l'Ordal</a></li><li><a href="zona/llaberia/">Serra de Llaberia</a></li><li><a href="zona/montsant/">Serra de Montsant – Ulldemolins</a></li><li><a href="zona/pandols/">Serra de Pàndols – Cavalls</a></li><li><a href="zona/rubio/">Serra de Rubió</a></li><li><a href="zona/montmell/">Serra del Montmell – Marmellar</a></li><li><a href="zona/serramarina/">Serralada de Marina – Sant Fost</a></li><li><a href="zona/camprodon/">Setcases – Vall de Camprodon</a></li><li><a href="zona/aran/">Vall d'Aran – Bossòst</a></li><li><a href="zona/llessui/">Vall d'Àssua – Llessui</a></li><li><a href="zona/boi/">Vall de Boí</a></li><li><a href="zona/cabo/">Vall de Cabó</a></li><li><a href="zona/cardos/">Vall de Cardós – Tírvia</a></li><li><a href="zona/tuixent/">Vall de la Vansa – Tuixent</a></li><li><a href="zona/tavascan/">Vall de Lladorre – Tavascan</a></li><li><a href="zona/valllord/">Vall de Lord – Sant Llorenç de Morunys</a></li><li><a href="zona/ribes/">Vall de Ribes – Bruguera</a></li><li><a href="zona/valferrera/">Vall Ferrera – Àreu</a></li><li><a href="zona/vidra/">Vidrà</a></li></ul></details>
   <div class="disclaimer"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" style="flex:none"><path d="M12 2 1 21h22Z" fill="none" stroke="var(--bad)" stroke-width="2"/><path d="M12 9v5m0 3v.5" stroke="var(--bad)" stroke-width="2" stroke-linecap="round"/></svg><div><strong>No comas ninguna seta sin identificación segura.</strong> Esta app orienta sobre dónde y cuándo buscar; no sirve para identificar. Ante la duda, llévalas a una asociación micológica o a un farmacéutico. Urgencias por intoxicación: <b>112</b> · Servicio de Información Toxicológica: <b>91 562 04 20</b>.</div></div>
 </div>
 
@@ -1933,6 +1938,8 @@ function computeTrend(site, w, start){
 
 /* ---------- Estado ---------- */
 let TREND={}; let DATA=null, RES={}, DAYS=[], dayIdx=0, sel=null, guideFilter="todas", guideFocus=null, mapMode="indice", prov="all";
+/* Enlace directo a una zona: ?z=montseny (lo usan las páginas de zona/ y los planes compartidos) */
+let LINKZ=null; try{ const q=new URLSearchParams(location.search); const z=q.get("z"); if(z&&SITES.some(s=>s.id===z)){ LINKZ=z; sel=z; } const d=+q.get("d"); if(d>=0&&d<9&&q.has("d")) dayIdx=d; }catch(e){}
 const PROVN={all:"Toda Catalunya","08":"Barcelona","17":"Girona","25":"Lleida","43":"Tarragona"};
 const PV={camprodon:"17",frontanya:"08",ogassa:"17",montseny:"08",viladrau:"17",collsacabra:"08",llucanes:"08",valllord:"25",lladurs:"25",gisclareny:"08",queralt:"08",bor:"25",guils:"17",alinya:"25",erm:"25",gerdar:"25",cardos:"25",aran:"25",boi:"25",garrotxa:"17",albera:"17",gavarres:"17",montnegre:"08",stllorenc:"08",prades:"43",ports:"43",montsec:"25",montsant:"43",poblet:"43",llaberia:"43",cardo:"43",ribes:"17",gombren:"17",vidra:"17",serramarina:"08",sanhilari:"17",montesquiu:"08",oix:"17",rocacorba:"17",castellar:"08",ensija:"08",busa:"25",tuixent:"25",lles:"25",boumort:"25",valferrera:"25",nautaran:"25",montmell:"43",ordal:"08",collserola:"08",rubio:"08",castelltallat:"08",
  llessui:"25", tavascan:"25", cabo:"25", catllaras:"08", masella:"17", moia:"08", berti:"08", montserrat:"08", ancosa:"08", riner:"25", garraf:"08", pandols:"43"};
@@ -2084,6 +2091,7 @@ let flatOnly=false; try{ flatOnly=localStorage.getItem("boletaire.flat")==="1"; 
 const inProv=id=>(prov==="all"||PV[id]===prov)&&(!flatOnly||SLOPE[id][0]===1);
 try{ const p=localStorage.getItem("boletaire.prov"); if(p&&PROVN[p]) prov=p; }catch(e){}
 try{ const s=localStorage.getItem("boletaire.day"); if(s) dayIdx=+s||0; }catch(e){}
+if(LINKZ){ prov="all"; sel=LINKZ; try{ const q=new URLSearchParams(location.search); if(q.has("d")){ const d=+q.get("d"); if(d>=0&&d<9) dayIdx=d; } }catch(e){} }
 
 /* ---------- ¿Acierta la previsión? ----------
    Compara la nota que dio la app ese día (historial diario) con lo que se encontró de verdad:
@@ -4192,6 +4200,7 @@ maybeWelcome();
         `<span class="dl"><span>${fmtDay(DAYS[0],0)}</span><span>${fmtDay(DAYS[n-1],n-1)}</span></span>`;
       card.setAttribute("aria-label",`Mejor zona hoy: ${b.s.n}, ${Math.round(b.v)} sobre 100. Ver en el mapa.`);
       card.hidden=false;
+      if(typeof LINKZ!=="undefined"&&LINKZ&&!window.__linkzDone){ window.__linkzDone=1; setTimeout(()=>document.getElementById(innerWidth<860?"detail":"days")?.scrollIntoView({block:"start"}),400); }
       card.onclick=()=>{ sel=b.s.id; selTown=null; dayIdx=0; if(typeof inProv==="function"&&!inProv(sel)){ prov="all"; } renderAll(); toMap(); };
     }catch(e){ console.warn("hero",e); }
   };
