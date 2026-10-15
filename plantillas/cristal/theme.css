@@ -1,0 +1,91 @@
+/* Plantilla «Cristal»: estilo actual de apps (2025-26). Fondo con degradado de colores en movimiento lento,
+   paneles de cristal esmerilado, menú flotante en pastilla y bloques en mosaico (bento). Letra Manrope (OFL). */
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap");
+
+:root{
+  --bg:#eef3ee; --surface:rgba(255,255,255,.62); --surface-2:rgba(255,255,255,.55); --fg:#0f1d16; --muted:#55665c; --line:rgba(15,40,25,.10);
+  --moss:#0f7a4f; --moss-ink:#ffffff; --glow1:#b9f0cf; --glow2:#ffe1a8; --glow3:#bfe3ff; --solid:#ffffff;
+  --display:"Manrope",ui-sans-serif,system-ui,sans-serif; --body:"Manrope",ui-sans-serif,system-ui,sans-serif;
+  --glass:blur(22px) saturate(1.6);
+  --shadow:0 1px 0 rgba(255,255,255,.7) inset,0 10px 30px -12px rgba(16,48,30,.25);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#07120d; --surface:rgba(22,36,29,.58); --surface-2:rgba(40,60,50,.45); --fg:#eaf5ee; --muted:#9db3a6; --line:rgba(200,255,220,.10);
+  --moss:#46e39a; --moss-ink:#04170d; --glow1:#0d5a3a; --glow2:#5a3a0b; --glow3:#0b3a5a; --solid:#14211b;
+  --shadow:0 1px 0 rgba(255,255,255,.06) inset,0 14px 34px -14px rgba(0,0,0,.6)}}
+:root[data-theme="dark"]{
+  --bg:#07120d; --surface:rgba(22,36,29,.58); --surface-2:rgba(40,60,50,.45); --fg:#eaf5ee; --muted:#9db3a6; --line:rgba(200,255,220,.10);
+  --moss:#46e39a; --moss-ink:#04170d; --glow1:#0d5a3a; --glow2:#5a3a0b; --glow3:#0b3a5a; --solid:#14211b;
+  --shadow:0 1px 0 rgba(255,255,255,.06) inset,0 14px 34px -14px rgba(0,0,0,.6)}
+
+body{font:15px/1.55 var(--body);background:var(--bg);-webkit-font-smoothing:antialiased}
+/* Degradado de fondo: tres manchas de color que se mueven muy despacio */
+body::before{content:"";position:fixed;inset:-20%;z-index:-1;pointer-events:none;
+  background:radial-gradient(40% 35% at 15% 20%,var(--glow1),transparent 70%),
+             radial-gradient(35% 30% at 85% 15%,var(--glow2),transparent 70%),
+             radial-gradient(45% 40% at 70% 85%,var(--glow3),transparent 70%);
+  filter:blur(30px)}
+@media (prefers-reduced-motion:no-preference){body::before{animation:cr-drift 40s ease-in-out infinite alternate}}
+@keyframes cr-drift{to{transform:translate3d(4%,-3%,0) rotate(8deg)}}
+
+/* Cabecera */
+header.top{align-items:center;padding-block:14px 8px}
+.brand svg{width:44px;height:44px;padding:7px;border-radius:14px;background:var(--surface);backdrop-filter:var(--glass);-webkit-backdrop-filter:var(--glass);box-shadow:var(--shadow)}
+.brand h1{font:800 28px/1 var(--display);letter-spacing:-.04em}
+.brand small{text-transform:none;letter-spacing:0;font:600 13px var(--body)}
+.langsel,.acct{background:var(--surface)!important;backdrop-filter:var(--glass);-webkit-backdrop-filter:var(--glass);border:1px solid var(--line)!important;box-shadow:var(--shadow)}
+.langsel button[aria-pressed="true"]{background:var(--fg);color:var(--bg)}
+
+/* Menú flotante en pastilla, pegado arriba al bajar */
+nav.views{position:sticky;top:10px;z-index:1100;margin:6px auto 0;gap:4px;padding:5px;border-radius:999px;
+  background:var(--surface);backdrop-filter:var(--glass);-webkit-backdrop-filter:var(--glass);border:1px solid var(--line);box-shadow:var(--shadow);
+  overflow-x:auto;scrollbar-width:none}
+nav.views button{font:700 14px var(--body);padding:9px 18px;color:var(--muted);white-space:nowrap;transition:background .25s,color .25s}
+nav.views button:hover{color:var(--fg)}
+nav.views button[aria-pressed="true"]{background:var(--fg);color:var(--bg)}
+
+/* Paneles de cristal */
+.panel,.card,.originbar,.disclaimer,.estnote,.day,.plancard{background:var(--surface);backdrop-filter:var(--glass);-webkit-backdrop-filter:var(--glass);
+  border:1px solid var(--line);box-shadow:var(--shadow)}
+.panel,.card{border-radius:26px}
+.panel{padding:22px}
+.panel h2,.panel h3,.card h4{font-family:var(--display);font-weight:800;letter-spacing:-.03em}
+.originbar{border-radius:20px;margin-top:16px;padding:10px 12px 10px 18px}
+.originbar input,.townbar input,.frow input,.frow select,.frow textarea,.wcard input{background:var(--solid);border:1px solid var(--line);border-radius:12px;color:var(--fg)}
+.estnote{border-radius:18px;border-left:1px solid var(--line);color:var(--muted)}
+.disclaimer{border-radius:20px}
+
+/* Plan del finde en mosaico: la mejor opción ocupa más */
+.plan .plancards{grid-template-columns:1.4fr 1fr 1fr}
+.plancard{border-radius:20px;padding:16px;transition:transform .2s}
+.plancard:hover{transform:translateY(-2px)}
+.plancard:first-child{background:linear-gradient(135deg,var(--moss),color-mix(in srgb,var(--moss) 60%,#0aa3a3));color:var(--moss-ink);border-color:transparent;box-shadow:0 14px 30px -12px color-mix(in srgb,var(--moss) 70%,transparent)}
+.plancard:first-child .pk,.plancard:first-child .ps,.plancard:first-child .ph{color:var(--moss-ink);opacity:.85}
+.plancard:first-child b{font-size:20px}
+.plancard b{font:800 17px/1.2 var(--display);letter-spacing:-.02em}
+.plancard .pk,.plancard .ph,.plan .eyebrow{text-transform:none;letter-spacing:0;font-size:12.5px;font-weight:700}
+@media (max-width:760px){.plan .plancards{grid-template-columns:none}}
+
+/* Días */
+.days{gap:8px}
+.day{border-radius:18px;padding:10px 4px}
+.day .dn{font:800 14px var(--display)}
+.day[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:transparent;box-shadow:0 10px 24px -10px rgba(0,0,0,.45)}
+.day[aria-pressed="true"] .dd,.day[aria-pressed="true"] .fr{color:var(--bg);opacity:.8}
+
+/* Chips y botones */
+.chip{border-radius:999px;font:700 13px var(--body);background:var(--surface);border-color:var(--line);backdrop-filter:var(--glass);-webkit-backdrop-filter:var(--glass)}
+.chip[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:transparent}
+.btn{border-radius:999px;font:800 14px var(--body);padding:10px 20px;background:var(--fg);color:var(--bg)}
+.btn.ghost{background:var(--surface);color:var(--fg);border:1px solid var(--line)}
+.mapbox{border-radius:26px;border:1px solid var(--line);box-shadow:var(--shadow)}
+.bigScore{border-radius:24px;font:800 30px var(--display);letter-spacing:-.04em;box-shadow:0 12px 26px -10px rgba(0,0,0,.35)}
+.pill{border-radius:999px;font-family:var(--display);font-weight:800}
+.rank li button{border-radius:14px}
+.wcard{border-radius:28px;background:var(--solid);border:1px solid var(--line)}
+.leaflet-bar{border:1px solid var(--line)!important;border-radius:14px!important;overflow:hidden;box-shadow:var(--shadow)!important}
+.leaflet-bar a{background:var(--solid)!important;color:var(--fg)!important}
+
+/* Al cambiar de sección, la nueva aparece con un fundido suave */
+@media (prefers-reduced-motion:no-preference){section[id^="view-"]:not([hidden]){animation:cr-in .35s ease-out}}
+@keyframes cr-in{from{opacity:0;transform:translateY(8px)}}

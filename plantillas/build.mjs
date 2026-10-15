@@ -7,7 +7,7 @@ import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const src = readFileSync(join(here, "..", "index.html"), "utf8");
-const ids = ["musgo", "pizarra", "sotobosque"];
+const ids = ["cristal", "musgo", "pizarra", "sotobosque"];
 
 function must(s, needle) { if (!s.includes(needle)) throw new Error("No encuentro " + needle); return s; }
 

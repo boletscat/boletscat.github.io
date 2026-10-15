@@ -1,6 +1,6 @@
 # Plantillas de diseño (vista previa)
 
-Tres diseños para elegir, cada uno con la app completa: `musgo/` (Material Design 3), `pizarra/` (shadcn/ui) y `sotobosque/` (revista de naturaleza). La portada `plantillas/index.html` las enseña con capturas.
+Diseños para elegir, cada uno con la app completa: `cristal/` (cristal y bento), `musgo/` (Material Design 3), `pizarra/` (shadcn/ui) y `sotobosque/` (revista de naturaleza). La portada `plantillas/index.html` las enseña con capturas.
 
 Cada plantilla es solo `theme.css` + `theme.js`. Su `index.html` es una copia del `index.html` de la raíz con esos dos archivos añadidos; si la app cambia, se regenera con:
 

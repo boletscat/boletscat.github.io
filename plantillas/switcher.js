@@ -1,7 +1,7 @@
 /* Barra flotante para saltar entre plantillas mientras se comparan. Solo existe en las vistas previas. */
 (function(){
   var cur=document.currentScript&&document.currentScript.dataset.current;
-  var list=[["musgo","Musgo"],["pizarra","Pizarra"],["sotobosque","Sotobosque"],["","Todas"]];
+  var list=[["cristal","Cristal"],["musgo","Musgo"],["pizarra","Pizarra"],["sotobosque","Sotobosque"],["","Todas"]];
   var bar=document.createElement("nav");
   bar.className="tplswitch"; bar.setAttribute("aria-label","Plantillas");
   bar.innerHTML='<span>Plantilla</span>'+list.map(function(t){
