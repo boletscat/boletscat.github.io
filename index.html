@@ -2182,8 +2182,8 @@ function syncOwnChecks(){
   for(const t of TRIPS) if(t.site&&t.date>=lim&&t.date<=todayISO()){ const kg=tripKg(t); if(kg>=0.5||kg<0.2) BCHECK.post(t.site,t.date,kg>=0.5,"salida"); }
   for(const f of SPFB) if(f.site&&f.date>=lim) BCHECK.post(f.site,f.date,!!f.ok,"punto");
 }
-function qcheckBlock(s){
-  if(!window.BCHECK) return "";
+function qcheckBlock(s,r){
+  if(!window.BCHECK||!r||r.d!==todayISO()) return "";   // solo el día de hoy: no tiene sentido preguntar por días que aún no han llegado
   const m=myCheck(s.id); const short=s.n.split(" – ")[0];
   const when=i=>i===0?"hoy":i===1?"ayer":"hace "+i+" días";
   if(m) return `<div class="qcheck done"><span>Gracias: anotado que <b>${m.ok?"había setas":"no había nada"}</b> ${when(m.i)}. Así comprobamos si la nota acierta.</span><button class="lnk" data-qc-undo>Cambiar</button></div>`;
@@ -2373,7 +2373,7 @@ function spotsBlock(s,r){
    <div class="spots">${S.map((c,i)=>`<div class="spot"><em class="spn">${i+1}</em><div>
      <b>${spotLine(c)}</b><span>${c.why.replace(/^./,x=>x.toUpperCase())}.${c.pk?` A ${nf(c.dist,1)} km en línea recta del aparcamiento ${pkLab(c.pki,n)}.`:""}${c.pd>=0?(c.pd<=60?" Junto a una pista o sendero.":` A unos ${c.pd} m del camino más cercano.`):""}</span>
      <div class="actions" style="margin-top:6px"><a class="btn small" href="https://www.google.com/maps/search/?api=1&query=${c.la},${c.lo}" target="_blank" rel="noopener">Ver punto</a>${c.pk?`<a class="btn small ghost" href="${walk(c)}" target="_blank" rel="noopener">Ruta a pie desde ${pkLab(c.pki,n)}</a>`:""}</div>
-     ${UID?(()=>{const f=fbFor(s.id,c);return `<div class="fbk">${f?`<span class="note">${f.ok?"Marcaste que había setas":"Marcaste que no había nada"} ${ago(f.date)}.</span>`:`<span class="note">¿Has ido?</span>`}<button class="chip small" data-fb="${i}" data-ok="1" aria-pressed="${!!(f&&f.ok)}">Había setas</button><button class="chip small" data-fb="${i}" data-ok="0" aria-pressed="${!!(f&&!f.ok)}">No había nada</button></div>`;})():""}</div></div>`).join("")}</div>
+     ${UID&&r.d===todayISO()?(()=>{const f=fbFor(s.id,c);return `<div class="fbk">${f?`<span class="note">${f.ok?"Marcaste que había setas":"Marcaste que no había nada"} ${ago(f.date)}.</span>`:`<span class="note">¿Has ido?</span>`}<button class="chip small" data-fb="${i}" data-ok="1" aria-pressed="${!!(f&&f.ok)}">Había setas</button><button class="chip small" data-fb="${i}" data-ok="0" aria-pressed="${!!(f&&!f.ok)}">No había nada</button></div>`;})():""}</div></div>`).join("")}</div>
    ${routeBlock(s,r)}
    <div class="actions" style="margin-top:8px"><button class="btn ghost small" id="zoomSpots">Ver los puntos en el mapa</button></div>
    <p class="note">Al acercar el mapa a una zona se ve el detalle: verde oscuro = coníferas, verde claro = frondosas, claro = sin árboles. Más cerca aún salen los caminos: blanco = carretera, marrón = pista, rojo = sendero. Los puntos cambian cada día según la lluvia, la temperatura y la cota ideal. Se eligen entre zonas con bosque real (mapas de satélite), cerca de un aparcamiento público. Si marcas cómo te fue en un punto, la app lo tiene en cuenta para ti en próximas salidas. Pueden caer en fincas privadas o lejos de un camino: mira la ruta antes de ir.</p>`;
@@ -3595,7 +3595,7 @@ function renderDetail(){
     ${(()=>{const dv=drive(s);return dv?`<div class="drive meta"><b style="color:var(--fg)">≈ ${dv.txt} en coche</b> · ${dv.km} km desde ${esc(origin.name)}</div>`:`<div class="meta"><a href="#" id="askOrigin">Indica desde dónde sales</a> para ver el tiempo en coche.</div>`})()}
     ${safetyBlock(s,r)}${huntDay(r.d)?`<div class="hunt"><b>${fmtDay(r.d,dayIdx)} es ${huntWhy(r.d)}: día habitual de batidas de jabalí.</b> Viste ropa de color vivo (naranja o amarillo), no entres en zonas con carteles de "batuda" o "cacera", habla en voz alta y no te alejes de las pistas.</div>`:""}
     <div class="scoreRow"><div class="bigScore${light(r.score)?' light':''}" style="background:${col(r.score)}">${r.score}</div>
-      <div class="scoreTxt"><b>${LABEL[band(r.score)]} · ${fmtDay(r.d,dayIdx)} ${fmtDate(r.d)}</b><span>${reasons.length?reasons.join(", ").replace(/^./,c=>c.toUpperCase())+".":"Condiciones normales."}</span></div></div>${adjNote(s)}${qcheckBlock(s)}
+      <div class="scoreTxt"><b>${LABEL[band(r.score)]} · ${fmtDay(r.d,dayIdx)} ${fmtDate(r.d)}</b><span>${reasons.length?reasons.join(", ").replace(/^./,c=>c.toUpperCase())+".":"Condiciones normales."}</span></div></div>${adjNote(s)}${qcheckBlock(s,r)}
     <div class="factors">
       <div class="factor"><span>Lluvia ~3 semanas</span><span class="bar"><i style="width:${r.soil*100}%"></i></span><span class="v">${r.W} mm</span></div>
       <div class="factor"><span>Lluvia desencadenante</span><span class="bar"><i style="width:${r.trigger*100}%"></i></span><span class="v">${r.recent} mm</span></div>
