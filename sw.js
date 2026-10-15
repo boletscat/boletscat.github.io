@@ -1,6 +1,6 @@
 /* Boletaire – funciona sin conexión: guarda la app, la última previsión y las zonas que hayas visto */
-const V="boletaire-v6", KEEP="boletaire-zonas";
-const CORE=["./","index.html","config.js","manifest.webmanifest","icon-192.png","icon-512.png","shim.js","web.js","relief.jpg","i18n_ca.js","cat.png","bosque.png","data/forecast.json","data/history.json",
+const V="boletaire-v7", KEEP="boletaire-zonas";
+const CORE=["./","index.html","config.js","manifest.webmanifest","icon-192.png","icon-512.png","shim.js","model.js","web.js","relief.jpg","i18n_ca.js","cat.png","bosque.png","data/forecast.json","data/history.json",
   "lib/leaflet.js"];
 self.addEventListener("install",e=>{ e.waitUntil(caches.open(V).then(c=>Promise.all(CORE.map(u=>c.add(u).catch(()=>{}))))); self.skipWaiting(); });
 self.addEventListener("activate",e=>{ e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==V&&k!==KEEP).map(k=>caches.delete(k))))); self.clients.claim(); });

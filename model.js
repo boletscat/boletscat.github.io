@@ -84,6 +84,7 @@ const SP = {
    conf:"Con las carreretes, que crecen en los mismos prados."}
 };
 /* Meses en que sale cada especie (1-12) */
+const MPROD = {1:.3,2:.2,3:.35,4:.6,5:.75,6:.55,7:.35,8:.45,9:.95,10:1,11:.95,12:.6};   // cuánto produce el bosque cada mes respecto a octubre
 const MONTHS = {rovello:[9,10,11],pinetell:[9,10],cep:[6,9,10,11],oureig:[8,9,10],llenega:[10,11,12],fredolic:[10,11,12],camagroc:[10,11,12,1],trompeta:[9,10,11],rossinyol:[6,7,8,9,10,11],apagallums:[8,9,10,11],
  farinera:[9,10,11],reigbord:[9,10,11],pixaca:[8,9,10,11],cortinari:[9,10],mataparent:[7,8,9,10],verderol:[10,11,12],galerina:[9,10,11,12],olivera:[9,10,11],
  murgola:[3,4,5],moixerno:[4,5,6],carreretes:[5,6,9,10],cepestiu:[6,7,8,9],gyromitra:[3,4,5],entoloma:[5,6,9,10],clitocybe:[5,6,9,10,11]};
@@ -138,15 +139,15 @@ const YLD = {
  camagroc:[2,15,3,"acid"], trompeta:[2,12,5,"acid"], rossinyol:[2,10,20,"acid"], oureig:[1,8,100,"acid"], apagallums:[1,5,60,""],
  murgola:[0.5,4,25,"calc"], moixerno:[2,12,40,"calc"], carreretes:[1,6,3,""], cepestiu:[2,15,150,"acid"]
 };
-const nf=(v,d=0)=>(NFC[d]||(NFC[d]=new Intl.NumberFormat(LOCALE,{maximumFractionDigits:d,minimumFractionDigits:0}))).format(v);
-function yieldFor(siteId, spId, p, rank){
+const NFC={}; const nf=(v,d=0)=>(NFC[d]||(NFC[d]=new Intl.NumberFormat(LOCALE,{maximumFractionDigits:d,minimumFractionDigits:0}))).format(v);
+function yieldFor(siteId, spId, p, rank, kf=1){
   const y=YLD[spId]; if(!y) return null;
   const soil=TERR[siteId]?.[0];
   let f = rank<2?1:rank<4?0.7:0.5;                       // especie principal o secundaria en la zona
   if(y[3]==="acid") f*= soil==="acido"?1.2:soil==="calcareo"?0.55:0.9;
   if(y[3]==="calc") f*= soil==="calcareo"?1.2:soil==="acido"?0.75:1;
   const season=y[0]*f, good=y[1]*f;
-  const week = season*0.18*Math.min(1.6,p/60);            // ~1/6 de la temporada en una buena semana
+  const week = season*0.18*Math.min(1.6,p/60)*kf;         // ~1/6 de la temporada en una buena semana, menos lo que ya habrán recogido otros
   const kgDisp = v=> v<1? nf(v,1) : nf(v,0);
   return {season, good, week, n:Math.round(week*1000/y[2]), txt:`${kgDisp(season)}–${kgDisp(good)} kg/ha`, wtxt: week<0.05?'casi nada esta semana':`${nf(week,1)} kg/ha · ~${Math.round(week*1000/y[2])} setas`};
 }
