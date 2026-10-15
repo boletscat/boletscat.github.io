@@ -41,7 +41,7 @@
   const offList=()=>{ try{ return JSON.parse(localStorage.getItem(OFFK)||"{}"); }catch(e){ return {}; } };
   const offSave=o=>{ try{ localStorage.setItem(OFFK,JSON.stringify(o)); }catch(e){} };
   const offUrls=s=>{ const sp=[...new Set([...(s.sp||[]),...(s.tx||[])])];
-    return ["index.html","i18n_ca.js","relief.jpg","cat.png","bosque.png","data/forecast.json",`z/${s.id}.jpg`,`w/${s.id}.json`,`wr/${s.id}.png`,`e/${s.id}.json`,...sp.map(id=>`g/${id}.jpg`)]; };
+    return ["index.html","i18n_ca.js","relief.jpg","cat.png","bosque.png","data/forecast.json",`z/${s.id}.jpg`,`w/${s.id}.json`,`wr/${s.id}.png`,`e/${s.id}.json`,...sp.map(id=>(typeof PH!=="undefined"&&PH[id]&&PH[id].src)||`g/${id}.jpg`)]; };
   const mb=n=>(n/1048576).toLocaleString(LOCALE,{maximumFractionDigits:1})+" MB";
   function offHtml(s){
     if(!("caches" in window)) return "";
