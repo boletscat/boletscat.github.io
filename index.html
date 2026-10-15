@@ -1,6 +1,6 @@
-<!doctype html><html lang="es"><head><title>Boletaire – previsión de setas en Catalunya</title>
+<!doctype html><html lang="es" data-theme="dark"><head><title>Boletaire – previsión de setas en Catalunya</title>
 <meta name="description" content="Dónde y cuándo salen setas en Catalunya: previsión de 10 días, puntos concretos según el bosque y la orientación, aparcamientos y rutas a pie.">
-<meta name="theme-color" content="#2f4a2a">
+<meta name="theme-color" content="#06110d">
 <!-- Vista previa al compartir (WhatsApp, Instagram, X…). Cuando tengas la dirección definitiva, pon la URL completa en og:url y og:image -->
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Boletaire">
@@ -21,10 +21,10 @@
 <meta name="apple-mobile-web-app-title" content="Boletaire">
 <script src="config.js"></script>
 <script src="shim.js"></script>
-<script>(function(){var l;try{l=localStorage.getItem("boletaire.lang")}catch(e){}if(!l)l=(navigator.language||"").toLowerCase().indexOf("ca")===0?"ca":"es";if(l==="ca")document.write('<script src="i18n_ca.js"><\/script>');})();</script><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<script>(function(){var l;try{l=localStorage.getItem("boletaire.lang")}catch(e){}if(!l)l=(navigator.language||"").toLowerCase().indexOf("ca")===0?"ca":"es";if(l==="ca")document.write('<script src="i18n_ca.js"><\/script>');})();</script><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#06110d;color:#e9f3ee}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <title>Boletaire</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@500&display=swap">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
 <script src="lib/leaflet.js"></script>
 <style>
 /* Leaflet 1.9.4 (BSD-2) */
@@ -1191,6 +1191,170 @@ details.sec[open]{padding-bottom:10px}
 .webfoot a{color:var(--moss)}
 .offbox{margin-top:12px;padding:10px 12px;border-radius:12px;background:var(--surface-2);display:grid;gap:6px}
 .offbox .actions{margin:0}
+
+/* ===== Boletaire · tema «Nit» (2026-10) — verde noche, degradado esmeralda-turquesa, tarjetas de cristal ===== */
+:root,:root[data-theme="dark"]{
+  --bg:#06110d; --surface:#0c1a15; --surface-2:#122520; --fg:#e9f3ee; --muted:#8fa89c; --line:#1f3a30;
+  --moss:#34d399; --moss-ink:#03140d; --land:#0e1d18; --land-line:#3c5d4f; --sea:#050e0b;
+  --s0:#3d4a43; --s1:#d9b545; --s2:#ec9440; --s3:#ef6a3f; --s4:#ff8f6a;
+  --ok:#4ade80; --warn:#f0b54a; --bad:#ff7d70; --dead:#ffa199; --acid:#a5abf5; --calc:#e9c95c; --mix:#5fd0c4;
+  --teal:#22d3ee; --grad:linear-gradient(100deg,#34d399 0%,#2dd4bf 45%,#22d3ee 100%);
+  --glass:rgba(13,29,23,.66); --glass-line:rgba(170,240,210,.09); --glow:0 0 0 1px rgba(52,211,153,.35),0 8px 30px -8px rgba(34,211,238,.35);
+  --display:"Plus Jakarta Sans",ui-sans-serif,system-ui,sans-serif;
+  --body:"Inter",ui-sans-serif,system-ui,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  color-scheme:dark;
+}
+html{background:var(--bg)}
+body{background:
+  radial-gradient(900px 520px at 8% -6%,rgba(52,211,153,.13),transparent 60%),
+  radial-gradient(800px 600px at 105% 8%,rgba(34,211,238,.09),transparent 60%),
+  var(--bg) fixed;
+  color:var(--fg);font:15px/1.55 var(--body);-webkit-font-smoothing:antialiased;letter-spacing:-.003em}
+::selection{background:rgba(52,211,153,.35)}
+a{color:var(--moss)}
+.wrap{max-width:1200px;padding-block:0 40px}
+
+/* ---- Barra superior de cristal ---- */
+header.top{position:sticky;top:0;z-index:1200;align-items:center;flex-wrap:nowrap;gap:18px;padding-block:12px;margin-bottom:6px;
+  background:rgba(6,17,13,.72);-webkit-backdrop-filter:blur(16px) saturate(140%);backdrop-filter:blur(16px) saturate(140%);
+  box-shadow:0 0 0 100vmax rgba(6,17,13,.72);clip-path:inset(0 -100vmax);border-bottom:1px solid var(--glass-line)}
+.brand{gap:10px;flex:none}
+.brand svg{width:30px;height:30px}
+.brand h1{font:800 21px/1 var(--display);letter-spacing:-.02em}
+.brand small{display:none}
+header.top .fresh{display:none}
+nav.views{position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:1250}
+body:has(#view-map[hidden]) .hero{display:none}
+nav.views{background:transparent;padding:0;gap:2px;border-radius:0}
+nav.views button{font:600 14px var(--body);color:var(--muted);padding:8px 13px;border-radius:999px;display:inline-flex;align-items:center;gap:7px;transition:color .15s,background .15s}
+nav.views button:hover{color:var(--fg);background:rgba(255,255,255,.04)}
+nav.views button svg{width:17px;height:17px;flex:none;display:none}
+nav.views .s{display:none}
+nav.views button[aria-pressed="true"]{background:rgba(52,211,153,.12);color:var(--fg);box-shadow:inset 0 0 0 1px rgba(52,211,153,.28)}
+.langsel{margin-left:auto;border-color:var(--glass-line);background:rgba(255,255,255,.03)}
+.langsel button{color:var(--muted)}
+.langsel button[aria-pressed="true"]{background:rgba(255,255,255,.1);color:var(--fg)}
+.acct,header.top .acct{border:0!important;background:var(--grad)!important;color:var(--moss-ink)!important;font:700 13.5px var(--body)!important;padding:9px 18px!important;box-shadow:0 6px 22px -6px rgba(45,212,191,.55);flex:none}
+.acct.in{padding:0!important;width:36px!important;height:36px!important}
+
+/* ---- Portada ---- */
+.hero{position:relative;margin:4px 0 22px;border-radius:28px;overflow:hidden;min-height:clamp(420px,62vh,560px);display:grid;align-items:center;
+  background:#04100c;border:1px solid var(--glass-line);isolation:isolate}
+.hero-bg{position:absolute;inset:0;z-index:-2;background:url(relief.jpg) 72% 42%/cover no-repeat;filter:grayscale(.55) brightness(.42) contrast(1.25) sepia(.35) hue-rotate(115deg) saturate(1.6);transform:scale(1.04)}
+.hero::before{content:"";position:absolute;inset:0;z-index:-1;background:
+  linear-gradient(90deg,rgba(4,14,11,.97) 0%,rgba(4,14,11,.86) 34%,rgba(4,14,11,.25) 66%,rgba(4,14,11,.45) 100%),
+  linear-gradient(0deg,rgba(4,14,11,.9) 0%,transparent 35%),
+  radial-gradient(600px 300px at 80% 30%,rgba(34,211,238,.12),transparent 70%)}
+.hero-dots{position:absolute;inset:0;z-index:-1;pointer-events:none}
+.hero-dots i{position:absolute;width:10px;height:10px;margin:-5px 0 0 -5px;border-radius:50%;background:#5ef0bd;box-shadow:0 0 0 4px rgba(52,211,153,.18),0 0 22px 6px rgba(52,211,153,.55);animation:hpulse 2.8s ease-in-out infinite}
+.hero-dots i.top{width:14px;height:14px;margin:-7px 0 0 -7px;background:#7ff8e6;box-shadow:0 0 0 6px rgba(34,211,238,.18),0 0 34px 10px rgba(34,211,238,.6)}
+.hero-dots i:nth-child(2){animation-delay:.5s}.hero-dots i:nth-child(3){animation-delay:1s}.hero-dots i:nth-child(4){animation-delay:1.5s}.hero-dots i:nth-child(5){animation-delay:2s}
+@keyframes hpulse{50%{transform:scale(1.35);opacity:.75}}
+@media (prefers-reduced-motion:reduce){.hero-dots i{animation:none}}
+.hero-in{padding:clamp(28px,5vw,64px);max-width:640px}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font:600 11.5px var(--body);letter-spacing:.16em;text-transform:uppercase;color:#a9c7b9;margin:0 0 18px}
+.eyebrow:before{content:"";width:7px;height:7px;border-radius:50%;background:var(--moss);box-shadow:0 0 10px 2px rgba(52,211,153,.7)}
+.hero h2{font:800 clamp(38px,6.4vw,74px)/.98 var(--display);letter-spacing:-.035em;margin:0 0 20px;color:#f1f7f3;text-wrap:balance}
+.grad{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p.lead{font:400 clamp(15.5px,1.6vw,18px)/1.6 var(--body);color:#b6c9c0;margin:0 0 28px;max-width:520px}
+.hero-cta{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:22px}
+.hbtn{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:13px 22px;font:700 15px var(--body);cursor:pointer;border:0;text-decoration:none;transition:transform .15s,box-shadow .15s}
+.hbtn.pri{background:var(--grad);color:var(--moss-ink);box-shadow:0 10px 30px -8px rgba(45,212,191,.6)}
+.hbtn.pri:hover{transform:translateY(-1px);box-shadow:0 14px 34px -8px rgba(45,212,191,.75)}
+.hbtn.sec{background:rgba(255,255,255,.05);color:var(--fg);box-shadow:inset 0 0 0 1px rgba(255,255,255,.14)}
+.hbtn.sec:hover{background:rgba(255,255,255,.09)}
+.hchecks{display:flex;flex-wrap:wrap;gap:6px 18px;list-style:none;margin:0;padding:0;font-size:12.5px;color:#9cb6aa}
+.hchecks li:before{content:"✓";color:var(--moss);font-weight:800;margin-right:6px}
+.hfresh{margin:18px 0 0;font-size:12.5px;color:#7f998d}
+.hfresh b{color:#cfe2d8;font-weight:600}
+.hcard{position:absolute;right:clamp(16px,4vw,48px);bottom:clamp(16px,4vw,44px);width:250px;padding:16px 16px 14px;border-radius:18px;
+  background:rgba(10,26,21,.55);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border:1px solid rgba(170,240,210,.16);box-shadow:0 20px 50px -20px rgba(0,0,0,.7);cursor:pointer;text-align:left;color:var(--fg);font-family:var(--body)}
+.hcard:hover{border-color:rgba(52,211,153,.45)}
+.hcard .k{display:block;font-size:11px;color:#8fb0a2;letter-spacing:.04em}
+.hcard .z{display:block;font:700 15px/1.25 var(--display);margin:4px 0 2px;color:#eef6f1}
+.hcard .v{display:flex;align-items:baseline;gap:6px;font:800 34px/1 var(--display);letter-spacing:-.03em}
+.hcard .v small{font:600 12px var(--body);color:#8fb0a2;letter-spacing:0}
+.hbars{display:flex;align-items:flex-end;gap:4px;height:34px;margin-top:10px}
+.hbars i{flex:1;border-radius:3px 3px 1px 1px;background:var(--grad);opacity:.9;min-height:3px}
+.hbars i.lo{opacity:.35}
+.hcard .dl{display:flex;justify-content:space-between;font:500 9.5px var(--mono);color:#6f8c80;margin-top:4px;text-transform:capitalize}
+@media (max-width:860px){
+  .hero{min-height:0;border-radius:22px;align-items:start}
+  .hero-bg{background-position:80% 40%}
+  .hero::before{background:linear-gradient(180deg,rgba(4,14,11,.55) 0%,rgba(4,14,11,.9) 52%,rgba(4,14,11,.98) 100%)}
+  .hero-in{padding:28px 22px 22px}
+  .hcard{position:relative;right:auto;bottom:auto;width:auto;margin:0 22px 22px}
+}
+
+/* ---- Superficies de cristal ---- */
+.panel,.originbar,.card,.disclaimer,.wcard,.rank.panel{background:var(--glass);border:1px solid var(--glass-line);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);box-shadow:inset 0 1px 0 rgba(255,255,255,.04)}
+.panel{border-radius:22px;padding:20px}
+.panel h2{font:800 23px/1.15 var(--display);letter-spacing:-.025em}
+h3{font:600 11.5px var(--body);letter-spacing:.16em;color:#8fb0a2}
+.originbar{border-radius:18px;padding:10px 12px}
+.originbar input,.townbar input,input,select,textarea{background:rgba(0,0,0,.25)!important;border:1px solid var(--glass-line)!important;color:var(--fg);border-radius:12px!important}
+input:focus,select:focus,textarea:focus{outline:none;border-color:rgba(52,211,153,.55)!important;box-shadow:0 0 0 3px rgba(52,211,153,.15)}
+.estnote{background:rgba(240,181,74,.06);border-left-color:var(--warn);border-radius:12px}
+.disclaimer{border-radius:18px}
+
+/* ---- Botones y chips ---- */
+.btn{background:var(--grad);color:var(--moss-ink);border-radius:999px;padding:10px 18px;font-weight:700;box-shadow:0 6px 20px -8px rgba(45,212,191,.6)}
+.btn.ghost{background:rgba(255,255,255,.04);box-shadow:inset 0 0 0 1px rgba(255,255,255,.12);border:0;color:var(--fg)}
+.chip{background:rgba(255,255,255,.035);border-color:var(--glass-line);color:#c9dbd2;font-weight:600;transition:background .15s,border-color .15s}
+.chip:hover{border-color:rgba(52,211,153,.35);color:var(--fg)}
+.chip[aria-pressed="true"]{background:var(--grad);color:var(--moss-ink);border-color:transparent;box-shadow:0 4px 16px -6px rgba(45,212,191,.6)}
+button:focus-visible,a:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--teal)}
+
+/* ---- Días ---- */
+.day{background:var(--glass);border-color:var(--glass-line);border-radius:16px;padding:10px 4px;transition:border-color .15s,transform .15s}
+.day:hover{border-color:rgba(52,211,153,.35)}
+.day[aria-pressed="true"]{background:linear-gradient(180deg,rgba(52,211,153,.16),rgba(34,211,238,.06));border-color:rgba(52,211,153,.55);box-shadow:var(--glow)}
+.day .dn{font:700 13.5px var(--display)}
+
+/* ---- Plan del finde ---- */
+.plancard{background:rgba(255,255,255,.03);border-color:var(--glass-line);border-radius:18px;padding:14px}
+.plancard:hover{border-color:rgba(52,211,153,.35)}
+.plancard:first-child{background:linear-gradient(160deg,rgba(52,211,153,.14),rgba(34,211,238,.05) 70%);border-color:rgba(52,211,153,.5);box-shadow:var(--glow)}
+.plancard b{font:800 17px/1.2 var(--display);letter-spacing:-.015em}
+
+/* ---- Mapa y ranking ---- */
+.mapbox{border-radius:22px;border:1px solid var(--glass-line);box-shadow:0 30px 60px -30px rgba(0,0,0,.8)}
+.relief{filter:brightness(.5) saturate(.5) sepia(.25) hue-rotate(110deg)!important}
+.leaflet-bar a{background:rgba(10,26,21,.85)!important;color:var(--fg)!important;border-color:var(--glass-line)!important}
+.leaflet-tooltip.lbl{background:rgba(10,26,21,.9);border-color:var(--glass-line)}
+.rank li button{border-radius:12px}
+.rank li button:hover{background:rgba(255,255,255,.04)}
+.bigScore{box-shadow:0 0 0 6px rgba(255,255,255,.04),0 12px 30px -10px rgba(0,0,0,.6);font-family:var(--display)}
+.card{border-radius:20px}
+.card.hl{box-shadow:var(--glow)}
+
+/* ---- Bienvenida ---- */
+.welcome{background:rgba(2,8,6,.66);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.wcard{background:rgba(12,28,22,.92);border-radius:24px;box-shadow:0 30px 80px -20px rgba(0,0,0,.8)}
+.wcard h2{font:800 25px/1.1 var(--display);letter-spacing:-.025em}
+
+.webfoot{color:var(--muted)}
+
+/* ---- Móvil: barra de pestañas abajo ---- */
+@media (max-width:1040px){
+  header.top{padding-block:10px;gap:10px}
+  nav.views{position:fixed;left:10px;right:10px;bottom:calc(10px + env(safe-area-inset-bottom,0px));top:auto;transform:none;margin:0 auto;max-width:560px!important;z-index:1300;
+    display:grid;grid-template-columns:repeat(5,1fr);gap:0;padding:6px;border-radius:22px;width:auto;max-width:none;
+    background:rgba(8,22,17,.86);-webkit-backdrop-filter:blur(18px) saturate(150%);backdrop-filter:blur(18px) saturate(150%);border:1px solid rgba(170,240,210,.12);box-shadow:0 18px 40px -12px rgba(0,0,0,.8)}
+  .hero-dots{display:none}
+  nav.views button{flex-direction:column;gap:3px;font:600 10.5px var(--body);padding:7px 2px;border-radius:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+  nav.views .l{display:none}
+  nav.views .s{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+  nav.views button svg{display:block;width:21px;height:21px}
+  nav.views button[aria-pressed="true"]{background:rgba(52,211,153,.14);color:#7ff0c7;box-shadow:none}
+  .langsel{margin-left:auto}
+  .acct,header.top .acct{position:static!important;padding:8px 14px!important}
+  .wrap{padding-bottom:110px}
+  .welcome{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
+  .webtoast{bottom:96px!important}
+}
+#days,#detail,#plan,.mapbox{scroll-margin-top:76px}
 </style>
 
 <div class="wrap">
@@ -1202,14 +1366,31 @@ details.sec[open]{padding-bottom:10px}
     <div class="fresh" id="fresh">Cargando datos…</div>
     <div class="langsel" role="group" aria-label="Idioma"><button data-lang="es">ES</button><button data-lang="ca">CA</button></div>
   </header>
-
   <nav class="views" aria-label="Secciones">
-    <button id="v-map" aria-pressed="true">Mapa</button>
-    <button id="v-guide" aria-pressed="false">Guía de setas</button>
-    <button id="v-trips" aria-pressed="false">Mis salidas</button>
-    <button id="v-forum" aria-pressed="false">Comunidad</button>
-    <button id="v-how" aria-pressed="false">Cómo se calcula</button>
+    <button id="v-map" aria-pressed="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2Zm0 0v14m6-12v14"/></svg><span class="l">Mapa</span><span class="s">Mapa</span></button>
+    <button id="v-guide" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 14a8 6 0 0 1 16 0Z"/><path d="M10 14h4l.6 5.5a2.6 2.6 0 0 1-5.2 0Z"/></svg><span class="l">Guía de setas</span><span class="s">Guía</span></button>
+    <button id="v-trips" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s7-6.2 7-11.5a7 7 0 0 0-14 0C5 14.8 12 21 12 21Z"/><circle cx="12" cy="9.5" r="2.5"/></svg><span class="l">Mis salidas</span><span class="s">Salidas</span></button>
+    <button id="v-forum" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12a8 8 0 0 1-11.6 7.1L4 20l1-4.2A8 8 0 1 1 20 12Z"/></svg><span class="l">Comunidad</span><span class="s">Comunidad</span></button>
+    <button id="v-how" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10m6 10V4m6 16v-7m4 7H3"/></svg><span class="l">Cómo se calcula</span><span class="s">Cálculo</span></button>
   </nav>
+
+
+    <div class="hero" id="hero">
+      <div class="hero-bg" aria-hidden="true"></div>
+      <div class="hero-dots" id="heroDots" aria-hidden="true"></div>
+      <div class="hero-in">
+        <p class="eyebrow">Previsión de setas · Catalunya</p>
+        <h2>Sabrás dónde <span class="grad">salen setas</span> antes de salir de casa.</h2>
+        <p class="lead">La lluvia real del Meteocat, la previsión a 9 días y el terreno de cada bosque, convertidos en una nota para 64 zonas y los 947 municipios de Catalunya.</p>
+        <div class="hero-cta">
+          <button class="hbtn pri" id="heroGo">Ver el mapa de hoy</button>
+          <button class="hbtn sec" id="heroHow">Cómo se calcula <span aria-hidden="true">→</span></button>
+        </div>
+        <ul class="hchecks"><li>Datos oficiales del Meteocat</li><li>64 zonas estudiadas</li><li>Funciona sin cobertura</li></ul>
+        <p class="hfresh" id="heroFresh"></p>
+      </div>
+      <button class="hcard" id="heroCard" hidden></button>
+    </div>
 
   <div class="originbar">
     <span id="originTxt">Elige desde dónde sales para ver el tiempo en coche</span>
@@ -3387,7 +3568,7 @@ function renderRank(){
   el.innerHTML=list.map((s,i)=>`<li><button data-id="${s.id}" aria-current="${s.id===sel}"><span class="pos">${i+1}</span><span class="nm"><b>${FAVS.has(s.id)?"★ ":""}${esc(s.n)}</b><span class="l2"><i style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${SLOPEC[SLOPE[s.id][0]]};margin-right:5px" title="${SLOPEN[SLOPE[s.id][0]]}"></i>${s.dv?s.dv.txt+" · ":""}${TREND[s.id]?`<span title="Tendencia de la semana que viene">${{up:"↗",down:"↘",flat:"→"}[TREND[s.id].dir]}</span> · `:""}${s.r.sp.slice(0,2).map(x=>SP[x.id].ca).join(", ")}</span></span><span class="rr"><span class="pill${light(s.r.score)?' light':''}" style="background:${col(s.r.score)}">${s.r.score}</span><span class="meta2"><b style="color:var(--fg)">${nf(zoneKg(s.id,s.r),1)} kg/ha</b></span></span></button></li>`).join("")
     +(RK.length>TOP+2?`<li class="rankmore"><button class="btn ghost small" id="rankMore" aria-expanded="${showAll}">${showAll?"Ver solo las 10 primeras ▴":`Ver las ${RK.length-TOP} zonas restantes ▾`}</button>${!showAll&&selPos>=TOP?`<span class="note">La zona abierta está en el puesto ${selPos+1}.</span>`:""}</li>`:"");
   const rm=el.querySelector("#rankMore"); if(rm) rm.onclick=()=>{ rankAll=!rankAll; renderRank(); if(!rankAll) document.getElementById("rank").scrollIntoView({behavior:"smooth",block:"start"}); };
-  el.querySelectorAll("button[data-id]").forEach(b=>b.onclick=()=>{sel=b.dataset.id;selTown=null;renderAll();window.scrollTo({top:0,behavior:"smooth"});});
+  el.querySelectorAll("button[data-id]").forEach(b=>b.onclick=()=>{sel=b.dataset.id;selTown=null;renderAll();document.getElementById(innerWidth<860?"detail":"days").scrollIntoView({behavior:"smooth",block:"start"});});
 }
 function renderGuide(){
   const F=[["todas","Todas"],["comer","Comestibles"],["toxicas","Tóxicas y mortales"]];
@@ -3936,5 +4117,58 @@ i18nStart();
 maybeWelcome();
 </script>
 
+<script>
+/* ---------- Portada (tema «Nit»): mejor zona de hoy, puntos brillantes en el relieve y hora de actualización ---------- */
+(function(){
+  const B={s:40.44904,n:42.95039,w:0.09888,e:3.40027};          // límites de relief.jpg (iguales que en el mapa)
+  const my=lat=>Math.log(Math.tan(Math.PI/4+lat*Math.PI/360));    // Mercator, como Leaflet
+  const hero=document.getElementById("hero"); if(!hero) return;
+  const toMap=()=>{ const d=document.getElementById("days"); if(d) d.scrollIntoView({behavior:"smooth",block:"start"}); };
+  document.getElementById("heroGo").onclick=toMap;
+  document.getElementById("heroHow").onclick=()=>{ setView("how"); window.scrollTo({top:0,behavior:"smooth"}); };
+
+  // Coloca un punto en la imagen de fondo, que se recorta con background-size:cover
+  function place(dot,lat,lon,bg){
+    const W=bg.clientWidth, H=bg.clientHeight, iw=2404, ih=2440, sc=Math.max(W/iw,H/ih)*1.04;
+    const px=parseFloat(getComputedStyle(bg).backgroundPositionX)/100, py=parseFloat(getComputedStyle(bg).backgroundPositionY)/100;
+    const dw=iw*sc, dh=ih*sc, ox=(W-dw)*(isNaN(px)?.72:px), oy=(H-dh)*(isNaN(py)?.42:py);
+    const fx=(lon-B.w)/(B.e-B.w), fy=(my(B.n)-my(lat))/(my(B.n)-my(B.s));
+    const x=ox+fx*dw, y=oy+fy*dh;
+    dot.style.left=x+"px"; dot.style.top=y+"px"; dot.hidden = x<8||y<8||x>W-8||y>H-8;
+  }
+  let top=[];
+  function draw(){
+    const bg=hero.querySelector(".hero-bg"), box=document.getElementById("heroDots"); if(!bg||!box) return;
+    box.innerHTML=top.map((s,i)=>`<i class="${i?'':'top'}" title="${s.n}"></i>`).join("");
+    [...box.children].forEach((d,i)=>place(d,top[i].lat,top[i].lon,bg));
+  }
+  window.renderHero=function(){
+    try{
+      const f=document.getElementById("fresh"), hf=document.getElementById("heroFresh"); if(f&&hf) hf.innerHTML=f.innerHTML;
+      if(typeof RES==="undefined"||!DAYS||!DAYS.length) return;
+      const L=SITES.filter(s=>RES[s.id]&&RES[s.id][0]).map(s=>({s,v:RES[s.id][0].score})).sort((a,b)=>b.v-a.v);
+      if(!L.length) return;
+      top=L.slice(0,5).map(x=>x.s); draw();
+      const b=L[0], card=document.getElementById("heroCard");
+      const n=Math.min(7,DAYS.length), vals=RES[b.s.id].slice(0,n).map(r=>Math.round(r.score));
+      const mx=Math.max(1,...vals);
+      card.innerHTML=`<span class="k">Mejor zona hoy</span><span class="z">${b.s.n}</span>`+
+        `<span class="v"><span class="grad">${Math.round(b.v)}</span><small>/ 100</small></span>`+
+        `<span class="hbars">${vals.map(v=>`<i class="${v<mx*.5?'lo':''}" style="height:${Math.max(8,v/mx*100)}%"></i>`).join("")}</span>`+
+        `<span class="dl"><span>${fmtDay(DAYS[0],0)}</span><span>${fmtDay(DAYS[n-1],n-1)}</span></span>`;
+      card.setAttribute("aria-label",`Mejor zona hoy: ${b.s.n}, ${Math.round(b.v)} sobre 100. Ver en el mapa.`);
+      card.hidden=false;
+      card.onclick=()=>{ sel=b.s.id; selTown=null; dayIdx=0; if(typeof inProv==="function"&&!inProv(sel)){ prov="all"; } renderAll(); toMap(); };
+    }catch(e){ console.warn("hero",e); }
+  };
+  const orig=renderAll;
+  renderAll=function(){ const r=orig.apply(this,arguments); renderHero(); return r; };
+  addEventListener("resize",()=>{ if(top.length) draw(); });
+  new MutationObserver(()=>{ const f=document.getElementById("fresh"), hf=document.getElementById("heroFresh"); if(f&&hf) hf.innerHTML=f.innerHTML; })
+    .observe(document.getElementById("fresh"),{childList:true,subtree:true,characterData:true});
+  if(typeof DATA!=="undefined"&&DATA) renderHero();
+})();
+
+</script>
 <script src="web.js"></script>
 </body></html>
