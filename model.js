@@ -17,7 +17,7 @@ const SP = {
  oureig:{ca:"Ou de reig",es:"Oronja",lat:"Amanita caesarea",ed:"excelente",t:[15,23],shape:"umbrella",cap:"#e2541f",stem:"#f2c94c",
    hab:"Encinar, alcornocal, castañar y robledal en zonas cálidas",sea:"Sept – oct",id:"Sombrero naranja liso, láminas y pie amarillos, volva blanca en la base.",
    conf:"Reig bord (Amanita muscaria), tóxico: verrugas blancas y láminas blancas. Nunca la cojas en forma de huevo cerrado: se confunde con la farinera borda, mortal."},
- llenega:{ca:"Llenega negra",es:"Babosa",lat:"Hygrophorus latitatus",ed:"comestible",t:[4,12],shape:"convex",cap:"#4a4038",stem:"#e4ddcf",
+ llenega:{ca:"Llenega negra",es:"Babosa",lat:"Hygrophorus latitabundus",ed:"comestible",t:[4,12],shape:"convex",cap:"#4a4038",stem:"#e4ddcf",
    hab:"Pinares de pino blanco y pinassa",sea:"Oct – dic",id:"Sombrero gris oscuro muy viscoso, láminas blancas y gruesas. Sale con el frío.",
    conf:"Fácil de reconocer, pero revisa que las láminas sean blancas y separadas."},
  fredolic:{ca:"Fredolic",es:"Negrilla",lat:"Tricholoma terreum",ed:"precaucion",t:[2,11],shape:"convex",cap:"#6e6a66",stem:"#ecebe6",
