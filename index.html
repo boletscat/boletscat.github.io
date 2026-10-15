@@ -2194,6 +2194,10 @@ function catBounds(){ return L.latLngBounds([[40.52,0.16],[42.86,3.33]]); }
 function initMap(){
   if(LM||!window.L) return;
   LM=L.map("lmap",{zoomSnap:.25,zoomDelta:.5,minZoom:6.25,maxZoom:14,maxBounds:[[40.0,-0.6],[43.4,4.0]],maxBoundsViscosity:.8});
+  /* Capas en orden fijo: relieve < fotos de zona < bosques/setas en todo el bosque < líneas y puntos */
+  LM.createPane("zimgPane").style.zIndex=410; LM.createPane("layPane").style.zIndex=420; LM.createPane("vecPane").style.zIndex=430;
+  [LM.getPane("zimgPane"),LM.getPane("layPane")].forEach(p=>p.style.pointerEvents="none");
+  LM.options.renderer=L.svg({pane:"vecPane"});
   LM.attributionControl.setPrefix(false).addAttribution('Relieve: AWS Terrain Tiles (SRTM) · Límites: IGN · Meteo: Meteocat, MET Norway');
   L.imageOverlay(RELIEF,[[40.44904,0.09888],[42.95039,3.40027]],{className:"relief",interactive:false}).addTo(LM);
   const world=[[44,-2],[44,6],[39,6],[39,-2]];
@@ -2347,7 +2351,7 @@ function renderZoneImgs(){
   if(!LM.hasLayer(LZIMG)) LZIMG.addTo(LM);
   for(const s of zonesInView(0.25)){
     if(ZOV[s.id]) continue;
-    const ov=L.imageOverlay("z/"+s.id+".jpg",zoneBounds(s),{className:"zoneimg",interactive:false,opacity:0});
+    const ov=L.imageOverlay("z/"+s.id+".jpg",zoneBounds(s),{className:"zoneimg",interactive:false,opacity:0,pane:"zimgPane"});
     ov.on("load",()=>ov.setOpacity(.96));
     ov.addTo(LZIMG); ZOV[s.id]=ov;
   }
@@ -2361,7 +2365,7 @@ function decodeWays(s,d){
 const WAYSTY={r:{color:"#fdfdfb",weight:2.6,opacity:.95},t:{color:"#8a5222",weight:1.8,opacity:.9,dashArray:"7 4"},p:{color:"#d23a2c",weight:1.6,opacity:.95,dashArray:"2 4"}};
 function renderWays(){
   if(!LM) return;
-  if(!WAYR) WAYR=L.canvas({padding:0.3});
+  if(!WAYR) WAYR=L.canvas({padding:0.3,pane:"vecPane"});
   if(!LWAY) LWAY=L.layerGroup();
   const on=showWays&&LM.getZoom()>=WAY_MIN;
   const b=document.getElementById("waysBtn"); if(b) b.setAttribute("aria-pressed",showWays);
@@ -3007,7 +3011,7 @@ function renderCatLayer(){
         out.data[k]=p[0]; out.data[k+1]=p[1]; out.data[k+2]=p[2]; out.data[k+3]=s<8?60:200; } }
     g.putImageData(out,0,0);
     if(CATOV) LM.removeLayer(CATOV);
-    CATOV=L.imageOverlay(c.toDataURL("image/png"),[[CATB.S,CATB.W],[CATB.N,CATB.E]],{className:"catov",interactive:false,opacity:.8});
+    CATOV=L.imageOverlay(c.toDataURL("image/png"),[[CATB.S,CATB.W],[CATB.N,CATB.E]],{className:"catov",interactive:false,opacity:.8,pane:"layPane"});
     CATKEY=key; if(showCat) CATOV.addTo(LM); if(LSITES) LSITES.eachLayer(l=>l.bringToFront&&l.bringToFront());
   }).catch(()=>{});
 }
@@ -3139,7 +3143,7 @@ function selectTown(i, fly=true){
 let LTOWNS=null, LTLABELS=null, townCanvas=null;
 function renderTownsLayer(){
   if(!LM||!DATA) return;
-  if(!townCanvas) townCanvas=L.canvas({padding:.3});
+  if(!townCanvas) townCanvas=L.canvas({padding:.3,pane:"vecPane"});
   if(!LTOWNS){ LTOWNS=L.layerGroup(); LTLABELS=L.layerGroup().addTo(LM); LM.on("zoomend moveend",()=>{toggleTowns();renderTownLabels();}); }
   LTOWNS.clearLayers();
   MUNIS.forEach((m,i)=>{ const t=townCalc(i); if(!t) return; const r=t.res[dayIdx]; if(!r) return;
@@ -3206,7 +3210,7 @@ const forestLabel = t => t<0.10?"Casi sin bosque":t<0.30?"Poco bosque":t<0.55?"B
 let LFOREST=null;
 function renderForestLayer(){
   if(!LM) return;
-  if(!LFOREST) LFOREST=L.imageOverlay(BOSQUE_IMG,[[40.45,0.1],[42.95,3.4]],{className:"forestov",interactive:false,opacity:.55});
+  if(!LFOREST) LFOREST=L.imageOverlay(BOSQUE_IMG,[[40.45,0.1],[42.95,3.4]],{className:"forestov",interactive:false,opacity:.55,pane:"layPane"});
   if(showForest&&!LM.hasLayer(LFOREST)) LFOREST.addTo(LM);
   if(!showForest&&LM.hasLayer(LFOREST)) LM.removeLayer(LFOREST);
   const b=document.getElementById("forestBtn"); if(b) b.setAttribute("aria-pressed",showForest);
