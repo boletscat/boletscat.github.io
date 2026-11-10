@@ -7,7 +7,8 @@ import path from "node:path";
 const SITE = "https://boletscat.github.io";
 const LABEL = ["Malo", "Flojo", "Bueno", "Muy bueno", "Excelente"];
 const BAND = (s) => (s < 25 ? 0 : s < 45 ? 1 : s < 65 ? 2 : s < 80 ? 3 : 4);
-const COLOR = ["#3d4a43", "#d9b545", "#ec9440", "#ef6a3f", "#ff8f6a"];
+const COLOR = ["#b7b4a0", "#e3be4c", "#dd8b2b", "#b4481c", "#7b2912"];
+const INK = ["#1b1406", "#1b1406", "#1b1406", "#fff", "#fff"];
 const ED = { excelente: "Comestible excelente", comestible: "Comestible", precaucion: "Comestible con precaución", nocomestible: "No comestible", toxica: "Tóxica", mortal: "Mortal" };
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const slug = (s) => s.id;
@@ -40,49 +41,49 @@ function page(s, model, out, hist, all) {
   return `<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${esc(title)}</title><meta name="description" content="${esc(desc)}"><link rel="canonical" href="${url}">
 <meta property="og:type" content="website"><meta property="og:site_name" content="Boletaire"><meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}"><meta property="og:url" content="${url}"><meta property="og:image" content="${SITE}/z/${s.id}.jpg"><meta property="og:locale" content="es_ES">
-<meta name="theme-color" content="#06110d"><link rel="icon" href="/icon-192.png"><link rel="manifest" href="/manifest.webmanifest">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=Inter:wght@400;600&display=swap">
+<meta name="theme-color" content="#eceee1"><link rel="icon" href="/icon-192.png"><link rel="manifest" href="/manifest.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bitter:wght@700;800&family=Figtree:wght@400;600;700&display=swap">
 <script type="application/ld+json">${JSON.stringify(ld)}</script>
 <style>
-:root{--bg:#06110d;--glass:rgba(13,29,23,.66);--line:rgba(170,240,210,.1);--fg:#e9f3ee;--mu:#8fa89c;--grad:linear-gradient(100deg,#34d399,#2dd4bf 45%,#22d3ee)}
-*{box-sizing:border-box}body{margin:0;background:radial-gradient(900px 520px at 8% -6%,rgba(52,211,153,.13),transparent 60%),var(--bg);color:var(--fg);font:16px/1.6 Inter,system-ui,sans-serif}
-a{color:#5eead4}.w{max-width:860px;margin:0 auto;padding:16px 16px 60px}
+:root{--bg:#eceee1;--glass:#fbfbf5;--line:#d0d5bf;--fg:#1d281b;--mu:#56624c;--grad:#33552a}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16.5px/1.6 Figtree,system-ui,sans-serif}
+a{color:#33552a}.w{max-width:860px;margin:0 auto;padding:16px 16px 60px}
 header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:6px 0 18px}
-.brand{display:flex;align-items:center;gap:8px;color:var(--fg);text-decoration:none;font:800 20px "Plus Jakarta Sans",sans-serif}
-.cta{background:var(--grad);color:#03140d;font-weight:700;text-decoration:none;padding:10px 18px;border-radius:999px;white-space:nowrap}
+.brand{display:flex;align-items:center;gap:8px;color:var(--fg);text-decoration:none;font:800 20px Bitter,Georgia,serif}
+.cta{background:var(--grad);color:#fbfbf5;font-weight:700;text-decoration:none;padding:10px 18px;border-radius:999px;white-space:nowrap}
 .crumbs{font-size:13px;color:var(--mu)}.crumbs a{color:var(--mu)}
-h1{font:800 clamp(30px,6vw,46px)/1.05 "Plus Jakarta Sans",sans-serif;letter-spacing:-.03em;margin:8px 0 6px}
-h2{font:800 22px/1.2 "Plus Jakarta Sans",sans-serif;margin:0 0 12px;letter-spacing:-.02em}
+h1{font:800 clamp(30px,6vw,46px)/1.05 Bitter,Georgia,serif;letter-spacing:-.03em;margin:8px 0 6px}
+h2{font:800 22px/1.2 Bitter,Georgia,serif;margin:0 0 12px;letter-spacing:-.02em}
 .sub{color:var(--mu);margin:0 0 20px}
 .card{background:var(--glass);border:1px solid var(--line);border-radius:22px;padding:20px;margin:0 0 16px}
 .now{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
-.big{width:96px;height:96px;border-radius:50%;display:grid;place-items:center;font:800 38px "Plus Jakarta Sans",sans-serif;color:#fff;flex:none}
-.now p{margin:2px 0}.now b.l{font:800 22px "Plus Jakarta Sans",sans-serif}
+.big{width:96px;height:96px;border-radius:50%;display:grid;place-items:center;font:800 38px Bitter,Georgia,serif;color:#fff;flex:none}
+.now p{margin:2px 0}.now b.l{font:800 22px Bitter,Georgia,serif}
 ol.days{list-style:none;display:grid;grid-template-columns:repeat(9,1fr);gap:6px;padding:0;margin:8px 0 0;height:170px;align-items:end}
 ol.days li{line-height:1.25;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;font-size:12px;color:var(--mu)}
 ol.days .bar{width:70%;border-radius:6px 6px 2px 2px}ol.days b{color:var(--fg);font-size:13px;margin-top:4px}
-ol.days li.best b{color:#5eead4}
+ol.days li.best b{color:#b4481c}
 .sp{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px;list-style:none;padding:0;margin:0}
-.sp li{display:flex;gap:12px;align-items:center;background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:14px;padding:10px}
+.sp li{display:flex;gap:12px;align-items:center;background:#e4e7d6;border:0;border-radius:14px;padding:10px}
 .sp img{width:60px;height:60px;object-fit:cover;border-radius:10px;flex:none}.sp small{display:block;color:var(--mu)}
 .tag{display:inline-block;font-size:11.5px;font-weight:600;border-radius:999px;padding:1px 8px;margin-top:3px;border:1px solid currentColor}
-.ok{color:#4ade80}.bad{color:#ff7d70}
+.ok{color:#2f7a45}.bad{color:#b3261e}
 dl{display:grid;grid-template-columns:max-content 1fr;gap:6px 16px;margin:0}dt{color:var(--mu)}dd{margin:0}
 .near{display:flex;flex-wrap:wrap;gap:8px;list-style:none;padding:0;margin:0}.near a{display:inline-block;padding:6px 12px;border:1px solid var(--line);border-radius:999px;text-decoration:none;color:var(--fg);font-size:14px}
-.warn{border-left:3px solid #ff7d70;padding:10px 14px;background:rgba(255,125,112,.06);border-radius:12px;font-size:14px}
+.warn{border-left:3px solid #b3261e;padding:10px 14px;background:#f6e3df;border-radius:12px;font-size:14px}
 footer{color:var(--mu);font-size:13px;margin-top:26px}
 @media (max-width:560px){ol.days{gap:3px}ol.days li{font-size:10.5px}}
 </style></head><body><div class="w">
-<header><a class="brand" href="/"><svg width="28" height="28" viewBox="0 0 40 40" aria-hidden="true"><path d="M4 21C4 11 11 5 20 5s16 6 16 16c0 2-1 3-3 3H7c-2 0-3-1-3-3Z" fill="#ef6a3f"/><path d="M15 24h10l1 10c0 2-2 3-6 3s-6-1-6-3Z" fill="#3c5d4f"/></svg>Boletaire</a><a class="cta" href="/?z=${s.id}">Ver en el mapa</a></header>
+<header><a class="brand" href="/"><svg width="28" height="28" viewBox="0 0 40 40" aria-hidden="true"><path d="M4 21C4 11 11 5 20 5s16 6 16 16c0 2-1 3-3 3H7c-2 0-3-1-3-3Z" fill="#b4481c"/><path d="M15 24h10l1 10c0 2-2 3-6 3s-6-1-6-3Z" fill="#93a087"/></svg>Boletaire</a><a class="cta" href="/?z=${s.id}">Ver en el mapa</a></header>
 <nav class="crumbs"><a href="/">Boletaire</a> › <a href="/zona/">Zonas</a> › ${esc(s.c)}</nav>
 <h1>Setas en ${esc(name)}</h1>
 <p class="sub">${esc(s.c)} · ${s.alt} m · ${esc(s.h)}. Previsión actualizada el ${esc(longDate(upd))}.</p>
-<section class="card"><div class="now"><div class="big" style="background:${COLOR[b]}">${today ?? "–"}</div><div><b class="l">${today != null ? LABEL[b] : "Sin datos"} hoy</b><p>Nota de 0 a 100 según la lluvia de las últimas semanas, la temperatura y el terreno.</p>${best > 0 && sc[best] > (today ?? 0) ? `<p>Mejor día de la semana: <b>${esc(fmt(days[best], best))}</b> (${sc[best]}).</p>` : ""}</div></div>
+<section class="card"><div class="now"><div class="big" style="background:${COLOR[b]};color:${INK[b]}">${today ?? "–"}</div><div><b class="l">${today != null ? LABEL[b] : "Sin datos"} hoy</b><p>Nota de 0 a 100 según la lluvia de las últimas semanas, la temperatura y el terreno.</p>${best > 0 && sc[best] > (today ?? 0) ? `<p>Mejor día de la semana: <b>${esc(fmt(days[best], best))}</b> (${sc[best]}).</p>` : ""}</div></div>
 <ol class="days" aria-label="Previsión a 9 días">${bars}</ol></section>
 ${sp.length ? `<section class="card"><h2>Qué setas salen aquí</h2><ul class="sp">${sp.map((x) => `<li><img src="/g/${x.id}.jpg" alt="${esc(x.ca)}" loading="lazy" width="60" height="60"><div><b>${esc(x.ca)}</b> <small>${esc(x.es)} · <i>${esc(x.lat)}</i></small><span class="tag ok">${esc(ED[x.ed] || x.ed)}</span></div></li>`).join("")}</ul></section>` : ""}
 ${tx.length ? `<section class="card"><h2>Cuidado con estas</h2><ul class="sp">${tx.map((x) => `<li><img src="/g/${x.id}.jpg" alt="${esc(x.ca)}" loading="lazy" width="60" height="60"><div><b>${esc(x.ca)}</b> <small>${esc(x.es)} · <i>${esc(x.lat)}</i></small><span class="tag bad">${esc(ED[x.ed] || x.ed)}</span></div></li>`).join("")}</ul><p class="warn" style="margin:12px 0 0"><b>No comas ninguna seta sin identificación segura.</b> Ante la duda, llévala a una asociación micológica. Urgencias por intoxicación: 112.</p></section>` : ""}
 <section class="card"><h2>La zona</h2><dl><dt>Comarca</dt><dd>${esc(s.c)}</dd><dt>Altitud</dt><dd>${s.alt} m</dd><dt>Bosque</dt><dd>${esc(s.h)}</dd><dt>Coordenadas</dt><dd>${s.lat.toFixed(3)}, ${s.lon.toFixed(3)} · <a href="https://www.google.com/maps/search/?api=1&query=${s.lat},${s.lon}" rel="nofollow">Google Maps</a></dd>${past.length > 2 ? `<dt>Últimos días</dt><dd>${past.map((h) => h.scores[s.id]).join(" · ")}</dd>` : ""}</dl>
-<p style="margin:14px 0 0">En la app tienes los puntos concretos donde buscar, los aparcamientos, las rutas a pie y las normas de recolección. <a href="/?z=${s.id}">Abrir ${esc(short)} en Boletaire →</a></p></section>
+<p style="margin:14px 0 0">En la app tienes los puntos concretos donde buscar, los aparcamientos, las rutas a pie y las normas de recolección. <a href="/?z=${s.id}">Abrir ${esc(short)} en Boletaire</a></p></section>
 <section class="card"><h2>Zonas cercanas</h2><ul class="near">${near.map(({ z, d }) => `<li><a href="/zona/${z.id}/">${esc(z.n.split(" – ")[0])} · ${out.z[z.id]?.[0] ?? "–"} <small style="color:var(--mu)">(${Math.round(d)} km)</small></a></li>`).join("")}</ul></section>
 <footer>Datos: Meteocat (XEMA, dades obertes de la Generalitat) y MET Norway. Es una estimación, no una garantía. Respeta las normas de cada zona. · <a href="/legal.html">Aviso legal</a></footer>
 </div></body></html>`;
@@ -93,9 +94,9 @@ function indexPage(all, out) {
   const byC = {}; rows.forEach((s) => (byC[s.c] ??= []).push(s));
   return `<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Zonas de setas en Catalunya – previsión de hoy | Boletaire</title><meta name="description" content="Las ${all.length} zonas de setas de Catalunya ordenadas por la previsión de hoy: Montseny, Guilleries, Berguedà, Ripollès, Pirineo y más. Actualizado cada mañana."><link rel="canonical" href="${SITE}/zona/">
-<meta name="theme-color" content="#06110d"><link rel="icon" href="/icon-192.png">
-<style>body{margin:0;background:#06110d;color:#e9f3ee;font:16px/1.6 Inter,system-ui,sans-serif}.w{max-width:860px;margin:0 auto;padding:20px 16px 60px}a{color:#e9f3ee}h1{font:800 34px/1.1 system-ui,sans-serif;letter-spacing:-.02em}h2{font-size:15px;letter-spacing:.12em;text-transform:uppercase;color:#8fa89c;margin:24px 0 8px}ul{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:6px}li a{display:flex;justify-content:space-between;gap:10px;padding:8px 12px;border:1px solid rgba(170,240,210,.1);border-radius:12px;text-decoration:none;background:rgba(13,29,23,.66)}b{color:#5eead4}</style></head>
-<body><div class="w"><p><a href="/">← Boletaire</a></p><h1>Zonas de setas en Catalunya</h1><p style="color:#8fa89c">Ordenadas por la nota de hoy. Se actualiza cada mañana con la lluvia real del Meteocat.</p>
+<meta name="theme-color" content="#eceee1"><link rel="icon" href="/icon-192.png"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bitter:wght@700;800&family=Figtree:wght@400;600;700&display=swap">
+<style>body{margin:0;background:#eceee1;color:#1d281b;font:16.5px/1.6 Figtree,system-ui,sans-serif}.w{max-width:860px;margin:0 auto;padding:20px 16px 60px}a{color:#1d281b}h1{font:800 36px/1.1 Bitter,Georgia,serif;letter-spacing:-.02em}h2{font:700 19px/1.2 Bitter,Georgia,serif;color:#1d281b;margin:26px 0 8px}ul{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:6px}li a{display:flex;justify-content:space-between;gap:10px;padding:8px 12px;border:1px solid #d0d5bf;background:#fbfbf5;border-radius:12px;text-decoration:none}b{color:#b4481c}</style></head>
+<body><div class="w"><p><a href="/">← Boletaire</a></p><h1>Zonas de setas en Catalunya</h1><p style="color:#56624c">Ordenadas por la nota de hoy. Se actualiza cada mañana con la lluvia real del Meteocat.</p>
 ${Object.entries(byC).sort().map(([c, L]) => `<h2>${esc(c)}</h2><ul>${L.map((s) => `<li><a href="/zona/${s.id}/"><span>${esc(s.n)}</span><b>${out.z[s.id]?.[0] ?? "–"}</b></a></li>`).join("")}</ul>`).join("")}
 </div></body></html>`;
 }

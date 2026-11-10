@@ -79,53 +79,53 @@
     ros:'<path d="M8 16c6 6 15 8 24 8s18-2 24-8c1 6-4 12-14 16-3 8-4 16-3 24-5 2-9 2-14 0 1-8 0-16-3-24C12 28 7 22 8 16Z" fill="#f5b52e"/><path d="M8 16c6 6 15 8 24 8s18-2 24-8" fill="none" stroke="#d68e14" stroke-width="2.2" stroke-linecap="round"/>'
   };
   const svgImg=k=>new Promise(res=>{ const i=new Image(); i.onload=()=>res(i); i.onerror=()=>res(null); i.src="data:image/svg+xml;charset=utf-8,"+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">${SH[k]}</svg>`); });
-  const RAMPC=["#3d4a43","#d9b545","#ec9440","#ef6a3f","#ff8f6a"]; const bandC=v=>RAMPC[v<25?0:v<45?1:v<65?2:v<80?3:4];
+  const RAMPC=["#b7b4a0","#e3be4c","#dd8b2b","#b4481c","#7b2912"]; const bandC=v=>RAMPC[v<25?0:v<45?1:v<65?2:v<80?3:4];
   function wrap(g,text,x,y,maxW,lh,maxLines){ const w=String(text).split(" "); let line="",n=0; for(let i=0;i<w.length;i++){ const t=line?line+" "+w[i]:w[i]; if(g.measureText(t).width>maxW&&line){ g.fillText(line,x,y); y+=lh; line=w[i]; if(++n>=maxLines-1){ line=w.slice(i).join(" "); while(g.measureText(line+"…").width>maxW&&line.length>3) line=line.slice(0,-1); if(line!==w.slice(i).join(" ")) line+="…"; break; } } else line=t; } g.fillText(line,x,y); return y+lh; }
   function rr(g,x,y,w,h,r){ g.beginPath(); g.moveTo(x+r,y); g.arcTo(x+w,y,x+w,y+h,r); g.arcTo(x+w,y+h,x,y+h,r); g.arcTo(x,y+h,x,y,r); g.arcTo(x,y,x+w,y,r); g.closePath(); }
 
   async function planImage(s,r,di){
     try{ await document.fonts.ready; }catch(e){}
     const W=1080,H=1350, c=document.createElement("canvas"); c.width=W; c.height=H; const g=c.getContext("2d");
-    const ca=CA(), F=(w,sz)=>`${w} ${sz}px "Plus Jakarta Sans", Inter, system-ui, sans-serif`, B=(w,sz)=>`${w} ${sz}px Inter, system-ui, sans-serif`;
+    const ca=CA(), F=(w,sz)=>`${w} ${sz}px Bitter, Georgia, serif`, B=(w,sz)=>`${w} ${sz}px Figtree, system-ui, sans-serif`;
     // fondo
-    const bg=g.createLinearGradient(0,0,0,H); bg.addColorStop(0,"#0a1f18"); bg.addColorStop(1,"#04100c"); g.fillStyle=bg; g.fillRect(0,0,W,H);
-    const gl=g.createRadialGradient(880,180,20,880,180,620); gl.addColorStop(0,"rgba(34,211,238,.22)"); gl.addColorStop(1,"rgba(34,211,238,0)"); g.fillStyle=gl; g.fillRect(0,0,W,H);
-    const gl2=g.createRadialGradient(120,1250,20,120,1250,600); gl2.addColorStop(0,"rgba(52,211,153,.18)"); gl2.addColorStop(1,"rgba(52,211,153,0)"); g.fillStyle=gl2; g.fillRect(0,0,W,H);
+    const bg=g.createLinearGradient(0,0,0,H); bg.addColorStop(0,"#f6f6ec"); bg.addColorStop(1,"#e2e6d3"); g.fillStyle=bg; g.fillRect(0,0,W,H);
+    const gl=g.createRadialGradient(880,180,20,880,180,620); gl.addColorStop(0,"rgba(184,120,15,.16)"); gl.addColorStop(1,"rgba(184,120,15,0)"); g.fillStyle=gl; g.fillRect(0,0,W,H);
+    const gl2=g.createRadialGradient(120,1250,20,120,1250,600); gl2.addColorStop(0,"rgba(51,85,42,.14)"); gl2.addColorStop(1,"rgba(51,85,42,0)"); g.fillStyle=gl2; g.fillRect(0,0,W,H);
     // setas decorativas
     const [ic1,ic2,ic3]=await Promise.all([svgImg("cep"),svgImg("rov"),svgImg("ros")]);
     const deco=[[ic1,860,1040,190,-.12,1],[ic3,700,1120,120,.15,1],[ic2,960,1150,110,.2,1],[ic2,880,90,90,.25,.35],[ic3,1000,205,60,-.3,.3]];
     for(const [im,x,y,sz,rot,a] of deco){ if(!im) continue; g.save(); g.globalAlpha=a; g.translate(x,y); g.rotate(rot); g.drawImage(im,-sz/2,-sz/2,sz,sz); g.restore(); }
     // marca
-    g.fillStyle="#ef6a3f"; g.beginPath(); g.moveTo(80,124); g.bezierCurveTo(80,96,100,82,124,82); g.bezierCurveTo(148,82,168,96,168,124); g.lineTo(80,124); g.fill();
-    g.fillStyle="#3c5d4f"; rr(g,110,124,28,28,6); g.fill();
-    g.fillStyle="#e9f3ee"; g.font=F(800,44); g.fillText("Boletaire",186,132);
+    g.fillStyle="#b4481c"; g.beginPath(); g.moveTo(80,124); g.bezierCurveTo(80,96,100,82,124,82); g.bezierCurveTo(148,82,168,96,168,124); g.lineTo(80,124); g.fill();
+    g.fillStyle="#93a087"; rr(g,110,124,28,28,6); g.fill();
+    g.fillStyle="#1d281b"; g.font=F(800,44); g.fillText("Boletaire",186,132);
     // etiqueta
-    g.font=B(600,26); g.fillStyle="#7fe9c3"; g.fillText((ca?"PLA PER ANAR A BUSCAR BOLETS":"PLAN PARA IR A POR SETAS"),80,250);
+    g.font=B(600,26); g.fillStyle="#33552a"; g.fillText((ca?"PLA PER ANAR A BUSCAR BOLETS":"PLAN PARA IR A POR SETAS"),80,250);
     // zona
-    g.fillStyle="#f1f7f3"; g.font=F(800,84); let y=wrap(g,s.n,80,350,920,92,3);
-    g.font=B(500,32); g.fillStyle="#a9c7b9"; g.fillText(`${s.c} · ${s.alt} m`,80,y+4); y+=70;
+    g.fillStyle="#1d281b"; g.font=F(800,84); let y=wrap(g,s.n,80,350,920,92,3);
+    g.font=B(500,32); g.fillStyle="#56624c"; g.fillText(`${s.c} · ${s.alt} m`,80,y+4); y+=70;
     // día y nota
     const dname=(typeof fmtDay==="function"?fmtDay(r.d,di):r.d), dd=(typeof fmtDate==="function"?fmtDate(r.d):"");
-    rr(g,80,y,920,250,36); g.fillStyle="rgba(13,29,23,.75)"; g.fill(); g.strokeStyle="rgba(170,240,210,.18)"; g.lineWidth=2; g.stroke();
+    rr(g,80,y,920,250,36); g.fillStyle="rgba(251,251,245,.94)"; g.fill(); g.strokeStyle="#d0d5bf"; g.lineWidth=2; g.stroke();
     g.fillStyle=bandC(r.score); g.beginPath(); g.arc(205,y+125,92,0,Math.PI*2); g.fill();
-    g.fillStyle=r.score>=25&&r.score<65?"#1b1406":"#fff"; g.font=F(800,88); g.textAlign="center"; g.fillText(String(r.score),205,y+156); g.textAlign="left";
-    g.fillStyle="#f1f7f3"; g.font=F(800,50); g.fillText((dname.charAt(0).toUpperCase()+dname.slice(1))+" "+dd,330,y+100);
-    g.font=B(600,34); g.fillStyle="#7fe9c3"; g.fillText(T(LABEL[band(r.score)])+(ca?" per buscar bolets":" para buscar setas"),330,y+152);
-    g.font=B(400,30); g.fillStyle="#a9c7b9"; g.fillText(`${Math.round(r.lo)}–${Math.round(r.hi)} °C${r.rain>1?` · ${Math.round(r.rain)} mm`:""}`,330,y+198);
+    g.fillStyle=r.score<65?"#1b1406":"#fff"; g.font=F(800,88); g.textAlign="center"; g.fillText(String(r.score),205,y+156); g.textAlign="left";
+    g.fillStyle="#1d281b"; g.font=F(800,50); g.fillText((dname.charAt(0).toUpperCase()+dname.slice(1))+" "+dd,330,y+100);
+    g.font=B(600,34); g.fillStyle="#33552a"; g.fillText(T(LABEL[band(r.score)])+(ca?" per buscar bolets":" para buscar setas"),330,y+152);
+    g.font=B(400,30); g.fillStyle="#56624c"; g.fillText(`${Math.round(r.lo)}–${Math.round(r.hi)} °C${r.rain>1?` · ${Math.round(r.rain)} mm`:""}`,330,y+198);
     y+=300;
     // especies
     const sp=(r.sp||[]).slice(0,3).map(x=>SP[x.id]?.ca).filter(Boolean);
-    if(sp.length){ g.font=B(600,26); g.fillStyle="#8fb0a2"; g.fillText(ca?"QUÈ HI POT SORTIR":"QUÉ PUEDE SALIR",80,y); y+=50; g.font=F(700,40); g.fillStyle="#e9f3ee"; y=wrap(g,sp.join(" · "),80,y,900,50,2)+10; }
+    if(sp.length){ g.font=B(600,26); g.fillStyle="#56624c"; g.fillText(ca?"QUÈ HI POT SORTIR":"QUÉ PUEDE SALIR",80,y); y+=50; g.font=F(700,40); g.fillStyle="#1d281b"; y=wrap(g,sp.join(" · "),80,y,900,50,2)+10; }
     // aparcamiento
     let P=null; try{ P=mainPark(s,r); }catch(e){}
-    g.font=B(600,26); g.fillStyle="#8fb0a2"; g.fillText(ca?"QUEDEM A":"QUEDAMOS EN",80,y+10); y+=58;
-    g.font=F(700,36); g.fillStyle="#e9f3ee";
+    g.font=B(600,26); g.fillStyle="#56624c"; g.fillText(ca?"QUEDEM A":"QUEDAMOS EN",80,y+10); y+=58;
+    g.font=F(700,36); g.fillStyle="#1d281b";
     const startTxt=(typeof START!=="undefined"&&START[s.id])?START[s.id]:(P?(ca?"Aparcament de la zona":"Aparcamiento de la zona"):short(s));
     y=wrap(g,"🅿️ "+startTxt,80,y,620,46,2);
     // semana
     const all=RES[s.id]||[]; const n=Math.min(7,all.length), bx=80, by=H-200, bw=56, gap=18;
     for(let i=0;i<n;i++){ const v=all[i].score, h=Math.max(10,v*1.1); g.globalAlpha=i===di?1:.55; g.fillStyle=bandC(v); rr(g,bx+i*(bw+gap),by-h,bw,h,10); g.fill(); g.globalAlpha=1;
-      g.font=B(i===di?700:500,22); g.fillStyle=i===di?"#e9f3ee":"#8fa89c"; g.textAlign="center"; g.fillText((typeof fmtDay==="function"?fmtDay(all[i].d,i):"").slice(0,4),bx+i*(bw+gap)+bw/2,by+34); g.textAlign="left"; }
+      g.font=B(i===di?700:500,22); g.fillStyle=i===di?"#1d281b":"#56624c"; g.textAlign="center"; g.fillText((typeof fmtDay==="function"?fmtDay(all[i].d,i):"").slice(0,4),bx+i*(bw+gap)+bw/2,by+34); g.textAlign="left"; }
     // pie
     g.font=B(600,28); g.fillStyle="#5eead4"; g.fillText("boletscat.github.io",80,H-70);
     g.font=B(400,22); g.fillStyle="#6f8c80"; g.fillText(ca?"Previsió estimada. No mengis cap bolet que no coneguis.":"Previsión estimada. No comas ninguna seta que no conozcas.",80,H-34);
