@@ -1397,6 +1397,15 @@ body{background:transparent!important}
 @keyframes hshfloat{50%{transform:translate(-50%,calc(-100% - 12px)) rotate(calc(var(--r) - 5deg))}}
 @media (prefers-reduced-motion:reduce){.hero-shr .hshr{animation:none!important}}
 @media (max-width:860px){.hero-shr .hshr{scale:.6}.hero-shr .hshr:nth-child(-n+5){top:auto!important;bottom:-30px;opacity:.35}}
+
+/* Zonas táctiles ≥44px en pantallas táctiles (WCAG 2.5.8 / recomendación Apple y Google) */
+@media (pointer:coarse){
+  .chip,.chip.small,.btn.small{min-height:44px;display:inline-flex;align-items:center;justify-content:center}
+  .acct,header.top .acct{min-height:44px!important}
+  input:not([type=checkbox]):not([type=radio]),select{min-height:44px}
+  .langsel button{position:relative}
+  .langsel button::after{content:"";position:absolute;inset:-11px -2px}
+}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
