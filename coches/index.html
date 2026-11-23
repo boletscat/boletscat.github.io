@@ -1,0 +1,817 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="Diseña coches de todo tipo: dimensiones, silueta, mecánica y estilo, con plano acotado, ficha técnica estimada y notas del ingeniero.">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>Estudio Chasis</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: mesa de dibujo técnico — plano grande a la izquierda, panel de mandos a la derecha, ficha y garaje debajo */
+:root{
+  --paper:#edf1f4; --panel:#ffffff; --panel2:#f5f7f9; --ink:#15212c; --muted:#5a6b79; --line:#cdd6de;
+  --grid:rgba(29,95,168,.08); --grid2:rgba(29,95,168,.16);
+  --accent:#d9531e; --accent-ink:#ffffff; --dim:#1d5fa8;
+  --good:#1f8a4c; --warn:#a86a12; --bad:#c0392b; --glass:#2a3a4a; --shadow:rgba(10,20,30,.22);
+  --f-display:"Barlow Condensed","Arial Narrow",sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#0b1521; --panel:#111f2e; --panel2:#0e1a27; --ink:#e3ecf3; --muted:#8ea3b6; --line:#233a50;
+  --grid:rgba(108,180,255,.07); --grid2:rgba(108,180,255,.14);
+  --accent:#ff7a3d; --accent-ink:#1a0d05; --dim:#6cb4ff;
+  --good:#45c27a; --warn:#e0a54a; --bad:#ff6b5b; --glass:#1a2733; --shadow:rgba(0,0,0,.5); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#0b1521; --panel:#111f2e; --panel2:#0e1a27; --ink:#e3ecf3; --muted:#8ea3b6; --line:#233a50;
+  --grid:rgba(108,180,255,.07); --grid2:rgba(108,180,255,.14);
+  --accent:#ff7a3d; --accent-ink:#1a0d05; --dim:#6cb4ff;
+  --good:#45c27a; --warn:#e0a54a; --bad:#ff6b5b; --glass:#1a2733; --shadow:rgba(0,0,0,.5); color-scheme:dark}
+*{box-sizing:border-box}
+html,body{background:var(--paper);color:var(--ink)}
+body{font-family:var(--f-body);font-size:14px;line-height:1.45;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 40px}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.wrap{max-width:1380px;margin:0 auto}
+
+header.top{display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px;padding-block:18px 14px;border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:baseline;gap:10px}
+.brand h1{font-family:var(--f-display);font-weight:700;font-size:30px;letter-spacing:.02em;margin:0;text-transform:uppercase;line-height:1}
+.brand h1 b{color:var(--accent)}
+.brand span{font-family:var(--f-mono);font-size:11px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+.proj{display:flex;align-items:center;gap:8px;flex:1 1 240px;min-width:0}
+.proj label{font-family:var(--f-mono);font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;white-space:nowrap}
+.proj input{flex:1;min-width:0;background:transparent;border:none;border-bottom:1.5px dashed var(--line);font-family:var(--f-display);font-size:22px;font-weight:600;padding:2px 2px;letter-spacing:.02em}
+.proj input:focus{border-bottom-color:var(--accent);outline:none}
+.actions{display:flex;flex-wrap:wrap;gap:8px}
+.btn{border:1px solid var(--line);background:var(--panel);border-radius:6px;padding:8px 12px;cursor:pointer;font-weight:500;font-size:13px;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{border-color:var(--ink)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.primary:hover{filter:brightness(1.07)}
+.btn.small{padding:5px 9px;font-size:12px}
+.btn[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+
+.main{display:grid;grid-template-columns:minmax(0,1fr) 380px;grid-template-areas:"stage ctrl" "rest ctrl";gap:20px;margin-top:18px;align-items:start}
+.a-stage{grid-area:stage;min-width:0}.a-rest{grid-area:rest;min-width:0}.ctrl{grid-area:ctrl;align-self:start}
+.a-rest>.sub:first-child{margin-top:0}
+@media (max-width:960px){.main{grid-template-columns:minmax(0,1fr);grid-template-areas:"stage" "ctrl" "rest"}}
+@media (max-width:560px){.sheet-tag{display:none}}
+.front svg{max-height:230px}
+
+.stage{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.board{background-color:var(--panel2);background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px),linear-gradient(var(--grid2) 1px,transparent 1px),linear-gradient(90deg,var(--grid2) 1px,transparent 1px);background-size:16px 16px,16px 16px,80px 80px,80px 80px;position:relative}
+.board svg{display:block;width:100%;height:auto}
+.sheet-tag{position:absolute;left:12px;top:10px;font-family:var(--f-mono);font-size:11px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;pointer-events:none}
+.stage-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;padding:10px 12px;border-top:1px solid var(--line)}
+.stage-bar .left,.stage-bar .right{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.typechip{font-family:var(--f-mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em;padding:4px 8px;border-radius:4px;background:var(--ink);color:var(--paper)}
+
+.sub{display:grid;grid-template-columns:minmax(0,260px) minmax(0,1fr);gap:20px;margin-top:20px}
+@media (max-width:700px){.sub{grid-template-columns:minmax(0,1fr)}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px;min-width:0}
+.card h2{font-family:var(--f-display);font-size:18px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin:0 0 10px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.card h2 small{font-family:var(--f-mono);font-size:11px;font-weight:500;color:var(--muted);letter-spacing:.04em}
+.front svg{width:100%;height:auto;display:block}
+
+.notes{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.notes li{display:grid;grid-template-columns:10px 1fr;gap:10px;align-items:start;font-size:13.5px}
+.notes li::before{content:"";width:10px;height:10px;border-radius:50%;margin-top:5px;background:var(--good)}
+.notes li.warn::before{background:var(--warn)}
+.notes li.bad::before{background:var(--bad)}
+.pill{font-family:var(--f-mono);font-size:11px;padding:2px 8px;border-radius:99px;border:1px solid currentColor}
+.pill.ok{color:var(--good)} .pill.warn{color:var(--warn)} .pill.bad{color:var(--bad)}
+
+.spec{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:20px;margin-top:20px}
+@media (max-width:820px){.spec{grid-template-columns:minmax(0,1fr)}}
+.kv{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:0;margin:0;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.kv div{padding:10px 12px;min-width:0;border-right:1px solid var(--line);border-bottom:1px solid var(--line);margin:0 -1px -1px 0}
+.kv dt{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-family:var(--f-mono)}
+.kv dd{margin:2px 0 0;font-family:var(--f-display);font-size:24px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1.1}
+.kv dd small{font-family:var(--f-body);font-size:12px;font-weight:400;color:var(--muted);margin-left:3px}
+.bars{display:grid;gap:12px}
+.bar{display:grid;grid-template-columns:110px 1fr 34px;gap:10px;align-items:center}
+.bar span{font-size:13px}
+.bar .track{height:10px;background:var(--panel2);border:1px solid var(--line);border-radius:5px;overflow:hidden;position:relative}
+.bar .track i{position:absolute;inset:0 auto 0 0;background:var(--accent);border-radius:5px 0 0 5px;transition:width .25s ease}
+.bar b{font-family:var(--f-mono);font-size:13px;text-align:right;font-variant-numeric:tabular-nums}
+.disclaimer{font-size:12px;color:var(--muted);margin:12px 0 0}
+
+/* Panel de mandos */
+.ctrl{position:sticky;top:12px;background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+@media (max-width:960px){.ctrl{position:static}}
+.tabs{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--line)}
+.tabs button{background:none;border:none;padding:12px 4px;cursor:pointer;font-family:var(--f-display);font-weight:600;font-size:15px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);border-bottom:3px solid transparent}
+.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.pane{padding:14px 16px 18px;max-height:calc(100vh - 120px);overflow:auto}
+@media (max-width:960px){.pane{max-height:none}}
+.pane h3{font-family:var(--f-mono);font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin:16px 0 8px}
+.pane h3:first-child{margin-top:0}
+.types{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.types button{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:6px 6px 8px;cursor:pointer;text-align:left;display:grid;gap:2px;min-width:0}
+.types button:hover{border-color:var(--ink)}
+.types button[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.types svg{width:100%;height:44px;display:block}
+.types b{font-family:var(--f-display);font-weight:600;font-size:15px;letter-spacing:.02em}
+.types small{font-size:11px;color:var(--muted);line-height:1.3}
+.field{display:grid;gap:4px;margin-bottom:12px}
+.field .lab{display:flex;justify-content:space-between;gap:8px;font-size:13px}
+.field .lab output{font-family:var(--f-mono);font-size:12px;color:var(--dim);font-variant-numeric:tabular-nums}
+.field .hint{font-size:11.5px;color:var(--muted)}
+input[type=range]{width:100%;accent-color:var(--accent);margin:0}
+select{width:100%;padding:7px 8px;border:1px solid var(--line);border-radius:6px;background:var(--panel2)}
+.seg{display:flex;flex-wrap:wrap;gap:4px}
+.seg button{flex:1 1 auto;padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:var(--panel2);cursor:pointer;font-size:12.5px}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.swatches{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.swatches button{width:28px;height:28px;border-radius:50%;border:2px solid var(--panel);box-shadow:0 0 0 1px var(--line);cursor:pointer;padding:0}
+.swatches button[aria-pressed="true"]{box-shadow:0 0 0 2px var(--accent)}
+.swatches input[type=color]{width:34px;height:30px;border:1px solid var(--line);border-radius:6px;background:var(--panel2);padding:2px;cursor:pointer}
+.checks{display:grid;grid-template-columns:1fr 1fr;gap:6px 10px}
+.checks label{display:flex;gap:7px;align-items:center;font-size:13px;cursor:pointer}
+.checks input{accent-color:var(--accent)}
+.num{width:100%;padding:7px 8px;border:1px solid var(--line);border-radius:6px;background:var(--panel2);font-family:var(--f-mono)}
+
+/* Garaje */
+.garage{margin-top:28px}
+.garage-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:end;gap:10px;margin-bottom:12px}
+.garage-head h2{font-family:var(--f-display);font-size:26px;text-transform:uppercase;margin:0;letter-spacing:.03em}
+.garage-head p{margin:2px 0 0;color:var(--muted);font-size:13px}
+.cars{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.car{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 12px 12px;display:grid;gap:6px;min-width:0}
+.car svg{width:100%;height:80px;display:block}
+.car h4{margin:0;font-family:var(--f-display);font-size:18px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.car p{margin:0;font-family:var(--f-mono);font-size:11.5px;color:var(--muted)}
+.car .row{display:flex;gap:6px;flex-wrap:wrap}
+.empty{border:1.5px dashed var(--line);border-radius:10px;padding:22px;color:var(--muted);text-align:center}
+.io{margin-top:12px;display:none;gap:8px}
+.io.open{display:grid}
+.io textarea{width:100%;min-height:90px;font-family:var(--f-mono);font-size:12px;padding:8px;border:1px solid var(--line);border-radius:6px;background:var(--panel2);resize:vertical}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--paper);padding:9px 14px;border-radius:6px;font-size:13px;opacity:0;transition:.2s;pointer-events:none;z-index:20}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes road{to{stroke-dashoffset:-400}}
+.moving .wh{animation:spin .5s linear infinite}
+.moving .road{animation:road .35s linear infinite}
+@media (prefers-reduced-motion:reduce){.moving .wh,.moving .road{animation:none}}
+.wh{transform-box:fill-box;transform-origin:center}
+</style>
+
+<div class="wrap">
+<header class="top">
+  <div class="brand"><h1>Estudio <b>Chasis</b></h1><span>Diseño de vehículos</span></div>
+  <div class="proj"><label for="pname">Proyecto</label><input id="pname" maxlength="40" spellcheck="false"></div>
+  <div class="actions">
+    <button class="btn" id="rnd" type="button" title="Variación aleatoria del tipo actual">Variación</button>
+    <button class="btn" id="undo" type="button">Deshacer</button>
+    <button class="btn primary" id="save" type="button">Guardar en el garaje</button>
+  </div>
+</header>
+
+<div class="main">
+  <section class="a-stage">
+    <div class="stage">
+      <div class="board" id="board"><div class="sheet-tag" id="sheetTag">Alzado lateral · cotas en mm</div><div id="side"></div></div>
+      <div class="stage-bar">
+        <div class="left"><span class="typechip" id="typeChip">Berlina</span><span class="pill ok" id="notePill">Sin problemas</span></div>
+        <div class="right">
+          <button class="btn small" id="tDims" type="button" aria-pressed="true">Cotas</button>
+          <button class="btn small" id="tMove" type="button" aria-pressed="false">En marcha</button>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="a-rest">
+    <div class="sub">
+      <div class="card front"><h2>Vista frontal <small id="ssf"></small></h2><div id="frontView"></div></div>
+      <div class="card"><h2>Notas del ingeniero <small id="noteCount"></small></h2><ul class="notes" id="notes"></ul></div>
+    </div>
+
+    <div class="spec">
+      <div class="card"><h2>Ficha técnica <small>estimada</small></h2><dl class="kv" id="kv"></dl>
+        <p class="disclaimer">Cálculos físicos simplificados (aerodinámica, rodadura, tracción y ciclo mixto) para comparar diseños entre sí. No sustituyen una homologación.</p></div>
+      <div class="card"><h2>Perfil del diseño</h2><div class="bars" id="bars"></div></div>
+    </div>
+
+    <section class="garage">
+      <div class="garage-head">
+        <div><h2>Garaje</h2><p>Tus diseños guardados en este navegador. Pulsa uno para seguir editándolo.</p></div>
+        <div class="actions"><button class="btn small" id="ioBtn" type="button">Copiar o pegar código</button></div>
+      </div>
+      <div class="io" id="io">
+        <textarea id="ioText" spellcheck="false" aria-label="Código del diseño"></textarea>
+        <div class="actions"><button class="btn small" id="copyCode" type="button">Copiar el diseño actual</button><button class="btn small" id="loadCode" type="button">Cargar el código pegado</button></div>
+      </div>
+      <div class="cars" id="cars"></div>
+    </section>
+  </section>
+
+  <aside class="ctrl">
+    <div class="tabs" role="tablist">
+      <button role="tab" aria-selected="true" data-tab="tipo" type="button">Tipo</button>
+      <button role="tab" aria-selected="false" data-tab="carro" type="button">Carrocería</button>
+      <button role="tab" aria-selected="false" data-tab="meca" type="button">Mecánica</button>
+      <button role="tab" aria-selected="false" data-tab="estilo" type="button">Estilo</button>
+    </div>
+    <div class="pane" id="pane-tipo"></div>
+    <div class="pane" id="pane-carro" hidden></div>
+    <div class="pane" id="pane-meca" hidden></div>
+    <div class="pane" id="pane-estilo" hidden></div>
+  </aside>
+</div>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(function(){
+"use strict";
+const $=s=>document.querySelector(s);
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const f=n=>Math.round(n*10)/10;
+const DEG=Math.PI/180;
+const fmt=(n,d=0)=>n.toLocaleString('es-ES',{minimumFractionDigits:d,maximumFractionDigits:d});
+
+/* ---------- Tipos de vehículo ---------- */
+const BASE={name:'Proyecto 01',type:'berlina',length:4850,width:1850,height:1450,wheelbase:2850,frontBias:.44,clearance:140,wheel:680,hood:1150,ws:26,roof:1450,belt:.5,rear:'notch',doors:4,seats:5,
+ pt:'hybrid',power:150,battery:1.6,tank:50,drive:'FWD',material:'acero',color:'#1d4e89',finish:'metal',rim:'radios',rimColor:'#c9ced4',caliper:'#c8102e',spoiler:false,rack:false,stripe:false,tint:true,blackPillars:true};
+const PRESETS=[
+ {k:'urbano',n:'Urbano',d:'Pequeño, para ciudad',p:{length:3700,width:1700,height:1500,wheelbase:2450,frontBias:.5,clearance:140,wheel:600,hood:650,ws:30,roof:1250,belt:.5,rear:'hatch',doors:5,seats:4,pt:'gas',power:55,tank:35,drive:'FWD',color:'#f2b705'}},
+ {k:'compacto',n:'Compacto',d:'Hatchback familiar',p:{length:4300,width:1800,height:1450,wheelbase:2650,frontBias:.5,clearance:140,wheel:650,hood:950,ws:27,roof:1500,belt:.5,rear:'hatch',doors:5,seats:5,pt:'gas',power:96,tank:45,drive:'FWD',color:'#c8102e'}},
+ {k:'berlina',n:'Berlina',d:'Tres volúmenes',p:{}},
+ {k:'familiar',n:'Familiar',d:'Ranchera con gran maletero',p:{length:4800,width:1850,height:1500,wheelbase:2800,frontBias:.44,clearance:145,wheel:670,hood:1100,ws:27,roof:2050,belt:.5,rear:'wagon',doors:5,seats:5,pt:'diesel',power:110,tank:55,drive:'FWD',color:'#8a9199'}},
+ {k:'coupe',n:'Coupé',d:'Dos puertas, línea fluida',p:{length:4550,width:1870,height:1340,wheelbase:2720,frontBias:.42,clearance:125,wheel:690,hood:1300,ws:22,roof:1050,belt:.54,rear:'fastback',doors:2,seats:4,pt:'gas',power:240,tank:60,drive:'RWD',color:'#1b1f24',rim:'multi'}},
+ {k:'deportivo',n:'Superdeportivo',d:'Motor central, muy bajo',p:{length:4560,width:1980,height:1140,wheelbase:2680,frontBias:.42,clearance:100,wheel:700,hood:950,ws:19,roof:850,belt:.56,rear:'fastback',doors:2,seats:2,pt:'hybrid',power:600,battery:4,tank:70,drive:'AWD',material:'carbono',color:'#e86a1c',spoiler:true,rim:'malla',rimColor:'#2b2e33',caliper:'#f2b705',stripe:true}},
+ {k:'cabrio',n:'Descapotable',d:'Sin techo, dos plazas',p:{length:4250,width:1820,height:1280,wheelbase:2480,frontBias:.45,clearance:120,wheel:660,hood:1350,ws:26,roof:0,belt:.58,rear:'cabrio',doors:2,seats:2,pt:'gas',power:190,tank:50,drive:'RWD',color:'#c8102e',rimColor:'#c9ced4'}},
+ {k:'suv',n:'SUV',d:'Alto y versátil',p:{length:4700,width:1920,height:1700,wheelbase:2850,frontBias:.45,clearance:200,wheel:760,hood:1100,ws:30,roof:1950,belt:.52,rear:'wagon',doors:5,seats:5,pt:'hybrid',power:180,battery:14,tank:50,drive:'AWD',color:'#2f6b3a',rack:true}},
+ {k:'todoterreno',n:'Todoterreno',d:'Campo de verdad',p:{length:4600,width:1960,height:1920,wheelbase:2850,frontBias:.47,clearance:270,wheel:830,hood:1050,ws:42,roof:2150,belt:.5,rear:'wagon',doors:5,seats:5,pt:'diesel',power:150,tank:80,drive:'AWD',color:'#7a8a6a',rack:true,rim:'acero',rimColor:'#3a3d40',blackPillars:false}},
+ {k:'pickup',n:'Pickup',d:'Cabina y caja de carga',p:{length:5400,width:1950,height:1850,wheelbase:3300,frontBias:.4,clearance:240,wheel:800,hood:1300,ws:32,roof:1500,belt:.52,rear:'pickup',doors:4,seats:5,pt:'diesel',power:150,tank:80,drive:'AWD',color:'#f2f2ef',rim:'acero',rimColor:'#3a3d40'}},
+ {k:'monovolumen',n:'Monovolumen',d:'Siete plazas',p:{length:4850,width:1920,height:1760,wheelbase:3000,frontBias:.47,clearance:150,wheel:690,hood:650,ws:34,roof:2700,belt:.47,rear:'wagon',doors:5,seats:7,pt:'hybrid',power:140,battery:1.6,tank:55,drive:'FWD',color:'#8a9199'}},
+ {k:'furgoneta',n:'Furgoneta',d:'Reparto y carga',p:{length:5400,width:2000,height:2500,wheelbase:3450,frontBias:.47,clearance:170,wheel:690,hood:600,ws:42,roof:4300,belt:.38,rear:'van',doors:4,seats:3,pt:'diesel',power:120,tank:75,drive:'FWD',color:'#f2f2ef',rim:'acero',rimColor:'#8a9199',blackPillars:false,tint:false}},
+ {k:'limusina',n:'Limusina',d:'Batalla extralarga',p:{length:6200,width:1950,height:1480,wheelbase:4100,frontBias:.47,clearance:145,wheel:720,hood:1250,ws:26,roof:2800,belt:.52,rear:'notch',doors:4,seats:6,pt:'hybrid',power:300,battery:20,tank:80,drive:'AWD',color:'#1b1f24',rim:'multi'}},
+ {k:'micro',n:'Microcoche',d:'Eléctrico de dos plazas',p:{length:2600,width:1500,height:1550,wheelbase:1800,frontBias:.5,clearance:130,wheel:540,hood:300,ws:36,roof:1450,belt:.48,rear:'hatch',doors:2,seats:2,pt:'ev',power:15,battery:10,drive:'RWD',color:'#5b9bd5',rim:'aero',rimColor:'#f2f2ef'}},
+ {k:'monoplaza',n:'Monoplaza',d:'Carreras de rueda descubierta',p:{length:5600,width:2000,height:960,wheelbase:3600,frontBias:.33,clearance:30,wheel:720,hood:0,ws:20,roof:0,belt:.5,rear:'openwheel',doors:0,seats:1,pt:'hybrid',power:740,battery:4,tank:110,drive:'RWD',material:'carbono',color:'#c8102e',rim:'aero',rimColor:'#1b1f24',caliper:'#1b1f24'}},
+ {k:'camion',n:'Camión',d:'Rígido con caja',p:{length:8500,width:2500,height:3600,wheelbase:5000,frontBias:.32,clearance:280,wheel:1050,hood:0,ws:84,roof:1900,belt:.5,rear:'cargo',doors:2,seats:3,pt:'diesel',power:240,tank:300,drive:'RWD',color:'#1d4e89',rim:'acero',rimColor:'#c9ced4',blackPillars:false,tint:false}},
+ {k:'autobus',n:'Autobús',d:'Urbano eléctrico',p:{length:12000,width:2550,height:3250,wheelbase:6100,frontBias:.45,clearance:250,wheel:1000,hood:0,ws:84,roof:11800,belt:.33,rear:'van',doors:3,seats:40,pt:'ev',power:250,battery:400,drive:'RWD',color:'#c8102e',rim:'acero',rimColor:'#c9ced4',blackPillars:true}}
+];
+const TYPE_DEFAULTS={material:'acero',finish:'metal',rim:'radios',rimColor:'#c9ced4',caliper:'#c8102e',spoiler:false,rack:false,stripe:false,tint:true,blackPillars:true,battery:1.6,tank:50};
+function preset(k){const pr=PRESETS.find(x=>x.k===k)||PRESETS[2];return Object.assign({},BASE,TYPE_DEFAULTS,pr.p,{type:pr.k});}
+
+const REAR={fastback:'Fastback (caída continua)',notch:'Tres volúmenes',hatch:'Portón corto',wagon:'Familiar / SUV',van:'Caja (furgón, bus)',pickup:'Caja abierta (pickup)',cargo:'Cabina + caja (camión)',cabrio:'Descapotable',openwheel:'Rueda descubierta'};
+const PT={gas:'Gasolina',diesel:'Diésel',hybrid:'Híbrido',ev:'Eléctrico',h2:'Hidrógeno'};
+const COLORS=[['#c8102e','Rojo'],['#f2f2ef','Blanco'],['#1b1f24','Negro'],['#8a9199','Plata'],['#1d4e89','Azul'],['#5b9bd5','Celeste'],['#2f6b3a','Verde'],['#7a8a6a','Caqui'],['#f2b705','Amarillo'],['#e86a1c','Naranja'],['#5b3a8c','Morado'],['#6b4a2f','Bronce']];
+const RIMC=[['#c9ced4','Plata'],['#3a3d40','Grafito'],['#1b1f24','Negro'],['#c9a24a','Oro'],['#f2f2ef','Blanco']];
+const CALC=[['#c8102e','Rojo'],['#f2b705','Amarillo'],['#1d4e89','Azul'],['#1b1f24','Negro']];
+
+/* ---------- Geometría ---------- */
+function rpath(pts){
+  const P=[];for(const q of pts){const l=P[P.length-1];if(!l||Math.hypot(l[0]-q[0],l[1]-q[1])>1)P.push(q);}
+  const n=P.length;let d='';
+  for(let i=0;i<n;i++){
+    const [x,y,r=0]=P[i],pr=P[(i-1+n)%n],nx=P[(i+1)%n];
+    if(!r){d+=(i?'L':'M')+f(x)+' '+f(-y);continue;}
+    const d1=Math.hypot(pr[0]-x,pr[1]-y),d2=Math.hypot(nx[0]-x,nx[1]-y);
+    const rr=Math.min(r,d1/2,d2/2);
+    const a=[x+(pr[0]-x)*rr/d1,y+(pr[1]-y)*rr/d1],b=[x+(nx[0]-x)*rr/d2,y+(nx[1]-y)*rr/d2];
+    d+=(i?'L':'M')+f(a[0])+' '+f(-a[1])+'Q'+f(x)+' '+f(-y)+' '+f(b[0])+' '+f(-b[1]);
+  }
+  return d+'Z';
+}
+function crossX(seg,y){ // primer cruce de la polilínea con la cota y (bajando)
+  for(let i=0;i<seg.length-1;i++){const a=seg[i],b=seg[i+1];
+    if((a[1]-y)*(b[1]-y)<=0&&a[1]!==b[1]){return a[0]+(b[0]-a[0])*(y-a[1])/(b[1]-a[1]);}}
+  return seg[seg.length-1][0];
+}
+function geo(p){
+  const L=p.length,GC=p.clearance,R=p.wheel/2,WB=Math.min(p.wheelbase,L-100);
+  const fo=(L-WB)*p.frontBias, xf=fo, xr=fo+WB;
+  const g={L,GC,R,WB,fo,xf,xr,ro:L-xr,rear:p.rear};
+  if(p.rear==='openwheel'){g.T=p.height;g.belt=p.height*.5;g.A=[0,70];g.Z=[L,120];return g;}
+  const T=p.rear==='cargo'?Math.min(p.height,GC+(p.height-GC)*.82):p.height;
+  const belt=GC+(T-GC)*p.belt;
+  const noseH=GC+(belt-GC)*.78;
+  const hood=clamp(p.hood,0,L*.6);
+  const ws=clamp(p.ws,12,89)*DEG;
+  const rx=hood+(T-belt)/Math.tan(ws);
+  const minRear={fastback:500,notch:700,hatch:120,wagon:60,van:40,pickup:500,cargo:900,cabrio:0}[p.rear]||100;
+  let xe=Math.min(rx+p.roof,L-minRear); if(xe<rx+40)xe=Math.min(rx+40,L-10);
+  const bottom=[[L-20,GC+70,110],[L-160,GC,60],[160,GC,60],[0,GC+80,110]];
+  const front=hood>150?[[0,noseH,170],[Math.min(140,hood*.2+20),noseH+(belt-noseH)*.4,200],[hood,belt,70]]:[[0,belt,90],[hood,belt+1,40]];
+  let rearPts,deck=null,top;
+  const yW=belt+45;
+  if(p.rear==='fastback'){const dk=belt+(T-belt)*.14;rearPts=[[xe,T,Math.min(600,(L-xe)*.5)],[L-70,dk,90],[L,dk-170,70],[L,GC+130,110]];deck=[L-300,dk+(T-dk)*.12];}
+  else if(p.rear==='notch'){const dk=belt+(T-belt)*.2;const xw=Math.min(xe+(T-dk)/Math.tan(27*DEG),L-320);rearPts=[[xe,T,300],[xw,dk,90],[L-50,dk-15,90],[L,dk-220,70],[L,GC+130,110]];deck=[L-230,dk];}
+  else if(p.rear==='hatch'){rearPts=[[xe,T,200],[L-25,belt+(T-belt)*.42,140],[L,belt-70,90],[L,GC+130,110]];deck=[xe,T];}
+  else if(p.rear==='wagon'){rearPts=[[xe,T,170],[L-18,belt+(T-belt)*.58,130],[L,belt-80,90],[L,GC+130,110]];deck=[xe,T];}
+  else if(p.rear==='van'){rearPts=[[xe,T,220],[L,T-220,150],[L,GC+130,90]];}
+  else if(p.rear==='pickup'){const rail=belt+35;rearPts=[[xe,T,160],[xe+50,rail,40],[L-20,rail,30],[L,rail-60,40],[L,GC+130,90]];}
+  else if(p.rear==='cargo'){const fr=GC+320;rearPts=[[xe,T,150],[xe,fr,20],[L,fr,20]];}
+  else if(p.rear==='cabrio'){const dk=belt+(T-belt)*.06;rearPts=[[Math.max(hood+500,L*.62),belt+(T-belt)*.03,300],[L-60,dk,120],[L,dk-190,70],[L,GC+130,110]];deck=[L-260,dk];xe=hood;}
+  if(p.rear==='cabrio')top=[...front.slice(0,-1),[hood,belt,40],...rearPts];
+  else top=[...front,[rx,T,Math.min(320,(T-belt)*.55)],...rearPts];
+  const outline=(p.rear==='cargo')?[...top,[L,GC+150,30],[L-120,GC+120,20],[160,GC,60],[0,GC+80,110]]:[...top,...bottom];
+  Object.assign(g,{T,belt,noseH,hood,ws,rx,xe,yW,top,outline,rearPts,deck,A:[0,GC+80],Z:[L-20,p.rear==='cargo'?GC+120:GC+70]});
+  // cristales
+  if(p.rear!=='cabrio'){
+    const tin=60;
+    const x0=hood+(yW-belt)/Math.tan(ws)+75, x1=hood+(T-tin-belt)/Math.tan(ws)+75;
+    const rearSeg=[[xe,T],...rearPts.map(q=>[q[0],q[1]])];
+    let xb=crossX(rearSeg,yW)-90, xt=Math.min(xe-30,crossX(rearSeg,T-tin)-70);
+    if(p.rear==='cargo'||p.rear==='pickup'){xb=xe-80;xt=xe-80;}
+    if(xt<x1+40)xt=x1+40; if(xb<x0+60)xb=x0+60;
+    g.glass=[[x0,yW,50],[x1,T-tin,90],[xt,T-tin,110],[xb,yW,50]];
+    g.gx0=x0;g.gxb=xb;
+  }
+  return g;
+}
+
+/* ---------- Dibujo ---------- */
+let UID=0;
+function shade(hex,amt){let c=hex.replace('#','');if(c.length===3)c=c.split('').map(x=>x+x).join('');
+  let r=parseInt(c.slice(0,2),16),g=parseInt(c.slice(2,4),16),b=parseInt(c.slice(4,6),16);
+  const t=amt<0?0:255,a=Math.abs(amt);r=Math.round((t-r)*a+r);g=Math.round((t-g)*a+g);b=Math.round((t-b)*a+b);
+  return '#'+[r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('');}
+function lum(hex){const c=hex.replace('#','');const r=parseInt(c.slice(0,2),16),g=parseInt(c.slice(2,4),16),b=parseInt(c.slice(4,6),16);return (0.299*r+0.587*g+0.114*b)/255;}
+
+function wheelSVG(cx,R,p,thumb){
+  const rimR=R*(0.56+clamp((p.wheel-560)/2400,0,.1)), cy=-R;
+  let s=`<g><circle cx="${cx}" cy="${cy}" r="${R}" fill="#16181b"/>`;
+  if(!thumb)s+=`<circle cx="${cx}" cy="${cy}" r="${R*.9}" fill="none" stroke="#24272b" stroke-width="${R*.05}"/>`;
+  const rc=p.rimColor,dark='#202327';
+  if(!thumb&&p.rear!=='cargo'&&!['aero','acero'].includes(p.rim)){
+    s+=`<path d="M${f(cx+Math.cos(-150*DEG)*rimR*.78)} ${f(cy+Math.sin(-150*DEG)*rimR*.78)} A${rimR*.78} ${rimR*.78} 0 0 1 ${f(cx+Math.cos(-95*DEG)*rimR*.78)} ${f(cy+Math.sin(-95*DEG)*rimR*.78)}" stroke="${p.caliper}" stroke-width="${rimR*.2}" fill="none" stroke-linecap="round"/>`;
+  }
+  s+=`<g class="wh">`;
+  if(p.rim==='aero'){s+=`<circle cx="${cx}" cy="${cy}" r="${rimR}" fill="${rc}"/>`;if(!thumb)for(let i=0;i<5;i++){const a=i*72*DEG;s+=`<circle cx="${f(cx+Math.cos(a)*rimR*.62)}" cy="${f(cy+Math.sin(a)*rimR*.62)}" r="${f(rimR*.1)}" fill="${shade(rc,-.25)}"/>`;}}
+  else if(p.rim==='acero'){s+=`<circle cx="${cx}" cy="${cy}" r="${rimR}" fill="${rc}"/><circle cx="${cx}" cy="${cy}" r="${rimR*.8}" fill="${shade(rc,-.12)}"/>`;if(!thumb)for(let i=0;i<8;i++){const a=i*45*DEG;s+=`<circle cx="${f(cx+Math.cos(a)*rimR*.58)}" cy="${f(cy+Math.sin(a)*rimR*.58)}" r="${f(rimR*.09)}" fill="#16181b"/>`;}}
+  else{
+    s+=`<circle cx="${cx}" cy="${cy}" r="${rimR}" fill="${dark}"/><circle cx="${cx}" cy="${cy}" r="${rimR*.95}" fill="none" stroke="${rc}" stroke-width="${rimR*.1}"/>`;
+    const n=p.rim==='multi'?10:p.rim==='malla'?16:5, w=p.rim==='radios'?.24:p.rim==='multi'?.1:.06;
+    for(let i=0;i<n;i++){const a=(i*360/n-90)*DEG;s+=`<line x1="${cx}" y1="${cy}" x2="${f(cx+Math.cos(a)*rimR*.92)}" y2="${f(cy+Math.sin(a)*rimR*.92)}" stroke="${rc}" stroke-width="${f(rimR*w)}" stroke-linecap="round"/>`;}
+    if(p.rim==='malla')s+=`<circle cx="${cx}" cy="${cy}" r="${rimR*.55}" fill="none" stroke="${rc}" stroke-width="${rimR*.05}"/>`;
+  }
+  s+=`<circle cx="${cx}" cy="${cy}" r="${rimR*.18}" fill="${shade(rc,-.2)}"/></g></g>`;
+  return s;
+}
+
+function sideSVG(p,o={}){
+  const id='c'+(++UID), g=geo(p), L=p.length, R=g.R, thumb=!!o.thumb, dims=!!o.dims;
+  const body=p.color, hi=shade(body,.28), lo=shade(body,-.35);
+  const fs=Math.max(L,4200)*.022, top=Math.max(p.height,g.T||0)+(p.rear==='openwheel'?150:p.rack?160:80);
+  const padX=thumb?120:Math.max(L*.05,260), padR=thumb?120:Math.max(L*.11,560), padTop=thumb?60:Math.max(L*.06,320), padBot=thumb?40:(dims?Math.max(L*.17,880):200);
+  const vb=[-padX,-(top+padTop),L+padX+padR,top+padTop+padBot];
+  let s=`<svg viewBox="${vb.map(f).join(' ')}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Alzado lateral de ${esc(p.name)}">`;
+  const fin=p.finish;
+  s+=`<defs><linearGradient id="${id}p" x1="0" y1="0" x2="0" y2="1">`+
+     (fin==='mate'?`<stop offset="0" stop-color="${shade(body,.06)}"/><stop offset="1" stop-color="${shade(body,-.18)}"/>`:
+      fin==='metal'?`<stop offset="0" stop-color="${hi}"/><stop offset=".38" stop-color="${shade(body,.08)}"/><stop offset=".42" stop-color="${shade(body,-.08)}"/><stop offset="1" stop-color="${lo}"/>`:
+      `<stop offset="0" stop-color="${shade(body,.18)}"/><stop offset=".5" stop-color="${body}"/><stop offset="1" stop-color="${shade(body,-.25)}"/>`)+
+     `</linearGradient><linearGradient id="${id}g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${p.tint?'#2c3b4a':'#6f8aa0'}"/><stop offset=".55" stop-color="${p.tint?'#141c25':'#3d5266'}"/><stop offset=".56" stop-color="${p.tint?'#1d2833':'#4a6278'}"/><stop offset="1" stop-color="${p.tint?'#0d1319':'#2c3d4e'}"/></linearGradient>`;
+  if(p.rear!=='openwheel'){
+    s+=`<mask id="${id}m"><rect x="${vb[0]}" y="${vb[1]}" width="${vb[2]}" height="${vb[3]}" fill="#fff"/><circle cx="${g.xf}" cy="${-R}" r="${R+60}" fill="#000"/><circle cx="${g.xr}" cy="${-R}" r="${R+60}" fill="#000"/></mask>`;
+    s+=`<clipPath id="${id}k"><path d="${rpath(g.outline)}"/></clipPath>`;
+  }
+  s+=`</defs>`;
+  // suelo
+  s+=`<ellipse cx="${L/2}" cy="0" rx="${L*.55}" ry="${Math.max(40,L*.012)}" fill="var(--shadow)"/>`;
+  s+=`<line x1="${vb[0]}" y1="0" x2="${vb[0]+vb[2]}" y2="0" stroke="var(--muted)" stroke-width="${thumb?14:6}"/>`;
+  if(!thumb)s+=`<line class="road" x1="${vb[0]}" y1="${fs*.6}" x2="${vb[0]+vb[2]}" y2="${fs*.6}" stroke="var(--line)" stroke-width="10" stroke-dasharray="240 160"/>`;
+  if(p.rear==='openwheel')s+=openWheelBody(p,g,id,thumb);
+  else{
+    s+=`<circle cx="${g.xf}" cy="${-R}" r="${R+60}" fill="#0e1013"/><circle cx="${g.xr}" cy="${-R}" r="${R+60}" fill="#0e1013"/>`;
+    if(p.rear==='cargo'){ // chasis visible
+      s+=`<rect x="${g.xe-50}" y="${-(g.GC+330)}" width="${L-g.xe+20}" height="${180}" fill="#2a2d31"/>`;
+    }
+    s+=`<g mask="url(#${id}m)"><path d="${rpath(g.outline)}" fill="url(#${id}p)" stroke="${lo}" stroke-width="${thumb?14:8}"/>`;
+    if(!thumb){
+      s+=`<g clip-path="url(#${id}k)">`;
+      // faldón inferior y línea de carácter
+      s+=`<rect x="0" y="${-(g.GC+150)}" width="${L}" height="160" fill="${shade(body,-.45)}" opacity=".55"/>`;
+      s+=`<path d="M${L*.04} ${-(g.belt-70)} L${L*.97} ${-(g.belt-40)}" stroke="${hi}" stroke-width="16" opacity=".55" fill="none"/>`;
+      if(p.stripe){const c=lum(body)>.55?'#1b1f24':'#f2f2ef';s+=`<path d="M0 ${-(g.GC+300)} L${L} ${-(g.GC+300)}" stroke="${c}" stroke-width="60"/><path d="M0 ${-(g.GC+380)} L${L} ${-(g.GC+380)}" stroke="${c}" stroke-width="20"/>`;}
+      // puertas
+      if(p.rear!=='cargo')s+=doorsSVG(p,g,lo);
+      s+=`</g>`;
+    }
+    // cristales
+    if(g.glass){
+      s+=`<path d="${rpath(g.glass)}" fill="url(#${id}g)" stroke="${shade(body,-.55)}" stroke-width="${thumb?10:12}"/>`;
+      const splits=pillarSplits(p,g); const pc=p.blackPillars?'#15181c':shade(body,-.05);
+      for(const x of splits){s+=`<path d="M${f(x-45)} ${-(g.yW-5)} L${f(x+45)} ${-(g.yW-5)} L${f(x+10)} ${-(g.T-40)} L${f(x-80)} ${-(g.T-40)}Z" fill="${pc}"/>`;}
+    } else if(p.rear==='cabrio'){
+      const h=(g.T-g.belt)*.62, dx=h/Math.tan(g.ws);
+      s+=`<path d="M${g.hood+20} ${-g.belt} L${f(g.hood+20+dx)} ${-(g.belt+h)} L${f(g.hood+110+dx)} ${-(g.belt+h)} L${g.hood+110} ${-g.belt}Z" fill="url(#${id}g)" stroke="#15181c" stroke-width="18"/>`;
+      // reposacabezas y arco
+      const hx=g.hood+dx+700;
+      s+=`<path d="${rpath([[hx,g.belt,0],[hx+60,g.belt+(g.T-g.belt)*.72,90],[hx+260,g.belt+(g.T-g.belt)*.72,90],[hx+300,g.belt,0]])}" fill="#2a2d31"/>`;
+      if(!thumb)s+=`<path d="M${hx+300} ${-g.belt} L${hx+380} ${-(g.belt+(g.T-g.belt)*.55)} L${hx+520} ${-(g.belt+(g.T-g.belt)*.55)} L${hx+620} ${-g.belt}" stroke="#8a9199" stroke-width="40" fill="none" stroke-linejoin="round"/>`;
+    }
+    s+=`</g>`;
+    if(p.rear==='cargo'){const bx=g.xe+140,by=g.GC+360;s+=`<rect x="${bx}" y="${-p.height}" width="${L-bx}" height="${p.height-by}" rx="40" fill="${p.finish==='mate'?'#d8dcdf':'#e9ecef'}" stroke="#9aa3ab" stroke-width="10"/>`;
+      if(!thumb){for(let x=bx+400;x<L-100;x+=400)s+=`<line x1="${x}" y1="${-p.height+30}" x2="${x}" y2="${-by-30}" stroke="#c2c9cf" stroke-width="10"/>`;
+        s+=`<text x="${(bx+L)/2}" y="${-(p.height+by)/2+fs*.4}" text-anchor="middle" font-family="var(--f-display)" font-weight="700" font-size="${fs*2.6}" fill="${body}">${esc(p.name).toUpperCase().slice(0,18)}</text>`;}}
+    // luces
+    s+=lightsSVG(p,g,thumb);
+    // retrovisor, tirador, escape
+    if(!thumb&&p.rear!=='cabrio'){const mx=g.hood+(p.hood<150?60:120);s+=`<path d="${rpath([[mx,g.belt+20,20],[mx+40,g.belt+170,50],[mx+230,g.belt+150,50],[mx+190,g.belt+10,20]])}" fill="${p.blackPillars?'#15181c':shade(body,-.1)}"/>`;}
+    if(!thumb&&['gas','diesel','hybrid'].includes(p.pt))s+=`<rect x="${L-260}" y="${-(g.GC+30)}" width="200" height="60" rx="30" fill="#5d6166"/>`;
+    // alerón
+    if(p.spoiler&&g.deck){const[dx,dy]=g.deck;const h=p.rear==='hatch'||p.rear==='wagon'?0:170;
+      if(h)s+=`<path d="M${dx-80} ${-dy} L${dx-120} ${-(dy+h)} M${dx+120} ${-dy} L${dx+80} ${-(dy+h)}" stroke="#15181c" stroke-width="40"/><path d="M${dx-330} ${-(dy+h)} L${dx+260} ${-(dy+h+50)} L${dx+260} ${-(dy+h-10)} L${dx-320} ${-(dy+h-35)}Z" fill="#15181c"/>`;
+      else s+=`<path d="M${dx-250} ${-(dy-10)} L${dx+120} ${-(dy+15)} L${dx+150} ${-(dy-80)} L${dx-200} ${-(dy-60)}Z" fill="#15181c"/>`;}
+    // baca
+    if(p.rack&&p.rear!=='cabrio'){const x0=g.rx+200,x1=Math.max(x0+300,g.xe-150);s+=`<path d="M${x0} ${-(g.T+10)} L${x0} ${-(g.T+110)} L${x1} ${-(g.T+110)} L${x1} ${-(g.T+10)}" stroke="#2a2d31" stroke-width="40" fill="none" stroke-linejoin="round"/>`;}
+    s+=wheelSVG(g.xf,R,p,thumb)+wheelSVG(g.xr,R,p,thumb);
+    if(p.rear==='cargo'&&L-g.xr>R*2.4)s+=wheelSVG(g.xr+R*2.15,R,p,thumb);
+  }
+  if(p.rear==='openwheel')s+=wheelSVG(g.xf,R,p,thumb)+wheelSVG(g.xr,R,p,thumb);
+  if(dims)s+=dimsSVG(p,g,fs);
+  return s+`</svg>`;
+}
+function pillarSplits(p,g){
+  const a=g.gx0,b=g.gxb,len=b-a;if(len<300)return[];
+  if(p.rear==='van'&&p.length>7000){const n=Math.max(2,Math.round(len/1300));return Array.from({length:n-1},(_,i)=>a+len*(i+1)/n);}
+  if(p.rear==='van')return [a+Math.min(len*.3,1100)];
+  if(p.rear==='pickup'||p.rear==='cargo')return p.doors>=4?[a+len*.5]:[];
+  if(p.doors<=2)return [a+len*.66];
+  if(p.rear==='wagon'||p.rear==='hatch')return len>2200?[a+len*.36,a+len*.72]:[a+len*.45];
+  return [a+len*.45];
+}
+function doorsSVG(p,g,lo){
+  const xs=[g.xf+g.R+120];
+  const sp=g.glass?pillarSplits(p,g):[];
+  if(p.rear==='van'&&p.length>7000){ // puertas de bus
+    const n=Math.max(1,p.doors);let s='';for(let i=0;i<n;i++){const x=i===0?g.xf+g.R+200:(g.xf+g.xr)/2+(i-1)*1600;s+=`<rect x="${x}" y="${-(g.T-150)}" width="1100" height="${g.T-150-g.GC-60}" fill="#15181c" opacity=".7" rx="30"/><line x1="${x+550}" y1="${-(g.T-150)}" x2="${x+550}" y2="${-(g.GC+60)}" stroke="${lo}" stroke-width="14"/>`;}return s;}
+  if(p.doors>=2)xs.push(...sp.slice(0,1).map(x=>x+20));
+  if(p.doors>=4&&sp.length)xs.push(p.rear==='notch'||p.rear==='fastback'?Math.min(g.xr-g.R-80,g.gxb+20):Math.min(g.xr-g.R-80,(sp[1]||g.gxb)+20));
+  if(p.doors<2)return'';
+  let s='';const y0=g.GC+170,y1=g.yW-20;
+  for(const x of xs)s+=`<line x1="${f(x)}" y1="${-y0}" x2="${f(x-30)}" y2="${-y1}" stroke="${lo}" stroke-width="12"/>`;
+  for(let i=1;i<xs.length;i++)s+=`<rect x="${f(xs[i]-260)}" y="${-(g.yW-140)}" width="170" height="40" rx="20" fill="${lo}" opacity=".85"/>`;
+  return s;
+}
+function lightsSVG(p,g,thumb){
+  let s='';const L=p.length;
+  if(p.hood>150){const x2=Math.min(g.hood*.38,480);s+=`<path d="${rpath([[15,g.noseH-150,40],[x2,g.noseH+(g.belt-g.noseH)*.05,60],[x2-40,g.noseH-60,40],[25,g.noseH-30,30]])}" fill="#fff6d6" stroke="#15181c" stroke-width="12"/>`;}
+  else{s+=`<rect x="20" y="${-(g.GC+520)}" width="170" height="160" rx="30" fill="#fff6d6" stroke="#15181c" stroke-width="12"/>`;}
+  if(p.rear==='van'||p.rear==='cargo'){s+=`<rect x="${L-70}" y="${-(g.GC+900)}" width="70" height="380" rx="20" fill="#d4202b"/>`;}
+  else if(p.rear==='pickup'){s+=`<rect x="${L-60}" y="${-(g.belt-20)}" width="60" height="320" rx="20" fill="#d4202b"/>`;}
+  else{const yt=(p.rear==='notch'||p.rear==='fastback'||p.rear==='cabrio')?g.belt+(g.T-g.belt)*.1:g.belt+80;s+=`<path d="${rpath([[L-300,yt-30,30],[L,yt-50,30],[L,yt-200,30],[L-240,yt-160,40]])}" fill="#d4202b"/>`;}
+  return s;
+}
+function openWheelBody(p,g,id,thumb){
+  const L=p.length,H=p.height,sx=L/5600,sy=H/960,body=p.color,lo=shade(body,-.35);
+  const S=pts=>pts.map(([x,y,r])=>[x*sx,y*sy,r]);
+  let s='';
+  // pontones y fondo
+  s+=`<path d="${rpath(S([[1750,150,60],[2050,520,200],[3300,520,200],[4200,250,160],[4450,90,40],[1700,90,40]]))}" fill="${shade(body,-.25)}"/>`;
+  s+=`<path d="${rpath(S([[120,220,60],[900,380,400],[1750,560,250],[2200,600,60],[2500,700,100],[2850,955,160],[3300,930,260],[4300,560,400],[5050,470,100],[5150,320,60],[5050,160,60],[3800,120,150],[1800,150,200],[600,190,200]]))}" fill="url(#${id}p)" stroke="${lo}" stroke-width="10"/>`;
+  // casco y halo
+  s+=`<circle cx="${2620*sx}" cy="${-760*sy}" r="${125*sy}" fill="#f2f2ef" stroke="#15181c" stroke-width="10"/><rect x="${2620*sx}" y="${-790*sy}" width="${120*sx}" height="${50*sy}" fill="#15181c"/>`;
+  s+=`<path d="M${2150*sx} ${-610*sy} Q${2400*sx} ${-900*sy} ${2900*sx} ${-900*sy}" stroke="#2a2d31" stroke-width="${45*sy}" fill="none" stroke-linecap="round"/>`;
+  // alerones
+  s+=`<rect x="0" y="${-170*sy}" width="${820*sx}" height="${60*sy}" rx="20" fill="#15181c"/><rect x="${20*sx}" y="${-130*sy}" width="${720*sx}" height="${40*sy}" fill="${body}"/><rect x="${-10*sx}" y="${-360*sy}" width="${70*sx}" height="${290*sy}" rx="15" fill="#15181c"/>`;
+  s+=`<rect x="${(5600-640)*sx}" y="${-960*sy}" width="${600*sx}" height="${70*sy}" rx="20" fill="#15181c"/><rect x="${(5600-600)*sx}" y="${-870*sy}" width="${540*sx}" height="${50*sy}" fill="${body}"/><rect x="${(5600-90)*sx}" y="${-1000*sy}" width="${80*sx}" height="${720*sy}" rx="15" fill="#15181c"/><rect x="${(5600-420)*sx}" y="${-880*sy}" width="${40*sx}" height="${400*sy}" fill="#15181c"/>`;
+  if(!thumb&&p.stripe)s+=`<path d="M${900*sx} ${-330*sy} L${4800*sx} ${-420*sy}" stroke="#f2f2ef" stroke-width="${40*sy}"/>`;
+  return s;
+}
+function dimsSVG(p,g,fs){
+  const L=p.length,c='var(--dim)',sw=fs*.07,tk=fs*.45;
+  const tx=(x,y,t,a='middle',rot=0)=>`<text x="${f(x)}" y="${f(y)}" text-anchor="${a}" font-family="var(--f-mono)" font-size="${f(fs)}" fill="${c}"${rot?` transform="rotate(${rot} ${f(x)} ${f(y)})"`:''}>${t}</text>`;
+  const hline=(x1,x2,y,t)=>`<line x1="${x1}" y1="${y}" x2="${x2}" y2="${y}" stroke="${c}" stroke-width="${sw}"/><line x1="${x1}" y1="${y-tk}" x2="${x1}" y2="${y+tk}" stroke="${c}" stroke-width="${sw}"/><line x1="${x2}" y1="${y-tk}" x2="${x2}" y2="${y+tk}" stroke="${c}" stroke-width="${sw}"/>`+(x2-x1>fs*3.2?tx((x1+x2)/2,y-fs*.35,t):tx((x1+x2)/2,y+fs*1.2,t));
+  let s='';
+  const y1=fs*3.5,y2=fs*6.3;
+  s+=`<line x1="${g.xf}" y1="0" x2="${g.xf}" y2="${y1+tk}" stroke="${c}" stroke-width="${sw*.6}" stroke-dasharray="${fs*.3} ${fs*.3}"/><line x1="${g.xr}" y1="0" x2="${g.xr}" y2="${y1+tk}" stroke="${c}" stroke-width="${sw*.6}" stroke-dasharray="${fs*.3} ${fs*.3}"/>`;
+  s+=`<line x1="0" y1="${-g.GC}" x2="0" y2="${y2+tk}" stroke="${c}" stroke-width="${sw*.6}" stroke-dasharray="${fs*.3} ${fs*.3}"/><line x1="${L}" y1="${-g.GC}" x2="${L}" y2="${y2+tk}" stroke="${c}" stroke-width="${sw*.6}" stroke-dasharray="${fs*.3} ${fs*.3}"/>`;
+  s+=hline(0,g.xf,y1,fmt(g.fo))+hline(g.xf,g.xr,y1,'batalla '+fmt(g.WB))+hline(g.xr,L,y1,fmt(L-g.xr));
+  s+=hline(0,L,y2,'longitud '+fmt(L));
+  const H=p.height,xh=L+fs*2.2;
+  s+=`<line x1="${L}" y1="${-H}" x2="${xh+tk}" y2="${-H}" stroke="${c}" stroke-width="${sw*.6}" stroke-dasharray="${fs*.3} ${fs*.3}"/>`;
+  s+=`<line x1="${xh}" y1="0" x2="${xh}" y2="${-H}" stroke="${c}" stroke-width="${sw}"/><line x1="${xh-tk}" y1="0" x2="${xh+tk}" y2="0" stroke="${c}" stroke-width="${sw}"/><line x1="${xh-tk}" y1="${-H}" x2="${xh+tk}" y2="${-H}" stroke="${c}" stroke-width="${sw}"/>`;
+  s+=tx(xh+fs*1.1,-H/2,'altura '+fmt(H),'middle',-90);
+  // altura libre
+  const xg=(g.xf+g.xr)/2;
+  s+=`<line x1="${xg}" y1="0" x2="${xg}" y2="${-g.GC}" stroke="${c}" stroke-width="${sw}"/>`+tx(xg+fs*.4,-g.GC/2+fs*.35,'libre '+fmt(p.clearance),'start');
+  if(p.rear!=='openwheel'){
+    // ángulos de ataque y salida
+    const aa=Math.atan2(g.A[1],g.fo)/DEG,ad=Math.atan2(g.Z[1],L-g.xr-20)/DEG;
+    const ext=1.25;
+    s+=`<line x1="${g.xf}" y1="0" x2="${f(g.xf-(g.xf-g.A[0])*ext)}" y2="${f(-g.A[1]*ext)}" stroke="var(--accent)" stroke-width="${sw}" stroke-dasharray="${fs*.5} ${fs*.3}"/>`+`<text x="${f(g.xf/2)}" y="${f(fs*1.75)}" text-anchor="middle" font-family="var(--f-mono)" font-size="${f(fs*.85)}" fill="var(--accent)">${fmt(aa)}°</text>`;
+    s+=`<line x1="${g.xr}" y1="0" x2="${f(g.xr+(g.Z[0]-g.xr)*ext)}" y2="${f(-g.Z[1]*ext)}" stroke="var(--accent)" stroke-width="${sw}" stroke-dasharray="${fs*.5} ${fs*.3}"/>`+`<text x="${f((g.xr+L)/2)}" y="${f(fs*1.75)}" text-anchor="middle" font-family="var(--f-mono)" font-size="${f(fs*.85)}" fill="var(--accent)">${fmt(ad)}°</text>`;
+    // parabrisas
+    if(p.rear!=='cargo'||true){const ax=g.hood,ay=g.belt;s+=tx(ax-fs*.3,-(ay+fs*.4),fmt(p.ws)+'°','end');}
+  }
+  return s;
+}
+function frontSVG(p,st){
+  const W=p.width,H=p.height,GC=p.clearance,R=p.wheel/2,tw=st.tireW,tr=st.track;
+  const g=geo(p),body=p.color,lo=shade(body,-.35),fs=Math.max(W,H)*.06;
+  const vb=[-W*.62,-(H+fs*2.2),W*1.24,H+fs*4.2];
+  let s=`<svg viewBox="${vb.map(f).join(' ')}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Vista frontal">`;
+  s+=`<line x1="${vb[0]}" y1="0" x2="${vb[0]+vb[2]}" y2="0" stroke="var(--muted)" stroke-width="${fs*.08}"/>`;
+  // ruedas
+  for(const sx of[-1,1])s+=`<rect x="${f(sx*tr/2-tw/2)}" y="${-2*R}" width="${tw}" height="${2*R}" rx="${tw*.18}" fill="#16181b"/>`;
+  if(p.rear==='openwheel'){
+    s+=`<path d="${rpath([[-W*.17,40,30],[-W*.13,H*.6,80],[0,H*.78,120],[W*.13,H*.6,80],[W*.17,40,30]])}" fill="${body}" stroke="${lo}" stroke-width="10"/>`;
+    s+=`<rect x="${-W/2}" y="${-170}" width="${W}" height="70" fill="#15181c"/><rect x="${-W*.38}" y="${-H}" width="${W*.76}" height="60" fill="#15181c"/><circle cx="0" cy="${-H*.8}" r="${H*.12}" fill="#f2f2ef" stroke="#15181c" stroke-width="10"/>`;
+  } else {
+    const T=g.T,belt=g.belt,wb=W,wt=W*(p.rear==='van'||p.rear==='cargo'?.94:.76);
+    if(p.rear==='cargo')s+=`<rect x="${-W/2}" y="${-H}" width="${W}" height="${H-T+80}" rx="40" fill="#e9ecef" stroke="#9aa3ab" stroke-width="10"/>`;
+    s+=`<path d="${rpath([[-wb/2,GC+60,60],[-wb/2,belt,100],[-wt/2,T,p.rear==='cabrio'?0:200],[wt/2,T,p.rear==='cabrio'?0:200],[wb/2,belt,100],[wb/2,GC+60,60],[wb/2-80,GC,40],[-wb/2+80,GC,40]])}" fill="${body}" stroke="${lo}" stroke-width="${fs*.09}"/>`;
+    if(p.rear!=='cabrio'){const gb=wb*.92,gt=wt*.9;s+=`<path d="${rpath([[-gb/2,belt+60,40],[-gt/2,T-70,80],[gt/2,T-70,80],[gb/2,belt+60,40]])}" fill="${p.tint?'#1b2530':'#4a6278'}"/>`;}
+    else s+=`<path d="M${-wb*.42} ${-belt} L${-wt*.4} ${-(belt+(T-belt)*.6)} L${wt*.4} ${-(belt+(T-belt)*.6)} L${wb*.42} ${-belt}Z" fill="#1b2530" opacity=".85"/>`;
+    const lh=g.noseH-60;s+=`<rect x="${-wb/2+70}" y="${-lh-60}" width="${wb*.2}" height="110" rx="40" fill="#fff6d6" stroke="#15181c" stroke-width="10"/><rect x="${wb/2-70-wb*.2}" y="${-lh-60}" width="${wb*.2}" height="110" rx="40" fill="#fff6d6" stroke="#15181c" stroke-width="10"/>`;
+    s+=`<rect x="${-wb*.22}" y="${-(GC+(lh-GC)*.75)}" width="${wb*.44}" height="${(lh-GC)*.45}" rx="40" fill="#15181c" opacity=".85"/>`;
+    if(p.rear!=='cabrio')for(const sx of[-1,1])s+=`<rect x="${sx>0?wb/2-20:-wb/2-200+20}" y="${-(belt+160)}" width="200" height="110" rx="30" fill="${p.blackPillars?'#15181c':lo}"/>`;
+  }
+  // CdG
+  s+=`<circle cx="0" cy="${-st.cgH}" r="${fs*.35}" fill="var(--accent)"/><circle cx="0" cy="${-st.cgH}" r="${fs*.15}" fill="var(--panel)"/>`;
+  s+=`<text x="${fs*.6}" y="${-st.cgH+fs*.35}" font-family="var(--f-mono)" font-size="${fs}" fill="var(--accent)">CdG</text>`;
+  // cotas
+  const c='var(--dim)',y=fs*1.6;
+  s+=`<line x1="${-W/2}" y1="${y}" x2="${W/2}" y2="${y}" stroke="${c}" stroke-width="${fs*.07}"/><line x1="${-W/2}" y1="${y-fs*.4}" x2="${-W/2}" y2="${y+fs*.4}" stroke="${c}" stroke-width="${fs*.07}"/><line x1="${W/2}" y1="${y-fs*.4}" x2="${W/2}" y2="${y+fs*.4}" stroke="${c}" stroke-width="${fs*.07}"/>`;
+  s+=`<text x="0" y="${y-fs*.35}" text-anchor="middle" font-family="var(--f-mono)" font-size="${fs}" fill="${c}">anchura ${fmt(W)}</text>`;
+  return s+`</svg>`;
+}
+function esc(t){return String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+
+/* ---------- Física ---------- */
+function calc(p){
+  const g=geo(p), L=p.length/1000,W=p.width/1000,H=p.height/1000,GC=p.clearance/1000, ow=p.rear==='openwheel';
+  const mat={acero:1,aluminio:.82,carbono:.66}[p.material];
+  let vol=L*W*H, k=p.rear==='cargo'?68:p.rear==='van'&&p.length>7000?80:88;
+  let body=ow?600*mat:Math.max(380,vol*k*mat);
+  const P=p.power;
+  const ptm={gas:90+P*.55,diesel:130+P*.75,hybrid:140+P*.45+p.battery*8,ev:50+P*.22+p.battery*6.2,h2:220+P*.35}[p.pt];
+  let m=body+(ow?ptm*.45:ptm)+(p.drive==='AWD'?(p.pt==='ev'?40:65):0)+(p.pt==='ev'?0:(p.pt==='h2'?p.tank*12:p.tank*.4))+p.seats*(ow?0:10);
+  if(p.spoiler)m+=8;if(p.rack)m+=12;
+  m=Math.round(m);
+  const A=ow?1.45*(W/2):0.84*W*(H-GC*.5);
+  let cd={fastback:.27,notch:.29,hatch:.31,wagon:.32,van:.36,pickup:.42,cabrio:.35,cargo:.56,openwheel:.85}[p.rear];
+  if(!ow){cd+=(p.ws-28)*.0028+(p.clearance-140)*.00035+(p.wheel-650)*.00005;}
+  if(p.spoiler)cd+=.015;if(p.rack)cd+=.04;
+  cd=clamp(cd,.19,1.1);const CdA=cd*A, rho=1.2, gr=9.81, crr=ow?.015:p.length>7000?.008:.011;
+  const eta=p.pt==='ev'?.92:.88, Pw=P*1000*eta;
+  let lo=1,hi=200;for(let i=0;i<60;i++){const v=(lo+hi)/2;((.5*rho*CdA*v*v+crr*m*gr)*v>Pw)?hi=v:lo=v;}
+  let vmax=lo*3.6;
+  if(p.pt==='ev')vmax=Math.min(vmax,170+P*.18);
+  if(p.length>7000)vmax=Math.min(vmax,p.rear==='cargo'?90:100);
+  vmax=Math.min(vmax,ow?380:400);
+  const mu=ow?1.7:p.length>7000?.7:1.0, tf={FWD:.6,RWD:.62,AWD:1}[p.drive];
+  const Peff=Pw*(p.pt==='ev'?1:p.pt==='hybrid'?.86:p.pt==='h2'?.95:.76);
+  let v=0,t=0,tracLim=false;const target=Math.min(100,vmax*.98)/3.6;
+  while(v<target&&t<90){const Fm=Peff/Math.max(v,1),Ft=mu*m*gr*tf;if(Ft<Fm)tracLim=true;const F=Math.min(Fm,Ft)-.5*rho*CdA*v*v-crr*m*gr;if(F<=0){t=99;break;}v+=F/m*.01;t+=.01;}
+  t+=(p.pt==='ev'||p.pt==='h2')?.15:.4;
+  const t100=vmax<100?null:t;
+  // energía, ciclo mixto
+  const vc=ow?60:24, Fa=.5*rho*CdA*vc*vc+crr*m*gr, Fx=.012*m*gr;
+  let cons,unit,range,co2=0,eKwh;
+  if(p.pt==='ev'){const Jm=Fa+Fx*.35;const whkm=Jm/3.6/.86+15+p.seats*.4;cons=whkm/10;unit='kWh/100 km';range=p.battery*.92/cons*100;eKwh=cons;}
+  else if(p.pt==='h2'){const Jm=Fa+Fx*.45;cons=Jm/.5/120e6*1e5;unit='kg H₂/100 km';range=p.tank/cons*100;eKwh=cons*33.3;}
+  else{const ef=p.pt==='diesel'?.3:p.pt==='hybrid'?.3:.26,dens=p.pt==='diesel'?35.8e6:32e6;const Jm=Fa+Fx*(p.pt==='hybrid'?.5:1);cons=Jm/ef/dens*1e5;unit='l/100 km';range=p.tank/cons*100;co2=cons*(p.pt==='diesel'?26.4:23.1);eKwh=cons*(p.pt==='diesel'?9.9:8.9);}
+  // dimensiones derivadas
+  const R=p.wheel/2;
+  const tireW=clamp(p.wheel*.32,150,ow?400:420), track=p.width-tireW-(ow?-200:60);
+  const cgH=ow?p.height*.3:p.clearance+(p.height-p.clearance)*.3;
+  const ssf=track/(2*cgH);
+  const aa=ow?6:Math.atan2(g.A[1],g.fo)/DEG, ad=ow?6:Math.atan2(g.Z[1],p.length-g.xr-20)/DEG;
+  const bo=2*Math.atan(p.clearance/(g.WB/2))/DEG;
+  const turn=2*(g.WB/1000)/Math.sin(36*DEG)+W*.9;
+  const perRow=p.width>2300?4:p.width>1650?3:2;
+  const rows=p.seats<=2?1:1+Math.ceil((p.seats-2)/perRow);
+  const pitch=p.length>7000?780:850;
+  const cabin=ow?900:(p.rear==='cabrio'?Math.max(0,(g.hood?Math.max(p.hood+500,p.length*.62):0)-g.hood):(g.xe-g.hood));
+  const needCab=ow?900:rows*pitch+350;
+  let cargo=0;
+  if(!ow){
+    const beltM=g.belt/1000;
+    if(p.rear==='cargo'){cargo=(p.length-g.xe-140)/1000*(W-.1)*(H-(p.clearance+360)/1000)*1000;}
+    else if(p.rear==='pickup'){cargo=Math.max(0,(p.length-g.xe-120)/1000)*(W*.85)*Math.max(0,(g.belt+35-p.clearance-350)/1000)*1000;}
+    else if(p.rear==='van'){const behind=Math.max(0,g.xe-g.hood-rows*pitch-400)/1000;cargo=behind*(W-.15)*((g.T-p.clearance-250)/1000)*1000;}
+    else{const ro=Math.max(0,(p.length-g.xr)/1000-.22);cargo=ro*W*.75*Math.max(0,beltM-GC-.15)*.85*1000;
+      if(p.rear==='hatch')cargo+=30;
+      if(p.rear==='wagon')cargo+=Math.max(0,g.xe-g.hood-needCab+200)/1000*W*.85*((g.T-g.belt)/1000)*.8*1000*.12+60;
+      if(p.rear==='cabrio')cargo*=.6;}
+    cargo=Math.max(0,Math.round(cargo/10)*10);
+  }
+  let price=7000+vol*240+P*65+({ev:p.battery*115,hybrid:p.battery*150+2500,h2:26000,gas:0,diesel:1500}[p.pt])+(p.drive==='AWD'?2500:0);
+  price*=({acero:1,aluminio:1.12,carbono:1.6}[p.material]);if(p.material==='carbono')price+=25000;
+  if(ow)price=Math.max(price*6,250000);
+  if(p.length>7000)price=Math.max(price,p.pt==='ev'?380000:120000)*(p.rear==='cargo'?.4:1);
+  price=Math.round(price/500)*500;
+  return {g,m,A,cd,CdA,vmax,t100,tracLim,cons,unit,range,co2,eKwh,tireW,track,cgH,ssf,aa,ad,bo,turn,rows,cabin,needCab,cargo,price,pw:P/m*1000};
+}
+function scores(p,s){
+  const ow=p.rear==='openwheel';
+  const perf=s.t100==null?0:clamp(10-(s.t100-2.5)*.75,0,10);
+  const eAdj=s.eKwh/Math.max(1,p.seats/4.5);
+  const eff=clamp(10-(eAdj-12)/4,0,10);
+  const prac=ow?0:clamp(Math.min(p.seats,9)*.8+Math.min(s.cargo,4000)/220+(p.doors>=4?1:0),0,10);
+  const off=ow?0:clamp((p.clearance-100)/30+(s.aa-14)/5+(p.drive==='AWD'?2:0)+(p.wheel-600)/200,0,10);
+  const agil=clamp(10-(s.m-900)/450-Math.max(0,s.turn-10.2)*.9+s.pw/120,0,10);
+  const aero=clamp(10-(s.CdA-.48)*8,0,10);
+  return [['Prestaciones',perf],['Eficiencia',eff],['Practicidad',prac],['Todoterreno',off],['Agilidad',agil],['Aerodinámica',aero]];
+}
+function notes(p,s){
+  const n=[],g=s.g,ow=p.rear==='openwheel';
+  const L=p.length;
+  if(p.wheelbase>L-100)n.push(['bad','La batalla no cabe en la longitud. Alarga el coche o acorta la batalla.']);
+  if(g.fo<g.R+60)n.push(['bad',`El voladizo delantero (${fmt(g.fo)} mm) no deja sitio a la rueda delantera. Reduce el reparto delantero o la batalla.`]);
+  if(g.ro<g.R+60&&!ow)n.push(['bad',`El voladizo trasero (${fmt(g.ro)} mm) es más corto que la rueda trasera.`]);
+  if(!ow&&p.wheelbase/L<.5)n.push(['warn','Batalla corta para esta longitud: voladizos largos y más balanceo en curva.']);
+  if(!ow&&p.wheel>(g.belt-p.clearance)*1.25+p.clearance)n.push(['warn','Las ruedas son muy grandes para la altura de la carrocería.']);
+  if(!ow&&p.rear!=='cabrio'&&g.T-g.belt<300)n.push(['warn','Muy poca altura de ventanillas: los ocupantes no verán bien. Baja la línea de cintura.']);
+  if(s.needCab>s.cabin+50&&!ow)n.push(['bad',`El habitáculo mide ${fmt(s.cabin)} mm y ${p.seats} plazas en ${s.rows} filas necesitan unos ${fmt(s.needCab)} mm. Alarga el techo o quita plazas.`]);
+  if(!ow&&p.rear!=='cabrio'&&g.T-p.clearance<900&&p.seats>0)n.push(['warn','Altura interior muy justa: los ocupantes irán casi tumbados.']);
+  if(s.pw>300&&p.drive!=='AWD'&&!ow)n.push(['warn',`${fmt(s.pw)} kW por tonelada en dos ruedas motrices: patinará al acelerar. La tracción total aprovecharía mejor la potencia.`]);
+  else if(s.tracLim&&s.t100&&p.drive!=='AWD'&&s.pw>200)n.push(['warn','La aceleración está limitada por la tracción, no por el motor.']);
+  const heavy=p.length>7000||s.m>3500;
+  if(!ow&&s.ssf<(heavy?.6:.95))n.push(['bad',`Centro de gravedad alto para su vía (factor de estabilidad ${s.ssf.toFixed(2).replace('.',',')}): riesgo de vuelco. Ensancha o baja el vehículo.`]);
+  else if(!ow&&!heavy&&s.ssf<1.1)n.push(['warn',`Factor de estabilidad ${s.ssf.toFixed(2).replace('.',',')}: centro de gravedad algo alto. Los turismos suelen superar 1,2.`]);
+  if(p.clearance<100&&!ow)n.push(['warn','Altura libre muy baja: rozará en badenes y rampas de garaje.']);
+  if(s.aa<14&&!ow&&p.clearance>=180&&p.length<7000)n.push(['warn',`Ángulo de ataque de ${fmt(s.aa)}°: el voladizo delantero choca antes que la rueda en rampas. Acórtalo.`]);
+  if(p.type==='todoterreno'&&(p.clearance<220||p.drive!=='AWD'))n.push(['warn','Un todoterreno necesita al menos 220 mm de altura libre y tracción total.']);
+  if(p.pt==='ev'&&s.range<150)n.push(['warn',`Autonomía de ${fmt(s.range)} km: corta. Amplía la batería o mejora la aerodinámica.`]);
+  if(p.pt==='ev'&&s.range>1000)n.push(['warn','Batería enorme: pesa y encarece mucho. Probablemente sobre capacidad.']);
+  if(p.pt!=='ev'&&s.range<350&&!ow)n.push(['warn',`Autonomía de ${fmt(s.range)} km: el depósito se queda pequeño.`]);
+  if(s.cd>.4&&!['cargo','van','pickup','openwheel'].includes(p.rear)&&p.type!=='todoterreno')n.push(['warn',`Cx de ${s.cd.toFixed(2)}: aerodinámica mejorable. Inclina más el parabrisas o usa una zaga fastback.`]);
+  if(p.power/ (s.m/1000) < 40 && p.length<7000)n.push(['warn',`Solo ${fmt(p.power/(s.m/1000))} kW por tonelada: se quedará corto en autovía y adelantamientos.`]);
+  if(s.m>3500&&p.length<7000)n.push(['warn',`Pesa ${fmt(s.m)} kg: más de 3.500 kg exige carné C en Europa.`]);
+  if(p.width>2550)n.push(['bad','Más de 2.550 mm de ancho supera el máximo legal en carretera en la UE.']);
+  if(p.height>4000)n.push(['bad','Más de 4 m de alto no pasa bajo muchos puentes.']);
+  if(p.length>12000&&p.rear!=='cargo')n.push(['warn','Más de 12 m de longitud requiere autorización especial (o articulación).']);
+  if(p.seats>p.doors*15&&p.length>7000)n.push(['warn','Pocas puertas para tantas plazas: el embarque será lento.']);
+  if(!n.length)n.push(['ok','Diseño equilibrado: proporciones, peso y tracción son coherentes entre sí.']);
+  if(s.cd<.26&&!ow)n.push(['ok',`Muy aerodinámico (Cx ${s.cd.toFixed(2)}).`]);
+  return n;
+}
+
+/* ---------- Estado ---------- */
+let P;let history=[];let dimsOn=true,moving=false,tab='tipo';
+const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){return false}}};
+let garage=store.get('estudio-chasis.garaje',[]);
+P=Object.assign(preset('berlina'),store.get('estudio-chasis.actual',{}));
+try{const t=store.get('estudio-chasis.ui',{});if(t.tab)tab=t.tab;}catch(e){}
+
+function commit(snapshot=true){
+  if(snapshot){history.push(JSON.stringify(P));if(history.length>60)history.shift();}
+}
+let raf=0;function render(){cancelAnimationFrame(raf);raf=requestAnimationFrame(draw);}
+function draw(){
+  store.set('estudio-chasis.actual',P);
+  const s=calc(P);
+  $('#side').innerHTML=sideSVG(P,{dims:dimsOn});
+  $('#board').classList.toggle('moving',moving);
+  $('#frontView').innerHTML=frontSVG(P,s);
+  $('#ssf').textContent='vía '+fmt(s.track)+' mm';
+  const pr=PRESETS.find(x=>x.k===P.type);
+  $('#typeChip').textContent=pr?pr.n:'Personalizado';
+  $('#sheetTag').textContent=`Alzado lateral · ${REAR[P.rear]} · cotas en mm`;
+  if($('#pname').value!==P.name&&document.activeElement!==$('#pname'))$('#pname').value=P.name;
+  // ficha
+  const t=s.t100==null?'—':s.t100>60?'>60':s.t100.toFixed(1).replace('.',',');
+  const rows=[
+    ['Potencia',fmt(P.power),'kW · '+fmt(P.power*1.36)+' CV'],
+    ['Peso en vacío',fmt(s.m),'kg'],
+    ['0–100 km/h',t,s.t100==null?'no alcanza':'s'],
+    ['Velocidad máx.',fmt(s.vmax),'km/h'],
+    ['Consumo mixto',(P.pt==='h2'?s.cons.toFixed(2):s.cons.toFixed(1)).replace('.',','),s.unit],
+    ['Autonomía',fmt(s.range),'km'],
+    ['CO₂ al circular',fmt(s.co2),'g/km'],
+    ['Coef. aerodinámico',s.cd.toFixed(2).replace('.',','),'Cx · '+s.CdA.toFixed(2).replace('.',',')+' m²'],
+    ['Plazas',fmt(P.seats),s.rows+(s.rows>1?' filas':' fila')],
+    [P.rear==='cargo'||s.cargo>=2000?'Carga':'Maletero',s.cargo>=2000?fmt(s.cargo/1000,1):fmt(s.cargo),s.cargo>=2000?'m³':'litros'],
+    ['Diámetro de giro',s.turn.toFixed(1).replace('.',','),'m'],
+    ['Ataque / salida',P.rear==='openwheel'?'—':fmt(s.aa)+'° / '+fmt(s.ad)+'°',P.rear==='openwheel'?'':'ventral '+fmt(s.bo)+'°'],
+    ['Potencia/peso',fmt(s.pw),'kW/t'],
+    ['Precio orientativo',fmt(s.price),'€']
+  ];
+  $('#kv').innerHTML=rows.map(r=>`<div><dt>${r[0]}</dt><dd>${r[1]}<small>${r[2]}</small></dd></div>`).join('');
+  $('#bars').innerHTML=scores(P,s).map(([n,v])=>`<div class="bar"><span>${n}</span><div class="track"><i style="width:${v*10}%"></i></div><b>${v.toFixed(1).replace('.',',')}</b></div>`).join('');
+  const ns=notes(P,s);
+  $('#notes').innerHTML=ns.map(([c,t])=>`<li class="${c}">${t}</li>`).join('');
+  const nb=ns.filter(x=>x[0]==='bad').length,nw=ns.filter(x=>x[0]==='warn').length;
+  const pill=$('#notePill');pill.className='pill '+(nb?'bad':nw?'warn':'ok');
+  pill.textContent=nb?`${nb} ${nb>1?'problemas':'problema'}`+(nw?` · ${nw} ${nw>1?'avisos':'aviso'}`:''):nw?`${nw} ${nw>1?'avisos':'aviso'}`:'Sin problemas';
+  $('#noteCount').textContent=nb+nw?`${nb+nw} a revisar`:'todo en orden';
+  syncControls();
+}
+
+/* ---------- Controles ---------- */
+const SL={
+  length:['Longitud',2000,13000,10,'mm'],width:['Anchura',1300,2700,10,'mm'],height:['Altura',800,4200,10,'mm'],
+  wheelbase:['Batalla (entre ejes)',1500,7500,10,'mm'],frontBias:['Reparto de voladizos (delante)',.2,.8,.01,'%'],
+  clearance:['Altura libre al suelo',20,420,5,'mm'],wheel:['Diámetro de rueda',450,1200,5,'mm'],
+  hood:['Longitud del capó',0,2200,10,'mm'],ws:['Inclinación del parabrisas',12,88,1,'°'],
+  roof:['Longitud del techo / cabina',0,12000,10,'mm'],belt:['Línea de cintura',.3,.75,.01,'%'],
+  power:['Potencia',5,1200,1,'kW'],battery:['Batería',0,600,.1,'kWh'],tank:['Depósito',0,400,1,'l']
+};
+function slider(k,hint){const[l,mi,ma,st,u]=SL[k];return `<div class="field"><div class="lab"><label for="s-${k}">${l}</label><output id="o-${k}"></output></div><input type="range" id="s-${k}" data-k="${k}" min="${mi}" max="${ma}" step="${st}">${hint?`<div class="hint">${hint}</div>`:''}</div>`;}
+function seg(k,opts){return `<div class="seg" data-seg="${k}">${opts.map(([v,t])=>`<button type="button" data-v="${v}">${t}</button>`).join('')}</div>`;}
+function buildPanes(){
+  $('#pane-tipo').innerHTML=`<h3>Elige un punto de partida</h3><div class="types">${PRESETS.map(x=>`<button type="button" data-type="${x.k}" aria-pressed="false">${sideSVG(preset(x.k),{thumb:true})}<b>${x.n}</b><small>${x.d}</small></button>`).join('')}</div>`;
+  $('#pane-carro').innerHTML=`<h3>Dimensiones</h3>${slider('length')}${slider('width')}${slider('height')}${slider('wheelbase','Más batalla: más espacio interior y estabilidad, peor giro.')}${slider('frontBias')}${slider('clearance')}${slider('wheel')}
+    <h3>Silueta</h3><div class="field"><div class="lab"><label for="rear">Zaga</label></div><select id="rear">${Object.entries(REAR).map(([k,v])=>`<option value="${k}">${v}</option>`).join('')}</select></div>
+    ${slider('hood')}${slider('ws','Más tumbado: menos resistencia al aire, menos visibilidad.')}${slider('roof')}${slider('belt','Cintura alta: aspecto robusto, ventanillas pequeñas.')}
+    <h3>Habitáculo</h3><div class="field"><div class="lab"><span>Puertas</span></div>${seg('doors',[[0,'0'],[2,'2'],[3,'3'],[4,'4'],[5,'5']])}</div>
+    <div class="field"><div class="lab"><label for="seats">Plazas</label></div><input class="num" type="number" id="seats" min="1" max="90"></div>`;
+  $('#pane-meca').innerHTML=`<h3>Propulsión</h3>${seg('pt',Object.entries(PT))}
+    <div style="height:12px"></div>${slider('power')}<div id="w-battery">${slider('battery')}</div><div id="w-tank">${slider('tank')}</div>
+    <h3>Tracción</h3>${seg('drive',[['FWD','Delantera'],['RWD','Trasera'],['AWD','Total']])}
+    <h3>Material del chasis</h3>${seg('material',[['acero','Acero'],['aluminio','Aluminio'],['carbono','Fibra de carbono']])}
+    <p class="hint" style="font-size:12px;color:var(--muted);margin-top:14px">El aluminio ahorra un 18 % de peso de estructura y la fibra de carbono un 34 %, a cambio de un precio más alto.</p>`;
+  $('#pane-estilo').innerHTML=`<h3>Color de carrocería</h3><div class="swatches" data-sw="color">${COLORS.map(([c,n])=>`<button type="button" data-v="${c}" style="background:${c}" title="${n}" aria-label="${n}"></button>`).join('')}<input type="color" id="colorPick" aria-label="Color personalizado"></div>
+    <h3>Acabado</h3>${seg('finish',[['brillo','Brillo'],['metal','Metalizado'],['mate','Mate']])}
+    <h3>Llantas</h3>${seg('rim',[['radios','5 radios'],['multi','Multirradio'],['malla','Malla'],['aero','Aero'],['acero','Acero']])}
+    <div style="height:10px"></div><div class="swatches" data-sw="rimColor">${RIMC.map(([c,n])=>`<button type="button" data-v="${c}" style="background:${c}" title="${n}" aria-label="Llanta ${n}"></button>`).join('')}</div>
+    <h3>Pinzas de freno</h3><div class="swatches" data-sw="caliper">${CALC.map(([c,n])=>`<button type="button" data-v="${c}" style="background:${c}" title="${n}" aria-label="Pinzas ${n}"></button>`).join('')}</div>
+    <h3>Detalles</h3><div class="checks">
+      <label><input type="checkbox" data-c="spoiler">Alerón</label><label><input type="checkbox" data-c="rack">Barras de techo</label>
+      <label><input type="checkbox" data-c="stripe">Franjas laterales</label><label><input type="checkbox" data-c="tint">Lunas tintadas</label>
+      <label><input type="checkbox" data-c="blackPillars">Pilares negros</label></div>`;
+}
+function syncControls(){
+  document.querySelectorAll('input[type=range][data-k]').forEach(el=>{const k=el.dataset.k;if(document.activeElement!==el)el.value=P[k];
+    const u=SL[k][4];let v=P[k];$('#o-'+k).textContent=u==='%'?Math.round(v*100)+' %':u==='kW'?fmt(v)+' kW · '+fmt(v*1.36)+' CV':(k==='battery'?fmt(v,1):fmt(v))+' '+u;});
+  document.querySelectorAll('[data-seg]').forEach(el=>el.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v==String(P[el.dataset.seg])))));
+  document.querySelectorAll('[data-sw]').forEach(el=>el.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v.toLowerCase()===String(P[el.dataset.sw]).toLowerCase()))));
+  document.querySelectorAll('[data-c]').forEach(el=>el.checked=!!P[el.dataset.c]);
+  document.querySelectorAll('[data-type]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.type===P.type)));
+  const r=$('#rear');if(r&&document.activeElement!==r)r.value=P.rear;
+  const se=$('#seats');if(se&&document.activeElement!==se)se.value=P.seats;
+  const cp=$('#colorPick');if(cp)cp.value=P.color;
+  $('#w-battery').hidden=!['ev','hybrid'].includes(P.pt);$('#w-tank').hidden=P.pt==='ev';
+  const tk=$('#s-tank');if(tk){$('label[for=s-tank]').textContent=P.pt==='h2'?'Hidrógeno (kg)':'Depósito';}
+  if(P.pt==='h2')$('#o-tank').textContent=fmt(P.tank)+' kg';
+  $('label[for=s-battery]').textContent=P.pt==='hybrid'?'Batería (más de 8 kWh = enchufable)':'Batería';
+}
+function set(k,v,snap=true){if(snap)commit();P[k]=v;render();}
+
+function wire(){
+  document.addEventListener('pointerdown',e=>{if(e.target.matches('input[type=range]'))commit();});
+  document.addEventListener('keydown',e=>{if(e.target.matches('input[type=range]')&&!e.repeat)commit();});
+  document.addEventListener('input',e=>{const t=e.target;
+    if(t.dataset.k){P[t.dataset.k]=parseFloat(t.value);render();}
+    else if(t.id==='pname'){P.name=t.value||'Sin nombre';store.set('estudio-chasis.actual',P);}
+    else if(t.id==='colorPick'){P.color=t.value;render();}
+    else if(t.id==='seats'){const v=parseInt(t.value,10);if(v>0){P.seats=clamp(v,1,90);render();}}
+  });
+  document.addEventListener('change',e=>{const t=e.target;
+    if(t.id==='rear')set('rear',t.value);
+    if(t.dataset.c)set(t.dataset.c,t.checked);
+    if(t.id==='colorPick')commit();
+  });
+  document.addEventListener('click',e=>{
+    const b=e.target.closest('button');if(!b)return;
+    const sg=b.closest('[data-seg]');if(sg){const k=sg.dataset.seg;let v=b.dataset.v;if(k==='doors')v=+v;
+      if(k==='pt'){commit();P.pt=v;if(v==='ev'&&P.battery<20)P.battery=Math.round(clamp(P.length/50,30,120));if(v==='hybrid'&&P.battery>30)P.battery=1.6;if(v==='h2')P.tank=6;else if(P.tank<15&&v!=='ev')P.tank=50;render();return;}
+      set(k,v);return;}
+    const sw=b.closest('[data-sw]');if(sw){set(sw.dataset.sw,b.dataset.v);return;}
+    if(b.dataset.type){commit();const keep={name:P.name,color:P.color};P=Object.assign(preset(b.dataset.type),{name:keep.name});render();toast('Tipo cargado: '+b.querySelector('b').textContent);return;}
+    if(b.dataset.tab){tab=b.dataset.tab;showTab();return;}
+  });
+  $('#tDims').onclick=()=>{dimsOn=!dimsOn;$('#tDims').setAttribute('aria-pressed',dimsOn);render();};
+  $('#tMove').onclick=()=>{moving=!moving;$('#tMove').setAttribute('aria-pressed',moving);$('#board').classList.toggle('moving',moving);};
+  $('#undo').onclick=()=>{const h=history.pop();if(!h){toast('No hay nada que deshacer');return;}P=JSON.parse(h);render();};
+  $('#rnd').onclick=()=>{commit();const base=preset(P.type);const j=(v,a)=>v*(1+(Math.random()*2-1)*a);
+    Object.assign(P,{length:Math.round(j(base.length,.06)/10)*10,height:Math.round(j(base.height,.06)/10)*10,width:Math.round(j(base.width,.03)/10)*10,wheelbase:Math.round(j(base.wheelbase,.05)/10)*10,
+      hood:Math.round(j(base.hood,.15)/10)*10,ws:Math.round(clamp(j(base.ws,.15),12,88)),roof:Math.round(j(base.roof,.12)/10)*10,belt:+clamp(j(base.belt,.06),.3,.75).toFixed(2),
+      wheel:Math.round(j(base.wheel,.05)/5)*5,power:Math.round(j(base.power,.3)),color:COLORS[Math.floor(Math.random()*COLORS.length)][0],
+      rim:['radios','multi','malla','aero','acero'][Math.floor(Math.random()*5)],finish:['brillo','metal','mate'][Math.floor(Math.random()*3)],stripe:Math.random()<.25});
+    render();toast('Variación generada. Pulsa Deshacer para volver.');};
+  $('#save').onclick=()=>{const s=calc(P);const id=Date.now().toString(36);
+    const i=garage.findIndex(x=>x.p.name===P.name);const item={id:i>=0?garage[i].id:id,p:JSON.parse(JSON.stringify(P)),date:new Date().toISOString()};
+    if(i>=0)garage[i]=item;else garage.unshift(item);
+    const ok=store.set('estudio-chasis.garaje',garage);drawGarage();toast(i>=0?`«${P.name}» actualizado en el garaje`:`«${P.name}» guardado en el garaje`+(ok?'':' (solo durante esta sesión)'));};
+  $('#ioBtn').onclick=()=>{$('#io').classList.toggle('open');$('#ioText').value=JSON.stringify(P);};
+  $('#copyCode').onclick=()=>{const t=JSON.stringify(P);$('#ioText').value=t;
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(()=>toast('Código copiado'),()=>{$('#ioText').select();toast('Selecciona y copia el texto');});}else{$('#ioText').select();toast('Selecciona y copia el texto');}};
+  $('#loadCode').onclick=()=>{try{const o=JSON.parse($('#ioText').value);if(!o||typeof o!=='object'||!o.length)throw 0;commit();P=Object.assign(preset(o.type||'berlina'),sanitize(o));render();toast('Diseño cargado');}catch(e){toast('El código no es un diseño válido. Pega el texto completo copiado desde Estudio Chasis.');}};
+  $('#cars').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const id=b.closest('.car').dataset.id;const it=garage.find(x=>x.id===id);if(!it)return;
+    if(b.dataset.act==='load'){commit();P=Object.assign(preset(it.p.type),it.p);render();window.scrollTo({top:0,behavior:'smooth'});toast(`«${it.p.name}» cargado`);}
+    if(b.dataset.act==='del'){if(b.dataset.armed){garage=garage.filter(x=>x.id!==id);store.set('estudio-chasis.garaje',garage);drawGarage();toast('Diseño borrado');}else{b.dataset.armed='1';b.textContent='¿Borrar seguro?';setTimeout(()=>{if(b.isConnected){delete b.dataset.armed;b.textContent='Borrar';}},3000);}}
+  });
+}
+function sanitize(o){const out={};for(const k of Object.keys(BASE)){if(k in o&&typeof o[k]===typeof BASE[k])out[k]=o[k];}if(o.type)out.type=String(o.type);
+  for(const k in SL)if(k in out)out[k]=clamp(out[k],SL[k][1],SL[k][2]);if(!(out.rear in REAR))delete out.rear;if(!(out.pt in PT))delete out.pt;
+  for(const k of['color','rimColor','caliper'])if(out[k]&&!/^#[0-9a-f]{6}$/i.test(out[k]))delete out[k];return out;}
+function showTab(){document.querySelectorAll('.tabs button').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.tab===tab)));
+  ['tipo','carro','meca','estilo'].forEach(t=>$('#pane-'+t).hidden=t!==tab);store.set('estudio-chasis.ui',{tab});}
+function drawGarage(){
+  if(!garage.length){$('#cars').innerHTML=`<div class="empty">Aún no has guardado ningún diseño. Ajusta el coche y pulsa <b>Guardar en el garaje</b>: aparecerá aquí con su ficha resumida.</div>`;return;}
+  $('#cars').innerHTML=garage.map(it=>{const p=Object.assign(preset(it.p.type),it.p);const s=calc(p);const pr=PRESETS.find(x=>x.k===p.type);
+    return `<div class="car" data-id="${it.id}">${sideSVG(p,{thumb:true})}<h4>${esc(p.name)}</h4><p>${pr?pr.n:''} · ${PT[p.pt]} · ${fmt(p.power*1.36)} CV</p><p>${s.t100?s.t100.toFixed(1).replace('.',',')+' s 0–100':'—'} · ${fmt(s.vmax)} km/h · ${fmt(s.range)} km</p><div class="row"><button class="btn small" data-act="load" type="button">Abrir</button><button class="btn small" data-act="del" type="button">Borrar</button></div></div>`;}).join('');
+}
+let tt;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),2600);}
+
+buildPanes();wire();showTab();drawGarage();draw();
+})();
+</script>
+
+</body>
+</html>
